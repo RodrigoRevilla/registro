@@ -1,0 +1,371 @@
+@use '@angular/material' as mat;
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+html {
+  height: 100%;
+  @include mat.theme((
+    color: (
+      primary: mat.$azure-palette,
+      tertiary: mat.$blue-palette,
+    ),
+    density: 0,
+  ));
+}
+
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'Roboto', sans-serif;
+  color: var(--mat-sys-on-surface);
+  color-scheme: light;
+  background: linear-gradient(135deg, #8B1538 0%, #6A1230 50%, #5D0E29 100%);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  
+  &::before {
+    content: '';
+    position: fixed;
+    width: 200%;
+    height: 200%;
+    top: -50%;
+    left: -50%;
+    background: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 80px,
+      rgba(255,255,255,0.04) 80px,
+      rgba(255,255,255,0.04) 160px
+    );
+    animation: slidePattern 60s linear infinite;
+    z-index: 0;
+  }
+
+  &::after {
+    content: '';
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-image: 
+      radial-gradient(circle at 20% 80%, rgba(255,255,255,0.02) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(255,255,255,0.015) 0%, transparent 50%);
+    z-index: 0;
+  }
+}
+
+@keyframes slidePattern {
+  0% { 
+    transform: translate(0, 0); 
+  }
+  100% { 
+    transform: translate(113px, 113px); 
+  }
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--mat-sys-primary);
+  text-align: center;
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  position: relative;
+  display: inline-block;
+  padding-bottom: 0.5rem;
+}
+
+.title::after {
+  content: '';
+  display: block;
+  width: 80%;
+  margin: 0.5rem auto 0;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, var(--mat-sys-primary), transparent);
+  border-radius: 2px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.container {
+  max-width: 950px;
+  margin: 3rem auto;
+  padding: 3rem 2.5rem 4rem 2.5rem;
+  position: relative;
+  z-index: 1;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+  background: var(--mat-sys-surface);
+  background-image: linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)), url('assets/registro.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--mat-sys-primary), var(--mat-sys-tertiary));
+    border-radius: 20px 20px 0 0;
+  }
+}
+
+.mat-horizontal-stepper-header {
+  font-weight: 500;
+  color: var(--mat-sys-on-surface-variant);
+  padding: 1.5rem 1rem;
+}
+
+.mat-horizontal-stepper-line {
+  padding-top: 2rem;
+  border-color: var(--mat-sys-primary);
+}
+
+.mat-step-icon {
+  background-color: var(--mat-sys-primary);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.form-grid {
+  display: grid;
+  overflow: visible;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  padding: 1rem 0;
+}
+
+mat-form-field {
+  width: 100%;
+  min-height: 80px;
+}
+
+textarea {
+  resize: vertical;
+}
+
+mat-toolbar {
+  font-weight: 500;
+  font-size: 1.2rem;
+}
+
+mat-label {
+  font-size: 1rem;
+  top: 12px !important;
+  transform-origin: left top !important;
+  line-height: 1.2rem;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+  gap: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(0,0,0,0.08);
+}
+
+.actions-left, .actions-center, .actions-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.actions-left {
+  justify-content: flex-start;
+}
+
+.search-button-container {
+  display: flex;
+  justify-content: center;
+  margin: -1rem 0 1.5rem 0;
+  position: relative;
+  z-index: 1;
+
+  button {
+    padding: 0.9rem 2.5rem;
+    font-size: 1.05rem;
+    border-radius: 50px;
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+    background: linear-gradient(135deg, var(--mat-sys-tertiary), var(--mat-sys-primary));
+    color: white;
+    border: none;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    &:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    }
+  }
+}
+
+.actions-center {
+  justify-content: center;
+}
+
+.actions-right {
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+button {
+  border-radius: 12px;
+  padding: 0.75rem 1.8rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  }
+
+  &.mat-raised-button {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  }
+
+  &[color="warn"] {
+    &:hover {
+      box-shadow: 0 8px 20px rgba(244, 67, 54, 0.3);
+    }
+  }
+
+  &[color="primary"] {
+    &:hover {
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+  }
+}
+
+.fixed-search-btn {
+  position: fixed;
+  bottom: 30px;
+  left: 30px;
+  z-index: 1000;
+  border-radius: 50px;
+  padding: 0.8rem 1.5rem;
+  font-weight: 600;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  }
+}
+
+.app-footer {
+  text-align: center;
+  padding: 1.5rem 0;
+  background: var(--mat-sys-surface-variant);
+  color: var(--mat-sys-on-surface-variant);
+  margin-top: 3rem;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+  position: relative;
+  z-index: 1;
+}
+
+.confirm-text {
+  background: rgba(102, 126, 234, 0.08);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border-left: 4px solid var(--mat-sys-primary);
+  margin: 1rem 0 2rem 0;
+  font-size: 1.05rem;
+  color: var(--mat-sys-on-surface);
+  line-height: 1.6;
+}
+
+// Animación para los steps
+.mat-step-header {
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba(102, 126, 234, 0.05);
+  }
+}
+
+// Mejora visual para campos de formulario
+mat-form-field {
+  &.mat-focused {
+    .mat-form-field-outline-thick {
+      color: var(--mat-sys-primary);
+    }
+  }
+}
+
+// Asegurar que todo el contenido esté sobre el patrón
+app-root, .mat-app-background {
+  position: relative;
+  z-index: 1;
+}
+
+// Responsive
+@media (max-width: 768px) {
+  body {
+    &::before {
+      background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 50px,
+        rgba(255,255,255,0.04) 50px,
+        rgba(255,255,255,0.04) 100px
+      );
+    }
+  }
+
+  .container {
+    margin: 1.5rem;
+    padding: 2rem 1.5rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .actions {
+    flex-direction: column;
+    gap: 1rem;
+
+    .actions-left, .actions-center, .actions-right {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}
