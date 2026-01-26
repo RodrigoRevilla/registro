@@ -1,0 +1,15 @@
+<div *ngIf="acta; else noDatos">
+  <h2>Detalle del Acta</h2>
+  <p><strong>CURP:</strong> {{ actaId }}</p>
+  <p><strong>Nombre:</strong> {{ acta.nombre }} {{ acta.apellidoPaterno }} {{ acta.apellidoMaterno }}</p>
+  <p><strong>Fecha de nacimiento:</strong> {{ acta.fechaNacimiento }}</p>
+  <p><strong>Hora de nacimiento:</strong> {{ acta.horaNacimiento }}</p>
+  <p><strong>Sexo:</strong> {{ acta.sexo }}</p>
+  <p><strong>Entidad de nacimiento:</strong> {{ acta.entidadNacimiento }}</p>
+  <p><strong>Municipio de nacimiento:</strong> {{ acta.municipioNacimiento }}</p>
+  <p><strong>Localidad:</strong> {{ acta.localidad }}</p>
+</div>
+
+<ng-template #noDatos>
+  <p>No se encontraron datos para la CURP: {{ actaId }}</p>
+</ng-template>

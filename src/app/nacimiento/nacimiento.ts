@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -30,7 +31,7 @@ import { MatSelectModule } from '@angular/material/select';
 export class NacimientoComponent {
   nacimientoForm: FormGroup;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private router: Router) {
     this.nacimientoForm = this.fb.group({
       entidad: [''],
       municipio: [''],
@@ -55,5 +56,10 @@ export class NacimientoComponent {
 
   limpiarFormulario() {
     this.nacimientoForm.reset();
+  }
+
+  buscarActa() {
+    const curp = this.nacimientoForm.value.curp || 'TEST1234';
+    this.router.navigate(['/acta-detalle', curp]);
   }
 }
