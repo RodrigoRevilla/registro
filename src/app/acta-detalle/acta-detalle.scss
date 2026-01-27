@@ -1,0 +1,225 @@
+.acta-detalle-container {
+  max-width: 900px;
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    
+    h2 {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 0;
+      color: var(--mat-sys-primary);
+      
+      mat-icon {
+        font-size: 1.8rem;
+        width: 1.8rem;
+        height: 1.8rem;
+      }
+    }
+    
+    .close-button {
+      mat-icon {
+        color: var(--mat-sys-on-surface-variant);
+      }
+    }
+  }
+
+  .estado-chip {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    
+    .chip-activa {
+      background: #4caf50;
+      color: white;
+      font-weight: 600;
+      padding: 0.5rem 1rem;
+      
+      mat-icon {
+        margin-right: 0.3rem;
+      }
+    }
+  }
+}
+
+mat-dialog-content {
+  padding: 0 1.5rem;
+  max-height: 70vh;
+  overflow-y: auto;
+  
+  mat-divider {
+    margin: 1.5rem 0;
+  }
+}
+
+.info-section {
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border-radius: 12px;
+  
+  mat-card-header {
+    background: rgba(var(--mat-sys-primary-rgb), 0.05);
+    padding: 1rem 1.5rem;
+    border-radius: 12px 12px 0 0;
+    margin: -16px -16px 1rem -16px;
+    
+    mat-card-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--mat-sys-primary);
+      margin: 0;
+      
+      mat-icon {
+        font-size: 1.5rem;
+        width: 1.5rem;
+        height: 1.5rem;
+      }
+    }
+  }
+  
+  mat-card-content {
+    padding: 1rem 1.5rem;
+  }
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  
+  .info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    
+    &.highlight {
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, rgba(var(--mat-sys-primary-rgb), 0.08), rgba(var(--mat-sys-tertiary-rgb), 0.08));
+      padding: 1rem;
+      border-radius: 8px;
+      border-left: 4px solid var(--mat-sys-primary);
+    }
+
+    &.full-width {
+      grid-column: 1 / -1;
+    }
+    
+    label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--mat-sys-on-surface-variant);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    p {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 400;
+      color: var(--mat-sys-on-surface);
+      
+      &.nombre-completo {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--mat-sys-primary);
+      }
+      
+      &.curp {
+        font-family: 'Courier New', monospace;
+        font-weight: 600;
+        letter-spacing: 1px;
+        color: var(--mat-sys-secondary);
+      }
+      
+      &.acta-numero {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--mat-sys-tertiary);
+      }
+    }
+  }
+}
+
+.parent-section {
+  margin-bottom: 1.5rem;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+  
+  .parent-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--mat-sys-primary);
+    margin: 0 0 1rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid rgba(var(--mat-sys-primary-rgb), 0.2);
+    
+    mat-icon {
+      font-size: 1.3rem;
+      width: 1.3rem;
+      height: 1.3rem;
+    }
+  }
+}
+
+.parent-divider {
+  margin: 1.5rem 0 !important;
+  border-top-color: rgba(var(--mat-sys-primary-rgb), 0.15);
+}
+
+mat-dialog-actions {
+  padding: 1.5rem;
+  gap: 1rem;
+  
+  button {
+    mat-icon {
+      margin-right: 0.3rem;
+    }
+  }
+}
+.estado-vivo {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: #4caf50 !important;
+  font-weight: 600;
+  
+  mat-icon {
+    font-size: 1.2rem;
+    width: 1.2rem;
+    height: 1.2rem;
+    color: #4caf50;
+  }
+}
+
+.estado-finado {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: #757575 !important;
+  font-weight: 600;
+  
+  mat-icon {
+    font-size: 1.2rem;
+    width: 1.2rem;
+    height: 1.2rem;
+    color: #757575;
+  }
+}
+
+@media (max-width: 768px) {
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+}

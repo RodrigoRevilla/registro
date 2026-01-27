@@ -10,6 +10,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
+import { MatDialog } from '@angular/material/dialog';
+import { ActaDetalleComponent } from '../acta-detalle/acta-detalle';
 
 @Component({
   selector: 'app-nacimiento',
@@ -31,7 +33,11 @@ import { MatSelectModule } from '@angular/material/select';
 export class NacimientoComponent {
   nacimientoForm: FormGroup;
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(
+    private fb: FormBuilder, 
+    private router: Router,
+    private dialog: MatDialog
+  ) {
     this.nacimientoForm = this.fb.group({
       entidad: [''],
       municipio: [''],
@@ -59,7 +65,45 @@ export class NacimientoComponent {
   }
 
   buscarActa() {
-    const curp = this.nacimientoForm.value.curp || 'TEST1234';
-    this.router.navigate(['/acta-detalle', curp]);
+    const dialogRef = this.dialog.open(ActaDetalleComponent, {
+      width: '90%',
+      maxWidth: '1000px',
+      maxHeight: '90vh',
+      panelClass: 'acta-detalle-dialog',
+      disableClose: false,
+      autoFocus: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // Si el usuario presionó "Usar estos datos", rellenar el formulario
+        this.rellenarFormulario(result);
+      }
+    });
+  }
+
+  rellenarFormulario(datos: any): void {
+    this.nacimientoForm.patchValue({
+      entidad: datos.entidad,
+      municipio: datos.municipio,
+      oficialia: datos.oficialia,
+      distrito: datos.distrito,
+      anioRegistro: datos.anioRegistro,
+      curp: datos.curp,
+      entidadNacimiento: datos.entidadNacimiento,
+      municipioNacimiento: datos.municipioNacimiento,
+      localidad: datos.localidad,
+      fechaNacimiento: datos.fechaNacimiento,
+      horaNacimiento: datos.horaNacimiento,
+      nombre: datos.nombre,
+      apellidoPaterno: datos.apellidoPaterno,
+      apellidoMaterno: datos.apellidoMaterno,
+      sexo: datos.sexo,
+      nombrePadre: datos.nombrePadre,
+      nombreMadre: datos.nombreMadre
+    });
+
+    // Opcional: Mostrar un mensaje de éxito
+    console.log('Formulario rellenado con éxito');
   }
 }

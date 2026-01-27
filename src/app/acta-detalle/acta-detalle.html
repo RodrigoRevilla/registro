@@ -1,15 +1,236 @@
-<div *ngIf="acta; else noDatos">
-  <h2>Detalle del Acta</h2>
-  <p><strong>CURP:</strong> {{ actaId }}</p>
-  <p><strong>Nombre:</strong> {{ acta.nombre }} {{ acta.apellidoPaterno }} {{ acta.apellidoMaterno }}</p>
-  <p><strong>Fecha de nacimiento:</strong> {{ acta.fechaNacimiento }}</p>
-  <p><strong>Hora de nacimiento:</strong> {{ acta.horaNacimiento }}</p>
-  <p><strong>Sexo:</strong> {{ acta.sexo }}</p>
-  <p><strong>Entidad de nacimiento:</strong> {{ acta.entidadNacimiento }}</p>
-  <p><strong>Municipio de nacimiento:</strong> {{ acta.municipioNacimiento }}</p>
-  <p><strong>Localidad:</strong> {{ acta.localidad }}</p>
-</div>
+<div class="acta-detalle-container">
+  <div class="header">
+    <h2 mat-dialog-title>
+      <mat-icon>description</mat-icon>
+      Detalles del Acta de Nacimiento
+    </h2>
+    <button mat-icon-button (click)="cerrar()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
 
-<ng-template #noDatos>
-  <p>No se encontraron datos para la CURP: {{ actaId }}</p>
-</ng-template>
+  <mat-dialog-content>
+    <div class="estado-chip">
+      <mat-chip-set>
+        <mat-chip [highlighted]="true" class="chip-activa">
+          <mat-icon>check_circle</mat-icon>
+          {{ actaData.estado }}
+        </mat-chip>
+      </mat-chip-set>
+    </div>
+
+    <mat-card class="info-section">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>person</mat-icon>
+          Datos del Registrado
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="info-grid">
+          <div class="info-item highlight">
+            <label>Nombre Completo</label>
+            <p class="nombre-completo">{{ actaData.nombreCompleto }}</p>
+          </div>
+          
+          <div class="info-item">
+            <label>Nombre(s)</label>
+            <p>{{ actaData.nombre }}</p>
+          </div>
+          
+          <div class="info-item">
+            <label>Apellido Paterno</label>
+            <p>{{ actaData.apellidoPaterno }}</p>
+          </div>
+          
+          <div class="info-item">
+            <label>Apellido Materno</label>
+            <p>{{ actaData.apellidoMaterno }}</p>
+          </div>
+          
+          <div class="info-item">
+            <label>Sexo</label>
+            <p>{{ getSexoLabel(actaData.sexo) }}</p>
+          </div>
+          
+          <div class="info-item">
+        <label>Estado</label>
+        <p [class.estado-vivo]="actaData.estadoVital === 'Vivo'" 
+           [class.estado-finado]="actaData.estadoVital === 'Finado'">
+          <mat-icon>{{ actaData.estadoVital === 'Vivo' ? 'favorite' : 'heart_broken' }}</mat-icon>
+          {{ actaData.estadoVital }}
+        </p>
+      </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-divider></mat-divider>
+
+    <mat-card class="info-section">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>article</mat-icon>
+          Datos del Acta
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Número de Acta</label>
+            <p class="acta-numero">{{ actaData.numeroActa }}</p>
+          </div>
+          
+          <div class="info-item">
+            <label>Año de Registro</label>
+            <p>{{ actaData.anioRegistro }}</p>
+          </div>
+
+          <div class="info-item">
+            <label>Foja</label>
+            <p>{{ actaData.foja }}</p>
+          </div>
+          
+          <div class="info-item">
+            <label>CURP del Registrado</label>
+            <p class="curp">{{ actaData.curp }}</p>
+          </div>
+          
+          <div class="info-item">
+            <label>Entidad</label>
+            <p>{{ actaData.entidad }}</p>
+          </div>
+          
+          <div class="info-item">
+            <label>Municipio</label>
+            <p>{{ actaData.municipio }}</p>
+          </div>
+          
+          <div class="info-item">
+            <label>Oficialía</label>
+            <p>{{ actaData.oficialia }}</p>
+          </div>
+          
+          <div class="info-item">
+            <label>Distrito</label>
+            <p>{{ actaData.distrito }}</p>
+          </div>
+          
+          <div class="info-item">
+            <label>Fecha de Registro</label>
+            <p>{{ formatearFecha(actaData.fechaRegistro) }}</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-divider></mat-divider>
+
+    <mat-card class="info-section">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>cake</mat-icon>
+          Datos de Nacimiento
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Fecha de Nacimiento</label>
+            <p>{{ formatearFecha(actaData.fechaNacimiento) }}</p>
+          </div>
+          
+          <div class="info-item">
+            <label>Hora de Nacimiento</label>
+            <p>{{ actaData.horaNacimiento }} hrs</p>
+          </div>
+          
+          <div class="info-item">
+            <label>Entidad de Nacimiento</label>
+            <p>{{ actaData.entidadNacimiento }}</p>
+          </div>
+          
+          <div class="info-item">
+            <label>Municipio de Nacimiento</label>
+            <p>{{ actaData.municipioNacimiento }}</p>
+          </div>
+          
+          <div class="info-item">
+            <label>Localidad</label>
+            <p>{{ actaData.localidad }}</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-divider></mat-divider>
+
+    <mat-card class="info-section">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>family_restroom</mat-icon>
+          Datos de los Padres
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="parent-section">
+          <h3 class="parent-title">
+            <mat-icon>man</mat-icon>
+            Padre
+          </h3>
+          <div class="info-grid">
+            <div class="info-item full-width">
+              <label>Nombre del Padre</label>
+              <p>{{ actaData.nombrePadre }}</p>
+            </div>
+            
+            <div class="info-item">
+              <label>Edad al momento del registro</label>
+              <p>{{ actaData.edadPadre }} años</p>
+            </div>
+
+            <div class="info-item">
+              <label>Nacionalidad</label>
+              <p>{{ actaData.nacionalidadPadre }}</p>
+            </div>
+          </div>
+        </div>
+
+        <mat-divider class="parent-divider"></mat-divider>
+
+        <div class="parent-section">
+          <h3 class="parent-title">
+            <mat-icon>woman</mat-icon>
+            Madre
+          </h3>
+          <div class="info-grid">
+            <div class="info-item full-width">
+              <label>Nombre de la Madre</label>
+              <p>{{ actaData.nombreMadre }}</p>
+            </div>
+            
+            <div class="info-item">
+              <label>Edad al momento del registro</label>
+              <p>{{ actaData.edadMadre }} años</p>
+            </div>
+
+            <div class="info-item">
+              <label>Nacionalidad</label>
+              <p>{{ actaData.nacionalidadMadre }}</p>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="cerrar()">
+      Cancelar
+    </button>
+    <button mat-raised-button color="primary" (click)="usarDatos()">
+      <mat-icon>download</mat-icon>
+      Usar estos datos
+    </button>
+  </mat-dialog-actions>
+</div>

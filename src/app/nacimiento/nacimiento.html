@@ -1,34 +1,42 @@
-  <mat-card class="container">
+<mat-card class="container">
+  <div class="header-section">
     <mat-card-title class="title">
-      Solicitud de Certificación de Nacimiento
+      Solicitud de Certificación<br>de Nacimiento
     </mat-card-title>
+    <p class="subtitle">Complete el formulario para generar su certificado oficial</p>
+  </div>
 
-    <mat-divider></mat-divider>
+  <mat-divider></mat-divider>
+  <div class="search-section">
+    <button mat-raised-button color="accent" (click)="buscarActa()" class="search-button">
+      🔍 Buscar Acta Existente
+    </button>
+    <p class="search-hint">¿Ya cuenta con un registro? Encuéntrelo aquí</p>
+  </div>
 
-      <div class="serch-button-container">
-      <button mat-raised-button color="accent" (click)="buscarActa()">
-        Buscar Acta
-      </button>
-    </div>
+  <mat-horizontal-stepper linear #stepper class="custom-stepper">
+    <mat-step label="Datos del acta">
+      <div class="step-container">
+        <div class="step-header">
+          <h2 class="step-title">📋 Información del Acta</h2>
+          <p class="step-description">Ingrese los datos de registro del acta de nacimiento</p>
+        </div>
 
-    <mat-horizontal-stepper linear #stepper>
-
-      <mat-step label="Datos del acta">
-        <br>
         <form class="form-grid" [formGroup]="nacimientoForm">
           <mat-form-field appearance="outline">
             <mat-label>Entidad</mat-label>
-            <input matInput formControlName="entidad">
+            <input matInput formControlName="entidad" placeholder="Ej: Oaxaca">
+            <mat-hint>Estado donde se registró</mat-hint>
           </mat-form-field>
 
           <mat-form-field appearance="outline">
             <mat-label>Municipio</mat-label>
-            <input matInput formControlName="municipio">
+            <input matInput formControlName="municipio" placeholder="Ej: Oaxaca de Juárez">
           </mat-form-field>
 
           <mat-form-field appearance="outline">
             <mat-label>Oficialía</mat-label>
-            <input matInput formControlName="oficialia">
+            <input matInput formControlName="oficialia" placeholder="Número de oficialía">
           </mat-form-field>
 
           <mat-form-field appearance="outline">
@@ -38,31 +46,37 @@
 
           <mat-form-field appearance="outline">
             <mat-label>Año de registro</mat-label>
-            <input matInput type="number" formControlName="anioRegistro">
+            <input matInput type="number" formControlName="anioRegistro" placeholder="2024">
           </mat-form-field>
 
           <mat-form-field appearance="outline">
             <mat-label>CURP</mat-label>
-            <input matInput formControlName="curp">
+            <input matInput formControlName="curp" maxlength="18" style="text-transform: uppercase;">
+            <mat-hint>18 caracteres</mat-hint>
           </mat-form-field>
         </form>
 
         <div class="actions">
           <div class="actions-left">
-            <button mat-raised-button color="warn" (click)="limpiarFormulario()">
-              Limpiar Todo
+            <button mat-stroked-button color="warn" (click)="limpiarFormulario()">
+              🗑️ Limpiar Todo
             </button>
           </div>
           <div class="actions-right">
             <button mat-raised-button color="primary" matStepperNext>
-              Continuar
+              Continuar →
             </button>
           </div>
         </div>
-      </mat-step>
+      </div>
+    </mat-step>
+    <mat-step label="Datos de nacimiento">
+      <div class="step-container">
+        <div class="step-header">
+          <h2 class="step-title">🎂 Información de Nacimiento</h2>
+          <p class="step-description">Datos sobre el lugar y fecha del nacimiento</p>
+        </div>
 
-      <mat-step label="Datos de nacimiento">
-        <br>
         <form class="form-grid" [formGroup]="nacimientoForm">
           <mat-form-field appearance="outline">
             <mat-label>Entidad de nacimiento</mat-label>
@@ -87,29 +101,37 @@
           <mat-form-field appearance="outline">
             <mat-label>Hora de nacimiento</mat-label>
             <input matInput type="time" formControlName="horaNacimiento">
+            <mat-hint>Opcional</mat-hint>
           </mat-form-field>
         </form>
 
         <div class="actions">
           <div class="actions-left">
-            <button mat-raised-button color="warn" (click)="limpiarFormulario()">
-              Limpiar Todo
+            <button mat-stroked-button color="warn" (click)="limpiarFormulario()">
+              🗑️ Limpiar Todo
             </button>
           </div>
           <div class="actions-right">
-            <button mat-button matStepperPrevious>Regresar</button>
+            <button mat-button matStepperPrevious>
+              ← Regresar
+            </button>
             <button mat-raised-button color="primary" matStepperNext>
-              Continuar
+              Continuar →
             </button>
           </div>
         </div>
-      </mat-step>
+      </div>
+    </mat-step>
+    <mat-step label="Datos del registrado">
+      <div class="step-container">
+        <div class="step-header">
+          <h2 class="step-title">👤 Datos del Registrado</h2>
+          <p class="step-description">Información personal del recién nacido</p>
+        </div>
 
-      <mat-step label="Datos del registrado">
-        <br>
         <form class="form-grid" [formGroup]="nacimientoForm">
           <mat-form-field appearance="outline">
-            <mat-label>Nombre</mat-label>
+            <mat-label>Nombre(s)</mat-label>
             <input matInput formControlName="nombre">
           </mat-form-field>
 
@@ -132,59 +154,81 @@
             </mat-select>
           </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Nombre del padre</mat-label>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nombre completo del padre</mat-label>
             <input matInput formControlName="nombrePadre">
+            <mat-hint>Opcional</mat-hint>
           </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Nombre de la madre</mat-label>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nombre completo de la madre</mat-label>
             <input matInput formControlName="nombreMadre">
+            <mat-hint>Opcional</mat-hint>
           </mat-form-field>
         </form>
 
         <div class="actions">
           <div class="actions-left">
-            <button mat-raised-button color="warn" (click)="limpiarFormulario()">
-              Limpiar Todo
+            <button mat-stroked-button color="warn" (click)="limpiarFormulario()">
+              🗑️ Limpiar Todo
             </button>
           </div>
           <div class="actions-right">
-            <button mat-button matStepperPrevious>Regresar</button>
+            <button mat-button matStepperPrevious>
+              ← Regresar
+            </button>
             <button mat-raised-button color="primary" matStepperNext>
-              Continuar
+              Continuar →
             </button>
           </div>
         </div>
-      </mat-step>
+      </div>
+    </mat-step>
+    <mat-step label="Confirmación">
+      <div class="step-container">
+        <div class="step-header">
+          <h2 class="step-title">✅ Revisión y Confirmación</h2>
+        </div>
 
-      <mat-step label="Confirmación">
-        <p class="confirm-text">
-          Verifique cuidadosamente que los datos ingresados sean correctos antes
-          de generar el certificado.
-        </p>
+        <div class="confirmation-box">
+          <div class="confirmation-icon-wrapper">
+            <span class="confirmation-icon">✓</span>
+          </div>
+          <p class="confirm-text">
+            Verifique cuidadosamente que todos los datos ingresados sean correctos antes
+            de generar el certificado. Una vez emitido, no podrá ser modificado.
+          </p>
+        </div>
 
         <form [formGroup]="nacimientoForm">
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Observaciones</mat-label>
-            <textarea matInput rows="3" formControlName="observaciones"></textarea>
+            <mat-label>Observaciones adicionales</mat-label>
+            <textarea 
+              matInput 
+              rows="4" 
+              formControlName="observaciones"
+              placeholder="Escriba aquí cualquier nota o comentario adicional (opcional)..."></textarea>
+            <mat-hint>Máximo 500 caracteres</mat-hint>
           </mat-form-field>
         </form>
 
         <div class="actions">
           <div class="actions-left">
-            <button mat-raised-button color="warn" (click)="limpiarFormulario()">
-              Limpiar Todo
+            <button mat-stroked-button color="warn" (click)="limpiarFormulario()">
+              🗑️ Limpiar Todo
             </button>
           </div>
           <div class="actions-right">
-            <button mat-button matStepperPrevious>Regresar</button>
-            <button mat-raised-button color="primary">
-              Generar Acta
+            <button mat-button matStepperPrevious>
+              ← Regresar
+            </button>
+            <button mat-raised-button color="primary" class="generate-button">
+              📄 Generar Certificado
             </button>
           </div>
         </div>
-      </mat-step>
+      </div>
+    </mat-step>
 
-    </mat-horizontal-stepper>
-  </mat-card>
+  </mat-horizontal-stepper>
+</mat-card>

@@ -1,61 +1,123 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatChipsModule } from '@angular/material/chips';
+
+interface ActaData {
+  entidad: string;
+  municipio: string;
+  oficialia: string;
+  distrito: string;
+  anioRegistro: number;
+  numeroActa: string;
+  foja: string;
+  
+  entidadNacimiento: string;
+  municipioNacimiento: string;
+  localidad: string;
+  fechaNacimiento: string;
+  horaNacimiento: string;
+
+  nombre: string;
+  apellidoPaterno: string;
+  apellidoMaterno: string;
+  nombreCompleto: string;
+  sexo: string;
+  curp: string;
+  estadoVital: string;
+  
+  nombrePadre: string;
+  edadPadre: number;
+  nacionalidadPadre: string;
+  
+  nombreMadre: string;
+  edadMadre: number;
+  nacionalidadMadre: string;
+  
+  estado: string;
+  fechaRegistro: string;
+}
 
 @Component({
   selector: 'app-acta-detalle',
   standalone: true,
-  imports: [CommonModule],
-  templateUrl: './acta-detalle.component.html',
-  styleUrls: ['./acta-detalle.component.scss']
+  imports: [
+    CommonModule,
+    MatCardModule,
+    MatButtonModule,
+    MatIconModule,
+    MatDividerModule,
+    MatDialogModule,
+    MatChipsModule
+  ],
+  templateUrl: './acta-detalle.html',
+  styleUrl: './acta-detalle.scss'
 })
-export class ActaDetalleComponent implements OnInit {
-  actaId: string | null = null;
-
-  // Simulación de datos
-  acta: any = null;
-
-  constructor(private route: ActivatedRoute) {}
-
-ngOnInit() {
-  this.actaId = this.route.snapshot.paramMap.get('curp');
-
-  // Datos de prueba (ahora con Record<string, ...>)
-  const datosSimulados: Record<string, {
-    nombre: string;
-    apellidoPaterno: string;
-    apellidoMaterno: string;
-    fechaNacimiento: string;
-    horaNacimiento: string;
-    sexo: string;
-    entidadNacimiento: string;
-    municipioNacimiento: string;
-    localidad: string;
-  }> = {
-    TEST1234: {
-      nombre: 'Juan',
-      apellidoPaterno: 'Pérez',
-      apellidoMaterno: 'García',
-      fechaNacimiento: '2000-01-01',
-      horaNacimiento: '12:30',
-      sexo: 'M',
-      entidadNacimiento: 'CDMX',
-      municipioNacimiento: 'Coyoacán',
-      localidad: 'Del Carmen',
-    },
-    ABCD5678: {
-      nombre: 'María',
-      apellidoPaterno: 'López',
-      apellidoMaterno: 'Sánchez',
-      fechaNacimiento: '2010-05-20',
-      horaNacimiento: '08:15',
-      sexo: 'F',
-      entidadNacimiento: 'Jalisco',
-      municipioNacimiento: 'Guadalajara',
-      localidad: 'Chapalita',
-    }
+export class ActaDetalleComponent {
+  actaData: ActaData = {
+    entidad: 'Oaxaca',
+    municipio: 'Oaxaca de Juárez',
+    oficialia: '01',
+    distrito: 'Centro',
+    anioRegistro: 1995,
+    numeroActa: '00234',
+    foja: '145',
+    
+    entidadNacimiento: 'Oaxaca',
+    municipioNacimiento: 'Oaxaca de Juárez',
+    localidad: 'Centro',
+    fechaNacimiento: '1995-03-15',
+    horaNacimiento: '08:30',
+    
+    nombre: 'María Guadalupe',
+    apellidoPaterno: 'López',
+    apellidoMaterno: 'García',
+    nombreCompleto: 'María Guadalupe López García',
+    sexo: 'F',
+    curp: 'LOGM950315MOCDRS09',
+    estadoVital: 'Vivo',
+    
+    nombrePadre: 'José Antonio López Martínez',
+    edadPadre: 32,
+    nacionalidadPadre: 'Mexicana',
+    
+    nombreMadre: 'Ana María García Hernández',
+    edadMadre: 28,
+    nacionalidadMadre: 'Mexicana',
+    
+    estado: 'Activa',
+    fechaRegistro: '1995-03-20'
   };
 
-  this.acta = this.actaId ? datosSimulados[this.actaId] || null : null;
-}
+  constructor(public dialogRef: MatDialogRef<ActaDetalleComponent>) {}
+
+  cerrar(): void {
+    this.dialogRef.close();
+  }
+
+  usarDatos(): void {
+    this.dialogRef.close(this.actaData);
+  }
+
+  getSexoLabel(sexo: string): string {
+    switch(sexo) {
+      case 'M': return 'Masculino';
+      case 'F': return 'Femenino';
+      case 'N': return 'No especificado';
+      default: return sexo;
+    }
+  }
+
+  formatearFecha(fecha: string): string {
+    const date = new Date(fecha);
+    return date.toLocaleDateString('es-MX', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+  }
 }
