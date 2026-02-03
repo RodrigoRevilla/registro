@@ -66,9 +66,9 @@ export class NacimientoComponent {
 
   buscarActa() {
     const dialogRef = this.dialog.open(ActaDetalleComponent, {
-      width: '90%',
-      maxWidth: '1000px',
-      maxHeight: '90vh',
+      width: '95vw',
+      height: '90vh',
+      maxWidth: '1400px',
       panelClass: 'acta-detalle-dialog',
       disableClose: false,
       autoFocus: true
@@ -76,7 +76,6 @@ export class NacimientoComponent {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // Si el usuario presionó "Usar estos datos", rellenar el formulario
         this.rellenarFormulario(result);
       }
     });
@@ -102,8 +101,6 @@ export class NacimientoComponent {
       nombrePadre: datos.nombrePadre,
       nombreMadre: datos.nombreMadre
     });
-
-    // Opcional: Mostrar un mensaje de éxito
     console.log('Formulario rellenado con éxito');
   }
 }
