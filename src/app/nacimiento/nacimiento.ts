@@ -5,12 +5,12 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
-import { MatStepperModule } from '@angular/material/stepper';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDialog } from '@angular/material/dialog';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { ActaDetalleComponent } from '../acta-detalle/acta-detalle';
 
 @Component({
@@ -21,11 +21,11 @@ import { ActaDetalleComponent } from '../acta-detalle/acta-detalle';
     ReactiveFormsModule,
     MatCardModule,
     MatDividerModule,
-    MatStepperModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatSelectModule
+    MatSelectModule,
+    MatExpansionModule
   ],
   templateUrl: './nacimiento.html',
   styleUrls: ['./nacimiento.scss']
@@ -54,9 +54,13 @@ export class NacimientoComponent {
       apellidoPaterno: [''],
       apellidoMaterno: [''],
       sexo: [''],
+      libro: [''],
+      status: [''],
+      distritoNacimiento: [''],
       nombrePadre: [''],
+      edadPadre: [''],
       nombreMadre: [''],
-      observaciones: ['']
+      edadMadre: ['']
     });
   }
 
@@ -98,8 +102,12 @@ export class NacimientoComponent {
       apellidoPaterno: datos.apellidoPaterno,
       apellidoMaterno: datos.apellidoMaterno,
       sexo: datos.sexo,
+      libro: datos.libro,
+      status: datos.status,
       nombrePadre: datos.nombrePadre,
-      nombreMadre: datos.nombreMadre
+      edadPadre: datos.edadPadre,
+      nombreMadre: datos.nombreMadre,
+      edadMadre: datos.edadMadre
     });
     console.log('Formulario rellenado con éxito');
   }
