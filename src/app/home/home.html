@@ -13,7 +13,6 @@
     <div class="cards-grid">
       <mat-card
         class="service-card"
-        tabindex="0"
         (click)="navegarA('/buscadores')"
       >
         <div class="card-icon">🔍</div>
@@ -42,7 +41,10 @@
               Trabajo
             </mat-chip>
 
-            <mat-chip class="action-chip warn">
+            <mat-chip 
+              class="action-chip warn"
+              (click)="irABusqueda($event)"
+            >
               <mat-icon>search</mat-icon>
               En búsqueda
             </mat-chip>

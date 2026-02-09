@@ -1,0 +1,126 @@
+<mat-card class="container">
+  <div class="header-section">
+    <mat-card-title class="title">🔍 Búsqueda de Pagos</mat-card-title>
+    <p class="subtitle">Consulte los pagos registrados por fecha</p>
+  </div>
+
+  <div class="home-button-container">
+    <button mat-stroked-button color="primary" (click)="goHome()">
+      🏠 Home
+    </button>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <!-- FORM CORREGIDO: Usamos ngSubmit -->
+  <form [formGroup]="busquedaForm" class="search-form" (ngSubmit)="buscarPagos()">
+    <div class="section-block">
+      <h3 class="section-title">📅 Criterios de Búsqueda</h3>
+      <div class="form-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Fecha de búsqueda</mat-label>
+          <input matInput [matDatepicker]="picker" formControlName="fecha" placeholder="Seleccione una fecha">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+          <mat-error *ngIf="busquedaForm.get('fecha')?.hasError('required')">
+            La fecha es requerida
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Estado del pago</mat-label>
+          <mat-select formControlName="estado">
+            <mat-option [value]="null">Todos</mat-option>
+            <mat-option value="pendiente">Pendiente</mat-option>
+            <mat-option value="completado">Completado</mat-option>
+            <mat-option value="cancelado">Cancelado</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button mat-stroked-button color="warn" (click)="limpiarFormulario()" type="button">
+        🗑️ Limpiar
+      </button>
+      <!-- BOTÓN BUSCAR: type submit, no click -->
+      <button mat-raised-button color="primary" type="submit"
+              [disabled]="busquedaForm.invalid || cargando">
+        <mat-spinner *ngIf="cargando" diameter="20" class="button-spinner"></mat-spinner>
+        <span *ngIf="!cargando">🔍 Buscar</span>
+      </button>
+    </div>
+  </form>
+
+  <mat-divider *ngIf="resultados.length > 0 || sinResultados"></mat-divider>
+  <div *ngIf="sinResultados && !cargando" class="sin-resultados">
+    <mat-icon>search_off</mat-icon>
+    <p>No se encontraron pagos para la fecha seleccionada</p>
+  </div>
+
+  <div *ngIf="resultados.length > 0" class="table-container">
+    <h3 class="section-title">📊 Resultados de la Búsqueda</h3>
+    <p class="results-count">Se encontraron {{resultados.length}} pago(s)</p>
+
+    <table mat-table [dataSource]="resultados" class="results-table">
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef>ID</th>
+        <td mat-cell *matCellDef="let pago">{{pago.id}}</td>
+      </ng-container>
+      <ng-container matColumnDef="fecha">
+        <th mat-header-cell *matHeaderCellDef>Fecha</th>
+        <td mat-cell *matCellDef="let pago">{{pago.fecha | date:'dd/MM/yyyy'}}</td>
+      </ng-container>
+      <ng-container matColumnDef="concepto">
+        <th mat-header-cell *matHeaderCellDef>Concepto</th>
+        <td mat-cell *matCellDef="let pago">{{pago.concepto}}</td>
+      </ng-container>
+      <ng-container matColumnDef="monto">
+        <th mat-header-cell *matHeaderCellDef>Monto</th>
+        <td mat-cell *matCellDef="let pago" class="monto-cell">
+          {{pago.monto | currency:'MXN':'symbol-narrow':'1.2-2'}}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="estado">
+        <th mat-header-cell *matHeaderCellDef>Estado</th>
+        <td mat-cell *matCellDef="let pago">
+          <mat-chip [class.chip-pendiente]="pago.estado === 'pendiente'"
+                    [class.chip-completado]="pago.estado === 'completado'"
+                    [class.chip-cancelado]="pago.estado === 'cancelado'">
+            {{pago.estado | titlecase}}
+          </mat-chip>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="beneficiario">
+        <th mat-header-cell *matHeaderCellDef>Beneficiario</th>
+        <td mat-cell *matCellDef="let pago">{{pago.beneficiario}}</td>
+      </ng-container>
+      <ng-container matColumnDef="acciones">
+        <th mat-header-cell *matHeaderCellDef>Acciones</th>
+        <td mat-cell *matCellDef="let pago">
+          <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Acciones">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu #menu="matMenu">
+            <button mat-menu-item (click)="verDetalle(pago)">
+              <mat-icon>visibility</mat-icon>
+              <span>Ver detalle</span>
+            </button>
+            <button mat-menu-item (click)="descargarComprobante(pago)">
+              <mat-icon>download</mat-icon>
+              <span>Descargar comprobante</span>
+            </button>
+          </mat-menu>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="columnasTabla"></tr>
+      <tr mat-row *matRowDef="let row; columns: columnasTabla;" class="table-row"></tr>
+    </table>
+
+    <mat-paginator [pageSizeOptions]="[5, 10, 20]" 
+                   showFirstLastButtons
+                   aria-label="Seleccionar página de pagos">
+    </mat-paginator>
+  </div>
+</mat-card>

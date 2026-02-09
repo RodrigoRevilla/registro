@@ -37,4 +37,9 @@ irATrabajo(event: MouseEvent){
   event?.stopImmediatePropagation();
   this.router.navigate(['/trabajo']);
 }
+
+irABusqueda(event: MouseEvent){
+  event?.stopImmediatePropagation();
+  this.router.navigate(['/busqueda'])
+}
 }
