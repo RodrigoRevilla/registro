@@ -1,0 +1,97 @@
+<mat-card class="container">
+  <div class="header-section">
+    <mat-card-title class="title">🔍 Búsqueda de Pagos</mat-card-title>
+    <p class="subtitle">Consulta tus pagos realizados por fecha y categoría</p>
+    <button mat-stroked-button color="primary" (click)="goHome()" class="btn-home">
+      🏠 Home
+    </button>
+  </div>
+
+  <mat-divider></mat-divider>
+  <div class="search-section">
+    <div class="filter-tabs">
+      <button 
+        *ngFor="let filter of filters"
+        mat-button
+        class="filter-tab" 
+        [class.active]="currentFilter === filter.value"
+        (click)="setFilter(filter.value)">
+        {{ filter.label }}
+      </button>
+    </div>
+
+    <div class="search-controls">
+      <mat-form-field appearance="outline" class="input-group">
+        <mat-label>Fecha de Pago</mat-label>
+        <input matInput [matDatepicker]="picker" [(ngModel)]="fechaPago">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" (click)="buscarPagos()">Buscar</button>
+    </div>
+
+    <div class="year-groups">
+      <div *ngFor="let yearRange of yearRanges" class="year-group" [class.selected]="isYearRangeSelected(yearRange.range)" (click)="selectYearRange(yearRange.range)">
+        <div class="year-range">{{ yearRange.range }}</div>
+        <div class="year-count">{{ yearRange.count }} pagos</div>
+      </div>
+    </div>
+  </div>
+
+  <mat-divider></mat-divider>
+  <div class="results-section">
+    <div class="results-header">
+      <h2>Resultados</h2>
+      <span class="results-count">{{ resultsCount }}</span>
+    </div>
+
+    <div *ngIf="isLoading" class="loading">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Buscando pagos...</p>
+    </div>
+
+    <div *ngIf="!isLoading && payments.length === 0" class="empty-state">
+      <mat-icon>description</mat-icon>
+      <p>
+        {{ selectedYearRange || currentFilter !== 'todos' || fechaPago
+          ? 'No se encontraron pagos con los criterios seleccionados' 
+          : 'Selecciona un rango de años o realiza una búsqueda para ver los resultados' }}
+      </p>
+    </div>
+
+    <div *ngIf="!isLoading && payments.length > 0">
+      <mat-card *ngFor="let payment of payments" class="payment-card" [id]="'payment-' + payment.id">
+        
+        <div class="payment-header">
+          <div class="payment-id">{{ payment.id }}</div>
+          <div class="payment-status">✓ Pagado</div>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="payment-details">
+          <div class="detail-item"><strong>Fecha:</strong> {{ payment.fecha }}</div>
+          <div class="detail-item"><strong>Monto:</strong> {{ payment.monto }}</div>
+          <div class="detail-item"><strong>Concepto:</strong> {{ payment.concepto }}</div>
+          <div class="detail-item"><strong>Referencia:</strong> {{ payment.referencia }}</div>
+          <div class="detail-item"><strong>Método de Pago:</strong> {{ payment.metodo }}</div>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="payment-actions">
+          <button mat-stroked-button (click)="verDetalles(payment)">
+            <mat-icon>visibility</mat-icon> Ver Detalles
+          </button>
+          <button mat-stroked-button (click)="descargarComprobante(payment)">
+            <mat-icon>download</mat-icon> Descargar Comprobante
+          </button>
+          <button mat-stroked-button (click)="imprimirComprobante(payment)">
+            <mat-icon>print</mat-icon> Imprimir
+          </button>
+        </div>
+      </mat-card>
+    </div>
+  </div>
+</mat-card>

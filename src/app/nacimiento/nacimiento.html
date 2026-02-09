@@ -1,19 +1,20 @@
 <mat-card class="container">
-
-  <!-- ENCABEZADO -->
   <div class="header-section">
     <mat-card-title class="title">🔍 Consulta de Nacimientos</mat-card-title>
     <p class="subtitle">Ingrese uno o más criterios para localizar un acta de nacimiento</p>
   </div>
 
+    <div class="home-button">
+    <button mat-stroked-button color="primary" (click)="goHome()">
+      🏠 Home
+    </button>
+    </div>
+
   <mat-divider></mat-divider>
 
   <form [formGroup]="nacimientoForm">
-
-    <!-- ================= DATOS DEL REGISTRADO ================= -->
     <div class="section-block">
       <h3 class="section-title">👤 Datos del Registrado</h3>
-
       <div class="form-grid">
         <mat-form-field appearance="outline">
           <mat-label>Nombre(s)</mat-label>
@@ -49,8 +50,6 @@
           <input matInput formControlName="status">
         </mat-form-field>
       </div>
-
-      <!-- ================= OPCIONAL DATOS DE LOS PADRES (PLEGABLE) ================= -->
       <mat-expansion-panel class="parents-expansion">
         <mat-expansion-panel-header>
           <mat-panel-title>👨‍👩‍👦 Datos de los padres (opcional)</mat-panel-title>
@@ -77,15 +76,10 @@
             <input matInput type="number" formControlName="edadMadre">
           </mat-form-field>
         </div>
-
       </mat-expansion-panel>
-
     </div>
-
-    <!-- ================= DATOS DE NACIMIENTO ================= -->
     <div class="section-block">
       <h3 class="section-title">🎂 Datos de Nacimiento</h3>
-
       <div class="form-grid">
         <mat-form-field appearance="outline">
           <mat-label>Entidad de nacimiento</mat-label>
@@ -118,11 +112,8 @@
         </mat-form-field>
       </div>
     </div>
-
-    <!-- ================= DATOS DEL ACTA ================= -->
     <div class="section-block">
       <h3 class="section-title">📄 Datos del Acta</h3>
-
       <div class="form-grid">
         <mat-form-field appearance="outline">
           <mat-label>Entidad</mat-label>
@@ -155,10 +146,7 @@
         </mat-form-field>
       </div>
     </div>
-
   </form>
-
-  <!-- BOTONES -->
   <div class="actions">
     <button mat-stroked-button color="warn" (click)="limpiarFormulario()">
       🗑️ Limpiar
@@ -168,5 +156,4 @@
       🔍 Buscar
     </button>
   </div>
-
 </mat-card>

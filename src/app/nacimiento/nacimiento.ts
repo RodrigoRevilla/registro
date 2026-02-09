@@ -47,6 +47,7 @@ export class NacimientoComponent {
       curp: [''],
       entidadNacimiento: [''],
       municipioNacimiento: [''],
+      distritoNacimiento: [''],
       localidad: [''],
       fechaNacimiento: [''],
       horaNacimiento: [''],
@@ -56,7 +57,6 @@ export class NacimientoComponent {
       sexo: [''],
       libro: [''],
       status: [''],
-      distritoNacimiento: [''],
       nombrePadre: [''],
       edadPadre: [''],
       nombreMadre: [''],
@@ -64,10 +64,12 @@ export class NacimientoComponent {
     });
   }
 
+  goHome() {
+    this.router.navigate(['/home']);
+  }
   limpiarFormulario() {
     this.nacimientoForm.reset();
   }
-
   buscarActa() {
     const dialogRef = this.dialog.open(ActaDetalleComponent, {
       width: '95vw',
@@ -84,7 +86,6 @@ export class NacimientoComponent {
       }
     });
   }
-
   rellenarFormulario(datos: any): void {
     this.nacimientoForm.patchValue({
       entidad: datos.entidad,
@@ -95,6 +96,7 @@ export class NacimientoComponent {
       curp: datos.curp,
       entidadNacimiento: datos.entidadNacimiento,
       municipioNacimiento: datos.municipioNacimiento,
+      distritoNacimiento: datos.distritoNacimiento,
       localidad: datos.localidad,
       fechaNacimiento: datos.fechaNacimiento,
       horaNacimiento: datos.horaNacimiento,
