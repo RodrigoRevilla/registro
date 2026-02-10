@@ -98,15 +98,16 @@ export class BusquedaComponent implements OnInit {
 
     const pagosSimulados: Pago[] = [
       { id: 1001, fecha: new Date(2026, 1, 9), concepto: 'Acta de nacimiento certificada', monto: 150, estado: 'completado', beneficiario: 'Juan Pérez García' },
-      { id: 1002, fecha: new Date(2026, 1, 9), concepto: 'Trámite de licencia', monto: 450.5, estado: 'pendiente', beneficiario: 'María López Hernández' },
+      { id: 1002, fecha: new Date(2026, 1, 9), concepto: 'Trámite de constancia', monto: 450.5, estado: 'pendiente', beneficiario: 'María López Hernández' },
       { id: 1003, fecha: new Date(2026, 1, 9), concepto: 'Certificación de documentos', monto: 800, estado: 'completado', beneficiario: 'Carlos Ramírez Sánchez' },
       { id: 1004, fecha: new Date(2026, 1, 9), concepto: 'Registro de acta de matrimonio', monto: 320, estado: 'cancelado', beneficiario: 'Ana Martínez Torres' },
       { id: 1005, fecha: new Date(2026, 1, 9), concepto: 'Copia certificada de acta', monto: 95, estado: 'completado', beneficiario: 'Roberto González Díaz' },
       { id: 1006, fecha: new Date(2026, 1, 8), concepto: 'Apostilla de documentos', monto: 1200, estado: 'completado', beneficiario: 'Laura Sánchez Ruiz' },
       { id: 1007, fecha: new Date(2026, 1, 8), concepto: 'Trámite de CURP', monto: 0, estado: 'completado', beneficiario: 'Pedro Hernández López' },
       { id: 1008, fecha: new Date(2026, 1, 8), concepto: 'Pago de multa administrativa', monto: 2500, estado: 'pendiente', beneficiario: 'Sofía Morales Castro' },
-      { id: 1009, fecha: new Date(2026, 1, 7), concepto: 'Registro de propiedad', monto: 5000, estado: 'completado', beneficiario: 'José Luis Fernández' },
-      { id: 1010, fecha: new Date(2026, 1, 7), concepto: 'Permiso de construcción', monto: 3200, estado: 'pendiente', beneficiario: 'Diana Patricia Vargas' }
+      { id: 1009, fecha: new Date(2026, 1, 7), concepto: 'Tramite de acta de defuncion', monto: 5000, estado: 'completado', beneficiario: 'José Luis Fernández' },
+      { id: 1010, fecha: new Date(2026, 1, 7), concepto: 'Certificacion de documentos', monto: 3200, estado: 'pendiente', beneficiario: 'Diana Patricia Vargas' },
+      { id: 1011, fecha: new Date(2026, 1, 10), concepto: 'Constancia del registro civil', monto: 350, estado: 'completado', beneficiario: 'Ulrich Zwingli'}
     ];
 
     return pagosSimulados.filter(pago => {
