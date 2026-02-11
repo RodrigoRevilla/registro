@@ -55,7 +55,7 @@ interface ActaData {
     MatChipsModule
   ],
   templateUrl: './acta-detalle.html',
-  styleUrl: './acta-detalle.scss'
+  styleUrls: ['./acta-detalle.scss']
 })
 export class ActaDetalleComponent {
   actaData: ActaData = {
@@ -101,6 +101,10 @@ export class ActaDetalleComponent {
 
   usarDatos(): void {
     this.dialogRef.close(this.actaData);
+  }
+
+  generar(): void {
+    window.open('/generar', '_blank');
   }
 
   getSexoLabel(sexo: string): string {

@@ -10,11 +10,6 @@
   </div> 
 
   <mat-dialog-content>
-    <div class="estado-header fade-in" style="animation-delay: 0.1s">
-      <button mat-raised-button class="btn-aguila-top">
-        <img src="/escudo.png" alt="Escudo de México" class="icon-aguila">
-      </button>
-    </div>
     <mat-card class="info-section slide-up" style="animation-delay: 0.2s">
       <mat-card-header>
         <mat-card-title>
@@ -305,9 +300,9 @@
       <mat-icon>close</mat-icon>
       Cancelar
     </button>
-    <button mat-raised-button color="primary" (click)="usarDatos()" class="btn-primary">
+    <button mat-raised-button color="primary" (click)="generar()" class="btn-primary">
       <mat-icon>download</mat-icon>
-      Usar estos datos
+      Generar 
     </button>
   </mat-dialog-actions>
 </div>

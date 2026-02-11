@@ -12,14 +12,14 @@
 
   <mat-divider></mat-divider>
 
-  <!-- FORM CORREGIDO: Usamos ngSubmit -->
   <form [formGroup]="busquedaForm" class="search-form" (ngSubmit)="buscarPagos()">
     <div class="section-block">
       <h3 class="section-title">📅 Criterios de Búsqueda</h3>
       <div class="form-grid">
         <mat-form-field appearance="outline">
           <mat-label>Fecha de búsqueda</mat-label>
-          <input matInput [matDatepicker]="picker" formControlName="fecha" placeholder="Seleccione una fecha">
+          <input matInput [matDatepicker]="picker" formControlName="fecha"
+            (dateChange)="busquedaForm.get('fecha')?.setValue($event.value)" placeholder="Seleccione una fecha">
           <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
           <mat-datepicker #picker></mat-datepicker>
           <mat-error *ngIf="busquedaForm.get('fecha')?.hasError('required')">
@@ -43,58 +43,71 @@
       <button mat-stroked-button color="warn" (click)="limpiarFormulario()" type="button">
         🗑️ Limpiar
       </button>
-      <!-- BOTÓN BUSCAR: type submit, no click -->
-      <button mat-raised-button color="primary" type="submit"
-              [disabled]="busquedaForm.invalid || cargando">
+      <button mat-raised-button color="primary" type="submit" [disabled]="busquedaForm.invalid || cargando">
         <mat-spinner *ngIf="cargando" diameter="20" class="button-spinner"></mat-spinner>
         <span *ngIf="!cargando">🔍 Buscar</span>
+      </button>
+      <button mat-stroked-button color="primary" type="button" (click)="imprimirTodos()"
+        [disabled]="dataSource.data.length === 0">
+        🖨️ Imprimir todos
+      </button>
+      <button mat-stroked-button color="accent" type="button" (click)="exportarExcel()"
+        [disabled]="dataSource.data.length === 0">
+        📄 Exportar a Excel
       </button>
     </div>
   </form>
 
-  <mat-divider *ngIf="resultados.length > 0 || sinResultados"></mat-divider>
+  <mat-divider *ngIf="dataSource.data.length > 0 || sinResultados"></mat-divider>
+
   <div *ngIf="sinResultados && !cargando" class="sin-resultados">
     <mat-icon>search_off</mat-icon>
     <p>No se encontraron pagos para la fecha seleccionada</p>
   </div>
 
-  <div *ngIf="resultados.length > 0" class="table-container">
+  <div *ngIf="dataSource.data.length > 0" class="table-container">
     <h3 class="section-title">📊 Resultados de la Búsqueda</h3>
-    <p class="results-count">Se encontraron {{resultados.length}} pago(s)</p>
+    <p class="results-count">Se encontraron {{dataSource.data.length}} pago(s)</p>
 
-    <table mat-table [dataSource]="resultados" class="results-table">
+    <table mat-table [dataSource]="dataSource" class="results-table">
+
       <ng-container matColumnDef="id">
         <th mat-header-cell *matHeaderCellDef>ID</th>
         <td mat-cell *matCellDef="let pago">{{pago.id}}</td>
       </ng-container>
+
       <ng-container matColumnDef="fecha">
         <th mat-header-cell *matHeaderCellDef>Fecha</th>
         <td mat-cell *matCellDef="let pago">{{pago.fecha | date:'dd/MM/yyyy'}}</td>
       </ng-container>
+
       <ng-container matColumnDef="concepto">
         <th mat-header-cell *matHeaderCellDef>Concepto</th>
         <td mat-cell *matCellDef="let pago">{{pago.concepto}}</td>
       </ng-container>
+
       <ng-container matColumnDef="monto">
         <th mat-header-cell *matHeaderCellDef>Monto</th>
         <td mat-cell *matCellDef="let pago" class="monto-cell">
           {{pago.monto | currency:'MXN':'symbol-narrow':'1.2-2'}}
         </td>
       </ng-container>
+
       <ng-container matColumnDef="estado">
         <th mat-header-cell *matHeaderCellDef>Estado</th>
         <td mat-cell *matCellDef="let pago">
           <mat-chip [class.chip-pendiente]="pago.estado === 'pendiente'"
-                    [class.chip-completado]="pago.estado === 'completado'"
-                    [class.chip-cancelado]="pago.estado === 'cancelado'">
+            [class.chip-completado]="pago.estado === 'completado'" [class.chip-cancelado]="pago.estado === 'cancelado'">
             {{pago.estado | titlecase}}
           </mat-chip>
         </td>
       </ng-container>
+
       <ng-container matColumnDef="beneficiario">
         <th mat-header-cell *matHeaderCellDef>Beneficiario</th>
         <td mat-cell *matCellDef="let pago">{{pago.beneficiario}}</td>
       </ng-container>
+
       <ng-container matColumnDef="acciones">
         <th mat-header-cell *matHeaderCellDef>Acciones</th>
         <td mat-cell *matCellDef="let pago">
@@ -106,9 +119,9 @@
               <mat-icon>visibility</mat-icon>
               <span>Ver detalle</span>
             </button>
-            <button mat-menu-item (click)="descargarComprobante(pago)">
-              <mat-icon>download</mat-icon>
-              <span>Descargar comprobante</span>
+            <button mat-menu-item (click)="imprimir(pago)">
+              <mat-icon>print</mat-icon>
+              <span>Imprimir comprobante</span>
             </button>
           </mat-menu>
         </td>
@@ -118,9 +131,35 @@
       <tr mat-row *matRowDef="let row; columns: columnasTabla;" class="table-row"></tr>
     </table>
 
-    <mat-paginator [pageSizeOptions]="[5, 10, 20]" 
-                   showFirstLastButtons
-                   aria-label="Seleccionar página de pagos">
+    <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons aria-label="Seleccionar página de pagos">
     </mat-paginator>
   </div>
+
+  <ng-template #detalleDialog>
+    <mat-card class="detalle-card">
+      <mat-card-title>
+        <mat-icon color="primary" style="vertical-align: middle; margin-right: 8px;">info</mat-icon>
+        Detalle del Pago #{{pagoSeleccionado.id}}
+      </mat-card-title>
+      <mat-card-content>
+        <div class="detalle-row"><strong>📅 Fecha:</strong> {{pagoSeleccionado.fecha | date:'dd/MM/yyyy'}}</div>
+        <div class="detalle-row"><strong>📝 Concepto:</strong> {{pagoSeleccionado.concepto}}</div>
+        <div class="detalle-row"><strong>💰 Monto:</strong> {{pagoSeleccionado.monto |
+          currency:'MXN':'symbol-narrow':'1.2-2'}}</div>
+        <div class="detalle-row"><strong>👤 Beneficiario:</strong> {{pagoSeleccionado.beneficiario}}</div>
+        <div class="detalle-row">
+          <strong>Estado:</strong>
+          <mat-chip [class.chip-pendiente]="pagoSeleccionado.estado === 'pendiente'"
+            [class.chip-completado]="pagoSeleccionado.estado === 'completado'"
+            [class.chip-cancelado]="pagoSeleccionado.estado === 'cancelado'">
+            {{pagoSeleccionado.estado | titlecase}}
+          </mat-chip>
+        </div>
+      </mat-card-content>
+      <mat-divider></mat-divider>
+      <mat-card-actions align="end">
+        <button mat-stroked-button color="primary" (click)="cerrarDialog()">Cerrar</button>
+      </mat-card-actions>
+    </mat-card>
+  </ng-template>
 </mat-card>

@@ -7,6 +7,8 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDialog } from '@angular/material/dialog';
@@ -21,6 +23,8 @@ import { ActaDetalleComponent } from '../acta-detalle/acta-detalle';
     ReactiveFormsModule,
     MatCardModule,
     MatDividerModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
@@ -31,20 +35,26 @@ import { ActaDetalleComponent } from '../acta-detalle/acta-detalle';
   styleUrls: ['./nacimiento.scss']
 })
 export class NacimientoComponent {
+
   nacimientoForm: FormGroup;
 
   constructor(
-    private fb: FormBuilder, 
+    private fb: FormBuilder,
     private router: Router,
     private dialog: MatDialog
   ) {
+
     this.nacimientoForm = this.fb.group({
       entidad: [''],
       municipio: [''],
       oficialia: [''],
       distrito: [''],
+      fechaRegistro: [null],
       anioRegistro: [''],
+      foja: [''],
+      numeroActa: [''],
       curp: [''],
+      curp_regciv: [''],
       entidadNacimiento: [''],
       municipioNacimiento: [''],
       distritoNacimiento: [''],
@@ -62,14 +72,24 @@ export class NacimientoComponent {
       nombreMadre: [''],
       edadMadre: ['']
     });
+    this.nacimientoForm.get('fechaRegistro')?.valueChanges.subscribe((fecha: Date) => {
+      if (fecha) {
+        const year = new Date(fecha).getFullYear();
+        this.nacimientoForm.patchValue({
+          anioRegistro: year
+        }, { emitEvent: false });
+      }
+    });
   }
 
   goHome() {
     this.router.navigate(['/home']);
   }
+
   limpiarFormulario() {
     this.nacimientoForm.reset();
   }
+
   buscarActa() {
     const dialogRef = this.dialog.open(ActaDetalleComponent, {
       width: '95vw',
@@ -86,13 +106,18 @@ export class NacimientoComponent {
       }
     });
   }
+
   rellenarFormulario(datos: any): void {
+
     this.nacimientoForm.patchValue({
       entidad: datos.entidad,
       municipio: datos.municipio,
       oficialia: datos.oficialia,
       distrito: datos.distrito,
+      fechaRegistro: datos.fechaRegistro ? new Date(datos.fechaRegistro) : null,
       anioRegistro: datos.anioRegistro,
+      foja: datos.foja,
+      numeroActa: datos.numeroActa,
       curp: datos.curp,
       entidadNacimiento: datos.entidadNacimiento,
       municipioNacimiento: datos.municipioNacimiento,
@@ -110,7 +135,9 @@ export class NacimientoComponent {
       edadPadre: datos.edadPadre,
       nombreMadre: datos.nombreMadre,
       edadMadre: datos.edadMadre
+
     });
+
     console.log('Formulario rellenado con éxito');
   }
 }
