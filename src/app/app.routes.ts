@@ -5,14 +5,17 @@ import { HomeComponent } from './home/home';
 import { TrabajoComponent } from './trabajo/trabajo';
 import { BusquedaComponent } from './busqueda/busqueda';
 import { CertificacionComponent } from './certificacion/certificacion';
+import { LoginComponent } from './login/login';
+import { AuthGuard } from './auth-guard'; 
 
 export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
-  { path: 'home', component: HomeComponent },
-  { path: 'nacimiento', component: NacimientoComponent },
-  { path: 'acta-detalle/:curp', component: ActaDetalleComponent },
-  { path: 'trabajo', component: TrabajoComponent},
-  { path: 'busqueda', component: BusquedaComponent },
-  { path: 'generar', component: CertificacionComponent },
+  { path: 'login', component: LoginComponent },
+  { path: 'home', component: HomeComponent, canActivate: [AuthGuard] },
+  { path: 'nacimiento', component: NacimientoComponent, canActivate: [AuthGuard] },
+  { path: 'acta-detalle/:curp', component: ActaDetalleComponent, canActivate: [AuthGuard] },
+  { path: 'trabajo', component: TrabajoComponent, canActivate: [AuthGuard] },
+  { path: 'busqueda', component: BusquedaComponent, canActivate: [AuthGuard] },
+  { path: 'generar', component: CertificacionComponent, canActivate: [AuthGuard] },
   { path: '**', redirectTo: '/home' }
 ];

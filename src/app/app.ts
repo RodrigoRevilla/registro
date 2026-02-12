@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
+import { HeaderComponent } from './header/header';
 
 @Component({
   selector: 'app-root',
@@ -9,7 +10,8 @@ import { MatButtonModule } from '@angular/material/button';
   imports: [
     RouterOutlet,
     MatToolbarModule,
-    MatButtonModule
+    MatButtonModule,
+    HeaderComponent
   ],
   templateUrl: './app.html',
 })

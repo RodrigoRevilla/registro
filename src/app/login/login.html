@@ -1,0 +1,52 @@
+<div class="login-container">
+  <mat-card class="login-card">
+
+    <div class="header">
+      <img src="registro.jpg" alt="Escudo" class="logo">
+      <h2>Registro Civil</h2>
+      <span>Sistema Institucional de Gestión</span>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="login()">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Usuario</mat-label>
+        <input matInput formControlName="username">
+        <mat-icon matSuffix>person</mat-icon>
+        <mat-error *ngIf="loginForm.get('username')?.hasError('required')">
+          El usuario es obligatorio
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Contraseña</mat-label>
+        <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password">
+        <button mat-icon-button matSuffix type="button"
+                (click)="hidePassword = !hidePassword">
+          <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
+          La contraseña es obligatoria
+        </mat-error>
+      </mat-form-field>
+      <button mat-raised-button
+              color="primary"
+              class="full-width"
+              type="submit"
+              [disabled]="loading">
+
+        <mat-progress-spinner
+          *ngIf="loading"
+          diameter="20"
+          mode="indeterminate">
+        </mat-progress-spinner>
+
+        <span *ngIf="!loading">Iniciar Sesión</span>
+      </button>
+
+    </form>
+
+    <div class="footer">
+      © 2026 Registro Civil - Gobierno Nacional
+    </div>
+
+  </mat-card>
+</div>

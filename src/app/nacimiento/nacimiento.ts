@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -11,6 +12,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
+import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { ActaDetalleComponent } from '../acta-detalle/acta-detalle';
@@ -22,6 +24,8 @@ import { ActaDetalleComponent } from '../acta-detalle/acta-detalle';
     CommonModule,
     ReactiveFormsModule,
     MatCardModule,
+    RouterModule,
+    MatIconModule,
     MatDividerModule,
     MatDatepickerModule,
     MatNativeDateModule,

@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatChipsModule } from '@angular/material/chips';
+import { Router } from '@angular/router';
 
 interface ActaData {
   entidad: string;
@@ -93,7 +94,7 @@ export class ActaDetalleComponent {
     fechaRegistro: '1995-03-20'
   };
 
-  constructor(public dialogRef: MatDialogRef<ActaDetalleComponent>) {}
+  constructor(public dialogRef: MatDialogRef<ActaDetalleComponent>, private router: Router) {}
 
   cerrar(): void {
     this.dialogRef.close();
@@ -104,7 +105,8 @@ export class ActaDetalleComponent {
   }
 
   generar(): void {
-    window.open('/generar', '_blank');
+   this.cerrar();
+   this.router.navigate(['/generar'])
   }
 
   getSexoLabel(sexo: string): string {

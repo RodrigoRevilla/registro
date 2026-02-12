@@ -1,0 +1,50 @@
+.login-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(to bottom right, #0d1b2a, #1b263b);
+}
+
+.login-card {
+  width: 400px;
+  padding: 30px;
+  border-top: 5px solid #c9a227; 
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 20px;
+
+  .logo {
+    width: 70px;
+    margin-bottom: 10px;
+  }
+
+  h2 {
+    margin: 0;
+    font-weight: 600;
+    color: #0d1b2a;
+  }
+
+  span {
+    font-size: 13px;
+    color: gray;
+  }
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+button {
+  height: 45px;
+}
+
+.footer {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 12px;
+  color: gray;
+}

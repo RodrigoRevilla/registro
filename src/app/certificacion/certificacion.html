@@ -1,232 +1,222 @@
 <h2>Solicitud de Servicios de Nacimientos</h2>
-
 <form>
-    <fieldset>
-        <legend>Datos Generales</legend>
-        <div class="form-row">
-            <span class="label-inline">Entidad:</span>
-            <div class="field-group">
-                <input type="text" value="20" class="field-tiny" />
-                <input type="text" value="OAXACA" class="field-auto" />
-            </div>
-        </div>
-        <div class="form-row">
-            <span class="label-inline">Municipio:</span>
-            <div class="field-group">
-                <input type="text" value="67" class="field-small" />
-                <input type="text" value="OAXACA DE JUAREZ" class="field-auto" />
-            </div>
-        </div>
-        <div class="form-row-multi">
-            <label class="field-small">Foja:
-                <input type="text" value="1" />
-            </label>
-            <label class="field-small">Oficialía:
-                <input type="text" value="1" />
-            </label>
-            <label class="field-small">Acta:
-                <input type="text" value="1" />
-            </label>
-            <label class="field-small">Localidad:
-                <input type="text" value="1" />
-            </label>
-        </div>
-        <div class="form-row">
-            <span class="label-inline">Distrito:</span>
-            <div class="field-group">
-                <input type="text" value="1" class="field-tiny" />
-                <input type="text" value="CENTRO" class="field-auto" />
-            </div>
-        </div>
-        <div class="form-row-multi">
-            <label class="field-medium">Fecha:
-                <input type="date" value="2011-11-11" />
-            </label>
-            <label class="field-small">Año:
-                <input type="text" value="2011" />
-            </label>
-            <label class="field-small">EnDoc:
-                <input type="text" value="1" />
-            </label>
-        </div>
-        <div class="form-row-multi">
-            <label class="field-medium">Código Postal:
-                <input type="text" />
-            </label>
-            <label class="field-auto">Correo:
-                <input type="email" />
-            </label>
-        </div>
-    </fieldset>
+  <button mat-stroked-button color="primary" (click)="goHome()" class="btn-home">
+    🏠 Home
+  </button>
 
-    <fieldset>
-        <legend>Datos del(os) Registrado(s)</legend>
+  <fieldset>
+    <legend>Datos del Acta</legend>
 
-        <div class="form-row-multi">
-            <label class="field-auto">Nombre(s):
-                <input type="text" value="PRUEBA PRUEBA PRUEBA" />
-            </label>
-            <label class="field-medium">Crip:
-                <input type="text" value="20067011100001H" />
-            </label>
-        </div>
-        <div class="form-row">
-            <span class="label-inline">Entidad nac:</span>
-            <div class="field-group">
-                <input type="text" value="20" class="field-tiny" />
-                <input type="text" value="OAXACA" class="field-auto" />
-            </div>
-        </div>
-        <div class="form-row">
-            <span class="label-inline">Municipio nac:</span>
-            <div class="field-group">
-                <input type="text" value="67" class="field-small" />
-                <input type="text" value="OAXACA DE JUAREZ" class="field-auto" />
-            </div>
-        </div>
-        <div class="form-row-multi">
-            <div class="field-group" style="flex: 1;">
-                <span class="label-inline" style="min-width: 90px;">Distrito nac:</span>
-                <input type="text" value="1" class="field-tiny" />
-                <input type="text" value="CENTRO" style="flex: 1; min-width: 150px;" />
-            </div>
-            <label class="field-small">Localidad nac:
-                <input type="text" value="1" />
-            </label>
-        </div>
-        <div class="form-row-multi">
-            <label class="field-auto">Padre:
-                <input type="text" value="PADRE PRUEBA PRUEBA" />
-            </label>
-            <label class="field-auto">Madre:
-                <input type="text" />
-            </label>
-        </div>
-    </fieldset>
+    <div class="form-row-multi">
+      <div class="field-group">
+        <span class="label-inline">Entidad:</span>
+        <input type="text" value="20" class="field-tiny" />
+        <input type="text" value="OAXACA" class="field-auto" />
+      </div>
 
-    <fieldset>
-        <legend>Servicio</legend>
+      <div class="field-group">
+        <span class="label-inline">Distrito:</span>
+        <input type="text" value="1" class="field-tiny" />
+        <input type="text" value="CENTRO" class="field-auto" />
+      </div>
+    </div>
 
-        <div class="form-row-multi">
-            <label class="field-auto">Servicio:
-                <select>
-                    <option>Seleccione un tipo de Servicio</option>
-                </select>
-            </label>
-            <label class="field-auto">Dto Presentado:
-                <select>
-                    <option>Seleccione uno por...</option>
-                </select>
-            </label>
-        </div>
+    <div class="form-row-multi">
+      <div class="field-group">
+        <span class="label-inline">Municipio:</span>
+        <input type="text" value="67" class="field-small" />
+        <input type="text" value="OAXACA DE JUAREZ" class="field-auto" />
+      </div>
 
-        <div class="form-row-multi">
-            <label class="field-medium">Tipo acta: NACIMIENTO</label>
-            <label class="field-small">Copias Solicitadas:
-                <input type="number" />
-            </label>
-        </div>
+      <div class="field-group">
+        <span class="label-inline">Localidad:</span>
+        <input type="text" value="1" class="field-small" />
+        <input type="text" class="field-auto" />
+      </div>
+    </div>
 
-        <div class="radio-inline">
-            <label>
-                <input type="radio" id="auto" name="tipo" checked />
-                Automatizado
-            </label>
-            <label>
-                <input type="radio" id="semi" name="tipo" />
-                Semiautomatizado
-            </label>
-        </div>
+    <div class="form-row-multi">
+      <label class="field-small">Foja: <input type="text" value="1" /></label>
+      <label class="field-small">Oficialía: <input type="text" value="1" /></label>
+      <label class="field-small">Acta: <input type="text" value="1" /></label>
+      <label class="field-small">EnDoc: <input type="text" value="1" /></label>
+    </div>
 
-        <div class="form-row-multi">
-            <label class="field-small">Años de búsqueda:
-                <input type="text" />
-            </label>
-            <label class="field-small">Rango búsqueda:
-                <input type="text" />
-            </label>
-        </div>
+    <div class="form-row-multi">
+      <label class="field-medium">Fecha: <input type="date" value="2026-02-12" /></label>
+      <label class="field-small">Año: <input type="text" value="2011" /></label>
+    </div>
+  </fieldset>
+  <fieldset>
+    <legend>Datos del Registrado</legend>
 
-        <div class="form-row-multi">
-            <label class="field-medium">Fecha Entrega:
-                <input type="date" />
-            </label>
-            <label class="field-small">Hora Entrega:
-                <input type="time" value="11:00" />
-            </label>
-        </div>
+    <div class="form-row-multi">
+      <label class="field-auto">Nombre(s): <input type="text" value="PRUEBA PRUEBA PRUEBA" /></label>
+      <label class="field-medium">Crip: <input type="text" value="20067011100001H" /></label>
+    </div>
 
-        <fieldset>
-            <legend>Servicio Condonado</legend>
+    <div class="form-row-multi">
+      <div class="field-group">
+        <span class="label-inline">Entidad nac:</span>
+        <input type="text" value="20" class="field-tiny" />
+        <input type="text" value="OAXACA" class="field-auto" />
+      </div>
 
-            <div class="checkbox-inline">
-                <label>
-                    <input type="checkbox" name="condonado" id="condonado" />
-                    ¿Servicio Condonado?
-                </label>
-            </div>
+      <div class="field-group">
+        <span class="label-inline">Municipio nac:</span>
+        <input type="text" value="67" class="field-small" />
+        <input type="text" value="OAXACA DE JUAREZ" class="field-auto" />
+      </div>
+    </div>
 
-            <div class="radio-inline">
-                <label>
-                    <input type="radio" name="tipoCondonado" value="no" checked />
-                    No condonado
-                </label>
-                <label>
-                    <input type="radio" name="tipoCondonado" value="si" />
-                    Sí condonado
-                </label>
-            </div>
-            <small style="display:block; margin-top:8px;">
-                Anotar en caso de servicio CERTIF. C/ANOT. MARG YA PAGADA | recibo número: | fecha de pago:
-            </small>
-            <div class="form-row-multi">
-                <label class="field-medium">Recibo numero:
-                    <input type="text" />
-                </label>
-                <label class="field-medium">Fecha:
-                    <input type="date" />
-                </label>
-            </div>
-        </fieldset>
-    </fieldset>
+    <div class="form-row-multi">
+      <div class="field-group">
+        <span class="label-inline">Distrito nac:</span>
+        <input type="text" value="1" class="field-tiny" />
+        <input type="text" value="CENTRO" class="field-auto" />
+      </div>
 
-    <fieldset>
-        <legend>Facturación</legend>
+      <div class="field-group">
+        <span class="label-inline">Localidad nac:</span>
+        <input type="text" value="" class="field-auto" />
+      </div>
+    </div>
 
-        <label class="field-full">Nombre:
-            <input type="text" value="PRUEBA PRUEBA PRUEBA" />
-        </label>
+    <div class="form-row-multi">
+      <label class="field-auto">Padre: <input type="text" /></label>
+      <label class="field-auto">Madre: <input type="text" /></label>
+    </div>
+  </fieldset>
+  <fieldset>
+    <legend>Servicio</legend>
 
-        <div class="form-row-multi">
-            <label class="field-auto">CFDI:
-                <select>
-                    <option>S01 : Sin efectos fiscales</option>
-                    <option>G01 : Adquisición de mercancías</option>
-                    <option>G03 : Gastos en general</option>
-                    <option>D03 : Gastos funerales</option>
-                    <option>D04 : Donativos</option>
-                </select>
-            </label>
-            <label class="field-medium">RFC:
-                <input type="text" value="XAXX010101000" />
-            </label>
-        </div>
+    <div class="form-row-multi">
+      <label class="field-auto">Servicio:
+        <select>
+          <option>Seleccione un tipo de Servicio</option>
+          <option>C: Certificacion de acta</option>
+          <option>E: Const. Reg. Extem.</option>
+          <option>F: Fotocopia certificada</option>
+          <option>G: Anotacion y Fotocopia</option>
+          <option>H: Anotacion marginal</option>
+          <option>I: Fotocopia indice</option>
+          <option>J: Fotocopia C./Anot. ya pagada</option>
+          <option>M: Anotacion marginal</option>
+          <option>O: Anotacion marginal con certificacion</option>
+          <option>P: Fot. Ant y Post</option>
+          <option>R: Fot. Ant, Int, Post</option>
+          <option>V: Fotocopia C/Indice alfabetico</option>
+          <option>W: Fotocopia indice e inter.</option>
+          <option>X: Validacion</option>
+          <option>Z: Fotocopia con anotacion pagada</option>
+          <option>L: Certificacion con anotacion pagada</option>
+        </select>
+      </label>
 
-        <label class="field-full">Régimen:
-            <select>
-                <option>Personas Morales – General 601</option>
-                <option>Sueldos y Salarios 605</option>
-                <option>Actividades Empresariales y Profesionales 612</option>
-                <option>Régimen Simplificado de Confianza (RESICO) PF 626</option>
-                <option>RESICO PM 623</option>
-                <option>Arrendamiento 606</option>
-            </select>
-        </label>
-    </fieldset>
+      <label class="field-auto">Documento Presentado:
+        <select>
+          <option>Seleccione uno por favor</option>
+          <option>Presento fotocopia</option>
+          <option>Datos verbales</option>
+          <option>Boleta de registro</option>
+          <option>Certificado negativo</option>
+          <option>Resolucion</option>
+        </select>
+      </label>
+    </div>
 
-    <label class="field-full">Observaciones:
-        <textarea rows="3"></textarea>
+    <div class="form-row-multi">
+      <span class="field-medium">Tipo acta: NACIMIENTO</span>
+      <label class="field-small">Copias Solicitadas: <input type="number" /></label>
+    </div>
+
+    <div class="form-row-multi">
+      <label class="field-small">Años de búsqueda: <input type="text" /></label>
+      <label class="field-small">Rango búsqueda: <input type="text" /></label>
+    </div>
+
+    <div class="form-row-multi">
+      <label class="field-medium">Fecha Entrega: <input type="date" /></label>
+      <label class="field-small">Hora Entrega: <input type="time" value="11:00" /></label>
+    </div>
+  </fieldset>
+  <fieldset>
+    <legend>Facturación</legend>
+
+    <label class="field-full">Nombre: <input type="text" value="PRUEBA PRUEBA PRUEBA" /></label>
+
+    <div class="form-row-multi">
+      <label class="field-auto">CFDI:
+        <select>
+          <option>S01 : Sin efectos fiscales</option>
+          <option>G01 : Adquisición de mercancías</option>
+          <option>G03 : Gastos en general</option>
+          <option>D03 : Gastos funerales</option>
+          <option>D04 : Donativos</option>
+        </select>
+      </label>
+
+      <label class="field-medium">RFC: <input type="text" value="XAXX010101000" /></label>
+    </div>
+
+    <label class="field-full">Régimen:
+      <select>
+        <option>616 Sin obligaciones fiscales</option>
+        <option>601 General ley de personas morales</option>
+        <option>603 Personas morales con fines no lucrativos</option>
+        <option>605 Sueldos y salarios</option>
+        <option>606 Arrendamiento</option>
+        <option>607 Regimen de enagenacion o Adquisición de bienes</option>
+        <option>608 Demas ingresos</option>
+        <option>609 Consolidacion</option>
+        <option>610 Residentes en el extranjero sin permanencia en México</option>
+        <option>611 Ingresos por dividendos socios y accionistas</option>
+        <option>612 Personas fisicas con actividades empresariales y profesionales</option>
+        <option>614 Ingresos por intereses</option>
+        <option>615 Regimen de los ingresos por obtencion de premios</option>
+        <option>620 Sociedades cooperativas de produccion</option>
+        <option>621 Incorporacion fiscal</option>
+        <option>622 Actividades agricolas, ganaderas, silvicolas y pesqueras</option>
+        <option>623 Opcional para grupos de sociedades</option>
+        <option>624 Coordinados</option>
+        <option>625 Regimen plataformas tecnologicas</option>
+        <option>626 Regimen simplificado de confianza</option>
+        <option>628 Hidrocarburos</option>
+        <option>629 Regimen de sueldos y salarios</option>
+        <option>630 Enajenacion de bienes inmuebles</option>
+      </select>
     </label>
 
-    <button type="submit">Enviar</button>
+    <div class="form-row-multi">
+      <label class="field-medium">Correo: <input type="email" /></label>
+      <label class="field-medium">Codigo postal: <input type="text" /></label>
+    </div>
+  </fieldset>
+  <fieldset>
+    <legend>Servicio Condonado</legend>
+
+    <div class="radio-inline">
+      <label><input type="radio" name="tipoCondonado" value="no" checked /> No condonado</label>
+      <label><input type="radio" name="tipoCondonado" value="si" /> Condonado</label>
+    </div>
+
+    <div class="form-row-multi">
+      <label class="field-medium">No. Oficio: <input type="text" name="numeroOficio" /></label>
+      <label class="field-medium">Fecha: <input type="date" name="fechaOficio" /></label>
+    </div>
+
+    <small>Anotar en caso de servicio CERTIF. C/ANOT. MARG YA PAGADA</small>
+
+    <div class="form-row-multi">
+      <label class="field-medium">Recibo numero: <input type="text" /></label>
+      <label class="field-medium">Fecha de pago: <input type="date" /></label>
+    </div>
+  </fieldset>
+  <label class="field-full">Observaciones: <textarea rows="3"></textarea></label>
+
+  <div class="actions">
+    <button mat-raised-button color="primary" type="button">
+      Imprimir
+    </button>
+  </div>
 </form>
