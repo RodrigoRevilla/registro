@@ -50,28 +50,29 @@ login() {
 
   this.loading = true; 
   const { username, password } = this.loginForm.value;
-
-  this.http.post<any>('https://uncarolled-kaylene-unplentiful.ngrok-free.dev/api/v1/auth/login', { username, password })
-    .subscribe({
-      next: (res) => {
-        if (res.ok && res.data?.token && res.data?.usuario) {
-          this.authService.login(res.data.token, res.data.usuario);
-          this.router.navigate(['/home']);
-        } else {
-          alert('Credenciales inválidas');
-          this.loginForm.reset();
-          this.hidePassword = true;
-          this.loading = false; 
-        }
-      },
-      error: (err) => {
-        console.error(err);
-        alert('Error al iniciar sesión');
+  this.http.post<any>(
+    'https://uncarolled-kaylene-unplentiful.ngrok-free.dev/api/v1/auth/login', 
+    { username, password }
+  ).subscribe({
+    next: (res) => {
+      if (res.ok && res.data?.token && res.data?.usuario) {
+        this.authService.login(res.data.token, res.data.usuario);
+        this.router.navigate(['/home']);
+      } else {
+        alert('Credenciales inválidas');
         this.loginForm.reset();
         this.hidePassword = true;
         this.loading = false; 
-      },
-      complete: () => this.loading = false  
-    });
+      }
+    },
+    error: (err) => {
+      console.error(err);
+      alert('Error al iniciar sesión');
+      this.loginForm.reset();
+      this.hidePassword = true;
+      this.loading = false; 
+    },
+    complete: () => this.loading = false  
+  });
 }
 }

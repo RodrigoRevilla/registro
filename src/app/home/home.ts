@@ -1,11 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
-import { eventNames } from 'process';
+import { AuthService } from '../auth';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-home',
@@ -15,31 +16,48 @@ import { eventNames } from 'process';
     MatCardModule,
     MatButtonModule,
     MatIconModule,
-    MatChipsModule
+    MatChipsModule,
+    MatProgressSpinner
   ],
   templateUrl: './home.html',
-  styleUrl: './home.scss',
+  styleUrls: ['./home.scss'],
 })
-export class HomeComponent {
-  
-  constructor(private router: Router) {}
+export class HomeComponent implements OnInit {
+  isLoggedIn: boolean = false;
+  constructor(
+    private router: Router,
+    public authService: AuthService
+  ) {}
+
+  ngOnInit(): void {
+    this.isLoggedIn = this.authService.isLoggedIn();
+
+    if (!this.isLoggedIn){
+      this.router.navigate(['/login'])
+    }
+  }
+
+  logout():void{
+    this.authService.logout();
+    this.router.navigate(['/login'])
+  }
 
   navegarA(ruta: string) {
     this.router.navigate([ruta]);
   }
+  
+  irANacimiento(event: MouseEvent) {
+    event?.stopImmediatePropagation();
+    this.router.navigate(['/nacimiento']);
+  }
 
-irANacimiento(event: MouseEvent){
-  event?.stopImmediatePropagation();
-  this.router.navigate(['/nacimiento']);
-}
+  irATrabajo(event: MouseEvent) {
+    event?.stopImmediatePropagation();
+    this.router.navigate(['/trabajo']);
+  }
 
-irATrabajo(event: MouseEvent){
-  event?.stopImmediatePropagation();
-  this.router.navigate(['/trabajo']);
-}
-
-irABusqueda(event: MouseEvent){
-  event?.stopImmediatePropagation();
-  this.router.navigate(['/busqueda'])
-}
+  irABusqueda(event: MouseEvent) {
+    event?.stopImmediatePropagation();
+    this.router.navigate(['/busqueda']);
+  }
 }

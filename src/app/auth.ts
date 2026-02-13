@@ -8,10 +8,11 @@ export class AuthService {
   private tokenKey = 'token';
   private usuarioKey = 'usuario';
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) { }
 
   login(token: string, usuario: any) {
     if (isPlatformBrowser(this.platformId)) {
+      console.log('Guardando token:', token);
       localStorage.setItem(this.tokenKey, token);
       localStorage.setItem(this.usuarioKey, JSON.stringify(usuario));
     }
@@ -26,18 +27,22 @@ export class AuthService {
 
   isLoggedIn(): boolean {
     if (isPlatformBrowser(this.platformId)) {
-      return !!localStorage.getItem(this.tokenKey);
+      const token = localStorage.getItem(this.tokenKey);
+      console.log('Token en isLoggedIn:', token);  
+      return !!token;  
     }
     return false;
   }
+  
 
   getToken(): string | null {
     if (isPlatformBrowser(this.platformId)) {
-      return localStorage.getItem(this.tokenKey);
+      const token = localStorage.getItem(this.tokenKey);
+      console.log('Token obtenido:', token);
+      return token;
     }
     return null;
   }
-
   getUsuario(): any {
     if (isPlatformBrowser(this.platformId)) {
       const u = localStorage.getItem(this.usuarioKey);

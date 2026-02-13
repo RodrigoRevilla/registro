@@ -4,17 +4,24 @@
       <mat-icon>account_balance</mat-icon>
       Sistema de Trámites y Consultas
     </h2>
+    <div>
+      <button mat-stroked-button (click)="logout()" class="btn-logout">Cerrar sesión</button>
+    </div>
+    <ng-template #loadingTemplate>
+      <div class="loading">
+        <mat-spinner></mat-spinner>
+        <p>Cargando información...</p>
+      </div>
+    </ng-template>
   </div>
+
   <div class="dashboard-content slide-up">
     <p class="dashboard-subtitle">
       ¿Qué deseas hacer hoy?
     </p>
 
     <div class="cards-grid">
-      <mat-card
-        class="service-card"
-        (click)="navegarA('/buscadores')"
-      >
+      <mat-card class="service-card" (click)="navegarA('/buscadores')">
         <div class="card-icon">🔍</div>
 
         <mat-card-content>
@@ -25,26 +32,17 @@
           </p>
 
           <mat-chip-set class="action-chips">
-            <mat-chip
-              class="action-chip primary"
-              (click)="irANacimiento($event)"
-            >
+            <mat-chip class="action-chip primary" (click)="irANacimiento($event)">
               <mat-icon>child_care</mat-icon>
               Nacimientos
             </mat-chip>
 
-            <mat-chip
-              class="action-chip accent"
-              (click)="irATrabajo($event)"
-            >
+            <mat-chip class="action-chip accent" (click)="irATrabajo($event)">
               <mat-icon>work</mat-icon>
               Trabajo
             </mat-chip>
 
-            <mat-chip 
-              class="action-chip warn"
-              (click)="irABusqueda($event)"
-            >
+            <mat-chip class="action-chip warn" (click)="irABusqueda($event)">
               <mat-icon>search</mat-icon>
               En búsqueda
             </mat-chip>
@@ -52,11 +50,7 @@
         </mat-card-content>
       </mat-card>
 
-      <mat-card
-        class="service-card secondary"
-        tabindex="0"
-        (click)="navegarA('/tramites')"
-      >
+      <mat-card class="service-card secondary" tabindex="0" (click)="navegarA('/tramites')">
         <div class="card-icon">📋</div>
 
         <mat-card-content>
@@ -77,7 +71,12 @@
           </span>
         </mat-card-actions>
       </mat-card>
-
     </div>
   </div>
 </div>
+<ng-template #loading>
+  <div class="loading">
+    <mat-spinner></mat-spinner>
+    <p>Cargando información...</p>
+  </div>
+</ng-template>

@@ -6,14 +6,17 @@ import { AuthService } from './auth';
   providedIn: 'root'
 })
 export class AuthGuard implements CanActivate {
-  constructor(private auth: AuthService, private router: Router) {}
+  constructor(private auth: AuthService, private router: Router) { }
 
   canActivate(): boolean {
-    if (this.auth.isLoggedIn()) {
+    const isLoggedIn = this.auth.isLoggedIn();
+    console.log('¿Usuario autenticado?', isLoggedIn);  
+    if (isLoggedIn) {
       return true;
+    } else {
+      console.log('No autenticado, redirigiendo al login');
+      this.router.navigate(['/login']);
+      return false;
     }
-
-    this.router.navigate(['/login']);
-    return false;
   }
 }
