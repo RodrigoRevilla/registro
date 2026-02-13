@@ -8,7 +8,7 @@ import { catchError } from 'rxjs/operators';
   providedIn: 'root',
 })
 export class ApiService {
-  private baseUrl: string = 'https://uncarolled-kaylene-unplentiful.ngrok-free.dev/api/v1';
+  private baseUrl: string = '/api/v1';
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
