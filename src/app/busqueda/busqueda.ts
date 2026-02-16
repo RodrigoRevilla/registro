@@ -225,7 +225,7 @@ export class BusquedaComponent implements OnInit, AfterViewInit {
   }
 
   goHome(): void {
-    this.router.navigate(['/']);
+    this.router.navigate(['/home']);
   }
   imprimirTodos(): void {
     if (this.dataSource.data.length === 0) {

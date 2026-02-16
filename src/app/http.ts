@@ -10,10 +10,10 @@ import { catchError } from 'rxjs/operators';
 export class ApiService {
   private baseUrl: string = '/api/v1';
 
-  constructor(private http: HttpClient, private authService: AuthService) {}
+  constructor(private http: HttpClient, private authService: AuthService) { }
 
   cambiarEstado(id: number, estado: string, comentario: string): Observable<any> {
-    const token = this.authService.getToken(); 
+    const token = this.authService.getToken();
     if (!token) {
       console.error('Token no disponible. El usuario no está autenticado.');
       return throwError('Token no disponible. El usuario no está autenticado.');
@@ -51,9 +51,31 @@ export class ApiService {
     );
   }
 
+
+  // SOLICITUDES
+
+  crearSolicitud(datos: any): Observable<any> {
+    const token = this.authService.getToken();
+    if (!token) {
+      console.error('Token no disponible. El usuario no está autenticado.');
+      return throwError('Token no disponible. El usuario no está autenticado.');
+    }
+
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    });
+
+    return this.http.post<any>(`${this.baseUrl}/solicitudes`, datos, { headers }).pipe(
+      catchError((error) => {
+        console.error('Error al crear solicitud', error);
+        return throwError('Error al crear solicitud');
+      })
+    );
+  }
   // ACTOS REGISTRALES
   getActosRegistrales(): Observable<any> {
-    const token = this.authService.getToken(); 
+    const token = this.authService.getToken();
     if (!token) {
       console.error('Token no disponible. El usuario no está autenticado.');
       return throwError('Token no disponible. El usuario no está autenticado.');

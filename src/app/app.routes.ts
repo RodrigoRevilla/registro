@@ -19,5 +19,5 @@ export const routes: Routes = [
   { path: 'busqueda', component: BusquedaComponent, canActivate: [AuthGuard] },
   { path: 'generar', component: CertificacionComponent, canActivate: [AuthGuard] },
   { path: 'logout', component: LogoutComponent, canActivate: [AuthGuard]},
-  { path: '**', redirectTo: '/login' }  // ← Cambiar a login
+  { path: '**', redirectTo: '/login' }  
 ];
