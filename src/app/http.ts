@@ -12,6 +12,20 @@ export class ApiService {
 
   constructor(private http: HttpClient, private authService: AuthService) { }
 
+   getSolicitud(id: number): Observable<any> {
+    const token = this.authService.getToken();
+    if (!token) {
+      return throwError('Token no disponible. El usuario no está autenticado.');
+    }
+
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+
+    return this.http.get(`${this.baseUrl}/solicitudes/${id}`, { headers });
+  }
+
   cambiarEstado(id: number, estado: string, comentario: string): Observable<any> {
     const token = this.authService.getToken();
     if (!token) {
@@ -24,6 +38,10 @@ export class ApiService {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,
     });
+
+    console.log('Intentando POST a:', `${this.baseUrl}/solicitudes/${id}/cambio-estado`);
+    console.log('Headers:', headers);
+    console.log('Body:', body);
 
     return this.http.post<any>(`${this.baseUrl}/solicitudes/${id}/cambio-estado`, body, { headers });
   }
