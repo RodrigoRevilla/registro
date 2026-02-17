@@ -1,10 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiService } from '../http';
 import { AuthService } from '../auth';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-certificacion',
@@ -18,10 +17,10 @@ export class CertificacionComponent implements OnInit {
   solicitudId!: number;
   folio: string = '';
   actosRegistrales: any[] = [];
-  urlPagoPdf: SafeResourceUrl | null = null;
   folioGenerado: string | null = null;
   lineaCaptura: string | null = null;
   urlPdf: string | null = null;
+  mostrarPdf: boolean = false;
   procesando: boolean = false;
 
   datosSolicitud = {
@@ -41,7 +40,7 @@ export class CertificacionComponent implements OnInit {
     private router: Router,
     private apiService: ApiService,
     private authService: AuthService,
-    private sanitizer: DomSanitizer
+    private ngZone: NgZone
   ) { }
 
   ngOnInit(): void {
@@ -68,12 +67,15 @@ export class CertificacionComponent implements OnInit {
   }
 
   crearNuevaSolicitud(): void {
-
-    console.log('Payload enviado:', JSON.stringify(this.datosSolicitud, null, 2));
-
     this.apiService.crearSolicitud(this.datosSolicitud).subscribe({
       next: (response) => {
-        console.log('Respuesta backend:', response);
+        const url = response.data.linea_pago.url_pdf;
+        this.ngZone.run(() => {
+          this.urlPdf = url;
+          this.mostrarPdf = true;
+          const ventana = window.open(url, '_blank', `width=${screen.width},height=${screen.height},top=0,left=0`);
+          ventana?.addEventListener('load', () => ventana.print());
+        });
       },
       error: (error) => {
         console.log('Error backend completo:', error.error);
@@ -81,24 +83,11 @@ export class CertificacionComponent implements OnInit {
     });
   }
 
-
-
-  consultarPago(): void {
-    this.apiService.getPago(this.solicitudId).subscribe({
-      next: (response) => {
-        if (response.ok) {
-          const url = response.data.url_pdf;
-          this.urlPagoPdf = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-        }
-      },
-      error: (error) => {
-        console.error('Error al consultar pago', error);
-      }
-    });
-  }
-
   imprimir(): void {
-    window.print();
+    if (this.urlPdf) {
+      const ventana = window.open(this.urlPdf, '_blank', 'width=900,height=700');
+      ventana?.addEventListener('load', () => ventana.print());
+    }
   }
 
   goHome(): void {

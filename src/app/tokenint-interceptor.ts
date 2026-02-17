@@ -10,7 +10,7 @@ export class TokenInt implements HttpInterceptor {
       return next.handle(req);
     }
 
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (token) {
       const clonedRequest = req.clone({
         setHeaders: {

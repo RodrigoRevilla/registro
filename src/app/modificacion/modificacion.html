@@ -4,13 +4,19 @@
 
         <mat-card-header>
             <mat-card-title>
-                <mat-icon>edit</mat-icon>
-                Modificación de Solicitudes
+                <div class="custom-title">
+                    <span class="icon">✏️</span>
+                    <h1>Modificación de Solicitudes</h1>
+                </div>
             </mat-card-title>
         </mat-card-header>
-        <button mat-stroked-button color="primary" (click)="goHome()" class="btn-home">
-            🏠 Home
-        </button>
+
+        <mat-card-actions>
+            <button mat-stroked-button color="primary" (click)="goHome()" class="btn-home">
+                🏠 Home
+            </button>
+        </mat-card-actions>
+
         <mat-card-content>
             <div class="section search-section">
                 <div class="form-row">

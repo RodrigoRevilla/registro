@@ -231,17 +231,7 @@
     </button>
   </div>
 </form>
-
-<div *ngIf="urlPagoPdf" class="pdf-container">
-  <h2>🧾 Hoja de Pago - Finanzas</h2>
-
-  <iframe
-    [src]="urlPagoPdf"
-    width="100%"
-    height="700px"
-    style="border: 1px solid #ccc;">
-  </iframe>
-
+<div *ngIf="mostrarPdf" class="actions">
   <div class="actions">
     <button type="button" (click)="imprimir()">
       🖨️ Imprimir Hoja de Pago

@@ -12,40 +12,35 @@ export class AuthService {
 
   login(token: string, usuario: any) {
     if (isPlatformBrowser(this.platformId)) {
-      console.log('Guardando token:', token);
-      localStorage.setItem(this.tokenKey, token);
-      localStorage.setItem(this.usuarioKey, JSON.stringify(usuario));
+      sessionStorage.setItem(this.tokenKey, token);
+      sessionStorage.setItem(this.usuarioKey, JSON.stringify(usuario));
     }
   }
 
   logout() {
     if (isPlatformBrowser(this.platformId)) {
-      localStorage.removeItem(this.tokenKey);
-      localStorage.removeItem(this.usuarioKey);
+      sessionStorage.removeItem(this.tokenKey);
+      sessionStorage.removeItem(this.usuarioKey);
     }
   }
 
   isLoggedIn(): boolean {
     if (isPlatformBrowser(this.platformId)) {
-      const token = localStorage.getItem(this.tokenKey);
-      console.log('Token en isLoggedIn:', token);  
-      return !!token;  
+      return !!sessionStorage.getItem(this.tokenKey);
     }
     return false;
   }
-  
 
   getToken(): string | null {
     if (isPlatformBrowser(this.platformId)) {
-      const token = localStorage.getItem(this.tokenKey);
-      console.log('Token obtenido:', token);
-      return token;
+      return sessionStorage.getItem(this.tokenKey);
     }
     return null;
   }
+
   getUsuario(): any {
     if (isPlatformBrowser(this.platformId)) {
-      const u = localStorage.getItem(this.usuarioKey);
+      const u = sessionStorage.getItem(this.usuarioKey);
       return u ? JSON.parse(u) : null;
     }
     return null;

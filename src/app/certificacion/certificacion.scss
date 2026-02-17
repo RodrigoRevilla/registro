@@ -31,7 +31,6 @@
   --form-spacing-xl: 2rem;
 }
 
-// ─── Host / Fondo ─────────────────────────────────────────────────────────────
 :host {
   background: var(--form-bg);
   padding: 2rem 1.25rem;
@@ -39,7 +38,6 @@
   display: block;
 }
 
-// ─── Page Header ──────────────────────────────────────────────────────────────
 .page-header {
   max-width: 1200px;
   margin: 0 auto var(--form-spacing-xl);
@@ -75,7 +73,6 @@
   margin-bottom: var(--form-spacing-lg);
 }
 
-// ─── Título h2 ────────────────────────────────────────────────────────────────
 :host h2 {
   text-align: center;
   font-size: clamp(1.4rem, 3vw, 2rem);
@@ -96,7 +93,6 @@
   }
 }
 
-// ─── Form wrapper ─────────────────────────────────────────────────────────────
 :host form {
   max-width: 1200px;
   margin: 0 auto;
@@ -104,10 +100,9 @@
   background: transparent;
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;            // ← separación clara entre cards
+  gap: 1.25rem;          
 }
 
-// ─── Fieldset = Card ──────────────────────────────────────────────────────────
 :host fieldset {
   border: none;
   margin: 0;
@@ -125,7 +120,6 @@
   }
 }
 
-// ─── Legend = cabecera de la card ─────────────────────────────────────────────
 :host legend {
   display: block;
   width: 100%;
@@ -140,7 +134,6 @@
   border-bottom: 1.5px solid rgba(139, 21, 56, 0.12);
 }
 
-// ─── Filas de campos ──────────────────────────────────────────────────────────
 :host .form-row-multi {
   display: flex;
   flex-wrap: wrap;
@@ -152,7 +145,6 @@
   }
 }
 
-// ─── Grid de 4 columnas ───────────────────────────────────────────────────────
 .row-acta {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -178,7 +170,6 @@
   }
 }
 
-// ─── Labels ───────────────────────────────────────────────────────────────────
 :host label {
   display: flex;
   flex-direction: column;
@@ -190,7 +181,6 @@
   letter-spacing: 0.2px;
 }
 
-// ─── Tamaños de campo ─────────────────────────────────────────────────────────
 .field-tiny {
   flex: 0 0 65px;
   max-width: 65px;
@@ -225,7 +215,6 @@
   }
 }
 
-// ─── Field group ──────────────────────────────────────────────────────────────
 :host .field-group {
   display: flex;
   align-items: center;
@@ -241,7 +230,6 @@
   min-width: fit-content;
 }
 
-// ─── Inputs / Select / Textarea ───────────────────────────────────────────────
 :host input,
 :host select,
 :host textarea {
@@ -271,7 +259,6 @@
   min-height: 80px;
 }
 
-// ─── Radio inline ─────────────────────────────────────────────────────────────
 .radio-inline {
   display: flex;
   gap: 1.5rem;
@@ -295,7 +282,6 @@
   }
 }
 
-// ─── Nota small ───────────────────────────────────────────────────────────────
 fieldset small {
   display: block;
   padding: 0 1.25rem 0.75rem;
@@ -304,7 +290,6 @@ fieldset small {
   font-style: italic;
 }
 
-// ─── Botón Home ───────────────────────────────────────────────────────────────
 :host .btn-home {
   margin-bottom: 1.5rem;
   border-radius: 999px;
@@ -313,7 +298,6 @@ fieldset small {
   transition: var(--form-transition);
 }
 
-// ─── Observaciones (label.field-full fuera del fieldset) ──────────────────────
 form > label.field-full {
   background: var(--form-card);
   border-radius: var(--form-radius-md);
@@ -323,7 +307,6 @@ form > label.field-full {
   padding: 1rem 1.25rem;
 }
 
-// ─── Acciones ─────────────────────────────────────────────────────────────────
 .actions {
   display: flex;
   justify-content: flex-end;
@@ -365,7 +348,6 @@ form > label.field-full {
   }
 }
 
-// ─── Tablet (≤ 768px) ─────────────────────────────────────────────────────────
 @media (max-width: 768px) {
   :host {
     padding: 1.5rem 1rem;
@@ -377,7 +359,6 @@ form > label.field-full {
   }
 }
 
-// ─── Móvil (≤ 600px) ──────────────────────────────────────────────────────────
 @media (max-width: 600px) {
   :host {
     padding: 1rem 0.5rem;
