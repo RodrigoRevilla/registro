@@ -1,0 +1,60 @@
+.modificacion-container {
+  padding: 24px;
+  display: flex;
+  justify-content: center;
+}
+
+.mod-card {
+  width: 100%;
+  max-width: 1200px;
+  border-radius: 12px;
+}
+
+.section {
+  margin-bottom: 32px;
+  padding: 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  background: #fafafa;
+}
+
+.section-title {
+  margin-bottom: 16px;
+  font-weight: 600;
+  font-size: 16px;
+  color: #424242;
+}
+
+.search-section {
+  background: #f5f7fa;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.form-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.form-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+mat-card-header mat-icon {
+  margin-right: 8px;
+}
+
+mat-card-actions {
+  padding: 16px 24px;
+}

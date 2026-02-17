@@ -9,11 +9,11 @@
   --color-text: #1f2933;
   --color-subtext: #6b7280;
 
-  --radius-md: 10px;
-  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
 
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
-  --shadow-md: 0 2px 8px rgba(0,0,0,0.08);
+  --shadow-sm: 0 2px 6px rgba(0,0,0,0.06);
+  --shadow-md: 0 8px 24px rgba(0,0,0,0.06);
 }
 
 html, body {
@@ -25,8 +25,8 @@ html, body {
 }
 
 .container {
-  max-width: 100%;
-  margin: 1.5rem;
+  max-width: 1200px;
+  margin: 2rem auto;
   padding: 0;
   background: var(--color-white);
   border-radius: var(--radius-md);
@@ -37,64 +37,71 @@ html, body {
 }
 
 .header-section {
-  padding: 1rem 1.5rem;
+  padding: 1.5rem;
   background: #f9fafb;
-  border-bottom: 2px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  text-align: center;
 
   .title {
-    font-size: 1.2rem;
+    font-size: 1.4rem;
     font-weight: 700;
     margin: 0;
-    color: var(--color-text);
+    color: var(--color-primary);
   }
 
   .subtitle {
     font-size: 0.9rem;
     color: var(--color-subtext);
-    margin-top: 0.3rem;
+    margin-top: 0.4rem;
   }
 }
 
 .home-button-container {
-  padding: 0.75rem 1.5rem;
+  padding: 1rem 1.5rem;
   background: #fafafa;
   border-bottom: 1px solid var(--color-border);
 
   display: flex;
-  justify-content: center; 
+  justify-content: center;
   align-items: center;
+}
 
-  .home-btn {
-    border-radius: 999px;
-    font-weight: 600;
-    font-size: 0.85rem;
-    padding: 0.45rem 1.5rem;
-    border: 1px solid #e0c366;
-    background: white;
-    color: var(--color-primary);
-    transition: all 0.2s ease;
-    box-shadow: var(--shadow-sm);
+.home-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
 
-    &:hover {
-      background: #fef9e7;
-      transform: translateY(-1px);
-    }
+  width: auto;
+  max-width: fit-content;
+
+  padding: 0.6rem 1.5rem;
+  border-radius: 12px;
+
+  background: #ffffff;
+  border: 1.5px solid var(--color-primary);
+  color: var(--color-primary);
+
+  font-weight: 600;
+  font-size: 0.85rem;
+
+  transition: all 0.25s ease;
+
+  &:hover {
+    background: #fdf2f8;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(139, 21, 56, 0.15);
   }
 }
 
 .section-block {
-  padding: 1.2rem 1.5rem;
+  padding: 1.5rem;
   border-bottom: 1px solid var(--color-border);
-  background: #fafbfc;
-
-  &:nth-child(even) {
-    background: #ffffff;
-  }
+  background: #ffffff;
 
   .section-title {
-    font-size: 0.95rem;
+    font-size: 1rem;
     font-weight: 700;
-    margin-bottom: 1rem;
+    margin-bottom: 1.2rem;
     color: var(--color-text);
   }
 }
@@ -102,13 +109,13 @@ html, body {
 .form-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 0.85rem;
+  gap: 1rem;
 }
 
 .form-grid-parents {
   display: grid;
   grid-template-columns: 2fr 1fr;
-  gap: 0.85rem;
+  gap: 1rem;
 }
 
 mat-form-field {
@@ -121,25 +128,26 @@ mat-form-field {
 }
 
 .mat-mdc-form-field {
-  --mdc-outlined-text-field-container-shape: 6px;
+  --mdc-outlined-text-field-container-shape: 8px;
 }
 
 .actions {
-  padding: 1rem 1.5rem;
+  padding: 1.5rem;
   background: #f9fafb;
-  border-top: 2px solid var(--color-border);
+  border-top: 1px solid var(--color-border);
   display: flex;
   justify-content: flex-end;
-  gap: 0.75rem;
+  gap: 1rem;
 
   button {
     font-weight: 600;
-    min-height: 40px;
-    border-radius: 6px;
-    transition: all 0.2s ease;
+    min-height: 42px;
+    border-radius: 12px;
+    padding: 0 1.5rem;
+    transition: all 0.25s ease;
 
     &:hover {
-      transform: translateY(-1px);
+      transform: translateY(-2px);
       box-shadow: var(--shadow-sm);
     }
   }
@@ -152,12 +160,23 @@ button.mat-raised-button[color="primary"] {
     var(--color-primary-dark)
   );
   color: white;
+  border: none;
+}
+
+button.secondary-btn {
+  background: white;
+  border: 1.5px solid var(--color-primary);
+  color: var(--color-primary);
+
+  &:hover {
+    background: #fdf2f8;
+  }
 }
 
 @media (max-width: 768px) {
 
   .container {
-    margin: 0.75rem;
+    margin: 1rem;
   }
 
   .form-grid,

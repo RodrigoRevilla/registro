@@ -1,0 +1,146 @@
+<div class="modificacion-container fade-in">
+
+    <mat-card class="mod-card">
+
+        <mat-card-header>
+            <mat-card-title>
+                <mat-icon>edit</mat-icon>
+                Modificación de Solicitudes
+            </mat-card-title>
+        </mat-card-header>
+        <button mat-stroked-button color="primary" (click)="goHome()" class="btn-home">
+            🏠 Home
+        </button>
+        <mat-card-content>
+            <div class="section search-section">
+                <div class="form-row">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Folio</mat-label>
+                        <input matInput />
+                    </mat-form-field>
+
+                    <button mat-raised-button color="primary">
+                        <mat-icon>search</mat-icon>
+                        Buscar
+                    </button>
+                </div>
+            </div>
+            <div class="section">
+                <h3 class="section-title">Datos del Acta</h3>
+
+                <div class="form-grid-4">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Servicio</mat-label>
+                        <input matInput value="DATODELBACKEND" readonly />
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>Tipo de Acta</mat-label>
+                        <input matInput value="DATODELBACKEND" readonly />
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>Año</mat-label>
+                        <input matInput />
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>Fecha de Registro</mat-label>
+                        <input matInput type="date" />
+                    </mat-form-field>
+                </div>
+
+                <div class="form-grid-3">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Oficialía</mat-label>
+                        <input matInput />
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>No. de Acta</mat-label>
+                        <input matInput />
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>No. de Foja</mat-label>
+                        <input matInput />
+                    </mat-form-field>
+                </div>
+
+            </div>
+            <div class="section">
+                <h3 class="section-title">Registro</h3>
+
+                <div class="form-grid-4">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Localidad</mat-label>
+                        <input matInput />
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>Estado</mat-label>
+                        <input matInput />
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>Distrito</mat-label>
+                        <input matInput />
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>Municipio</mat-label>
+                        <input matInput />
+                    </mat-form-field>
+                </div>
+
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Nombre(s)</mat-label>
+                    <input matInput />
+                </mat-form-field>
+
+            </div>
+            <div class="section">
+                <h3 class="section-title">Datos Complementarios</h3>
+
+                <div class="form-grid-3">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Fecha Solicitud</mat-label>
+                        <input matInput type="date" />
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>Fecha Entrega</mat-label>
+                        <input matInput type="date" />
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>Fecha Pago</mat-label>
+                        <input matInput type="date" />
+                    </mat-form-field>
+                </div>
+
+            </div>
+            <div class="section">
+                <h3 class="section-title">Observaciones</h3>
+
+                <mat-form-field appearance="outline" class="full-width">
+                    <textarea matInput rows="4"></textarea>
+                </mat-form-field>
+            </div>
+
+        </mat-card-content>
+
+        <mat-card-actions align="end">
+            <button mat-stroked-button color="warn">
+                Cancelar
+            </button>
+
+            <button mat-raised-button color="primary">
+                <mat-icon>save</mat-icon>
+                Guardar Cambios
+            </button>
+        </mat-card-actions>
+
+    </mat-card>
+
+</div>

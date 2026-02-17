@@ -8,106 +8,125 @@ import { catchError } from 'rxjs/operators';
   providedIn: 'root',
 })
 export class ApiService {
+
   private baseUrl: string = '/api/v1';
 
-  constructor(private http: HttpClient, private authService: AuthService) { }
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) {}
 
-   getSolicitud(id: number): Observable<any> {
+  private getHeaders(): HttpHeaders {
     const token = this.authService.getToken();
+
     if (!token) {
-      return throwError('Token no disponible. El usuario no está autenticado.');
+      throw new Error('Token no disponible. Usuario no autenticado.');
     }
 
-    const headers = new HttpHeaders({
+    return new HttpHeaders({
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
     });
+  }
+  crearSolicitud(datos: any): Observable<any> {
+    return this.http
+      .post<any>(`${this.baseUrl}/solicitudes`, datos, {
+        headers: this.getHeaders()
+      })
+      .pipe(
+        catchError((error) => {
+          console.error('Error al crear solicitud', error);
+          return throwError(() => new Error('Error al crear solicitud'));
+        })
+      );
+  }
 
-    return this.http.get(`${this.baseUrl}/solicitudes/${id}`, { headers });
+  getSolicitud(id: number): Observable<any> {
+    return this.http
+      .get<any>(`${this.baseUrl}/solicitudes/${id}`, {
+        headers: this.getHeaders()
+      })
+      .pipe(
+        catchError((error) => {
+          console.error('Error al obtener solicitud', error);
+          return throwError(() => new Error('Error al obtener solicitud'));
+        })
+      );
+  }
+
+  getSolicitudPorFolio(folio: string): Observable<any> {
+    return this.http
+      .get<any>(`${this.baseUrl}/solicitudes/folio/${folio}`, {
+        headers: this.getHeaders()
+      })
+      .pipe(
+        catchError((error) => {
+          console.error('Error al obtener solicitud por folio', error);
+          return throwError(() => new Error('Error al obtener solicitud por folio'));
+        })
+      );
   }
 
   cambiarEstado(id: number, estado: string, comentario: string): Observable<any> {
-    const token = this.authService.getToken();
-    if (!token) {
-      console.error('Token no disponible. El usuario no está autenticado.');
-      return throwError('Token no disponible. El usuario no está autenticado.');
-    }
+    const body = {
+      estado_destino_clave: estado,
+      comentario: comentario
+    };
 
-    const body = { estado_destino_clave: estado, comentario: comentario };
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-    });
-
-    console.log('Intentando POST a:', `${this.baseUrl}/solicitudes/${id}/cambio-estado`);
-    console.log('Headers:', headers);
-    console.log('Body:', body);
-
-    return this.http.post<any>(`${this.baseUrl}/solicitudes/${id}/cambio-estado`, body, { headers });
+    return this.http
+      .post<any>(`${this.baseUrl}/solicitudes/${id}/cambio-estado`, body, {
+        headers: this.getHeaders()
+      })
+      .pipe(
+        catchError((error) => {
+          console.error('Error al cambiar estado', error);
+          return throwError(() => new Error('Error al cambiar estado'));
+        })
+      );
   }
 
   registrarImpresion(id: number, folio: string): Observable<any> {
-    const tokenKey = this.authService.getToken();
-    if (!tokenKey) {
-      console.error('Token no disponible. El usuario no está autenticado.');
-      return throwError('Token no disponible. El usuario no está autenticado.');
-    }
+    const body = {
+      folio_hoja_valorada: folio
+    };
 
-    const body = { folio_hoja_valorada: folio };
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${tokenKey}`,
-    });
-
-    console.log(`Llamando a la API para registrar impresión para la solicitud con ID: ${id} y folio: ${folio}`);
-
-    return this.http.post<any>(`${this.baseUrl}/solicitudes/${id}/impresion`, body, { headers }).pipe(
-      catchError((error) => {
-        console.error('Error al registrar impresión', error);
-        return throwError('Error al registrar impresión');
+    return this.http
+      .post<any>(`${this.baseUrl}/solicitudes/${id}/impresion`, body, {
+        headers: this.getHeaders()
       })
-    );
+      .pipe(
+        catchError((error) => {
+          console.error('Error al registrar impresión', error);
+          return throwError(() => new Error('Error al registrar impresión'));
+        })
+      );
   }
 
 
-  // SOLICITUDES
-
-  crearSolicitud(datos: any): Observable<any> {
-    const token = this.authService.getToken();
-    if (!token) {
-      console.error('Token no disponible. El usuario no está autenticado.');
-      return throwError('Token no disponible. El usuario no está autenticado.');
-    }
-
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-    });
-
-    return this.http.post<any>(`${this.baseUrl}/solicitudes`, datos, { headers }).pipe(
-      catchError((error) => {
-        console.error('Error al crear solicitud', error);
-        return throwError('Error al crear solicitud');
+  getPago(id: number): Observable<any> {
+    return this.http
+      .get<any>(`${this.baseUrl}/solicitudes/${id}/pago`, {
+        headers: this.getHeaders()
       })
-    );
+      .pipe(
+        catchError((error) => {
+          console.error('Error al obtener pago', error);
+          return throwError(() => new Error('Error al obtener pago'));
+        })
+      );
   }
-  // ACTOS REGISTRALES
+
   getActosRegistrales(): Observable<any> {
-    const token = this.authService.getToken();
-    if (!token) {
-      console.error('Token no disponible. El usuario no está autenticado.');
-      return throwError('Token no disponible. El usuario no está autenticado.');
-    }
-
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
-    });
-
-    return this.http.get<any>(`${this.baseUrl}/catalogos/actos-registrales`, { headers }).pipe(
-      catchError((error) => {
-        console.error('Error al obtener actos registrales', error);
-        return throwError('Error al obtener actos registrales');
+    return this.http
+      .get<any>(`${this.baseUrl}/catalogos/actos-registrales`, {
+        headers: this.getHeaders()
       })
-    );
+      .pipe(
+        catchError((error) => {
+          console.error('Error al obtener actos registrales', error);
+          return throwError(() => new Error('Error al obtener actos registrales'));
+        })
+      );
   }
+
 }

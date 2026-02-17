@@ -1,92 +1,100 @@
-<h2>Solicitud de Servicios de Nacimientos</h2>
-<form>
-  <button mat-stroked-button color="primary" (click)="goHome()" class="btn-home">
-    🏠 Home
-  </button>
+<div class="page-header">
+  <div class="page-header-content">
+    <h1>📄 Solicitud de Servicios de Nacimientos</h1>
+    <p>Captura la información del acta y del solicitante</p>
 
+    <button mat-stroked-button color="primary" (click)="goHome()" class="btn-home">
+      🏠 Home
+    </button>
+  </div>
+</div>
+
+<form>
   <fieldset>
     <legend>Datos del Acta</legend>
-
     <div class="form-row-multi">
       <div class="field-group">
         <span class="label-inline">Entidad:</span>
-        <input type="text" value="20" class="field-tiny" />
-        <input type="text" value="OAXACA" class="field-auto" />
+        <input type="text" class="field-tiny" />
+        <input type="text" class="field-auto" />
       </div>
 
       <div class="field-group">
         <span class="label-inline">Distrito:</span>
-        <input type="text" value="1" class="field-tiny" />
-        <input type="text" value="CENTRO" class="field-auto" />
+        <input type="text" class="field-tiny" />
+        <input type="text" class="field-auto" />
       </div>
     </div>
 
     <div class="form-row-multi">
       <div class="field-group">
         <span class="label-inline">Municipio:</span>
-        <input type="text" value="67" class="field-small" />
-        <input type="text" value="OAXACA DE JUAREZ" class="field-auto" />
+        <input type="text" class="field-tiny" />
+        <input type="text" class="field-auto" />
       </div>
 
       <div class="field-group">
         <span class="label-inline">Localidad:</span>
-        <input type="text" value="1" class="field-small" />
+        <input type="text" class="field-tiny" />
         <input type="text" class="field-auto" />
       </div>
     </div>
 
-    <div class="form-row-multi">
-      <label class="field-small">Foja: <input type="text" value="1" /></label>
-      <label class="field-small">Oficialía: <input type="text" value="1" /></label>
-      <label class="field-small">Acta: <input type="text" value="1" /></label>
-      <label class="field-small">EnDoc: <input type="text" value="1" /></label>
+    <div class="form-row-multi row-acta">
+      <label>Foja <input type="text" /></label>
+      <label>Oficialía <input type="text" /></label>
+      <label>Acta <input type="text" /></label>
+      <label>EnDoc <input type="text" /></label>
     </div>
 
-    <div class="form-row-multi">
-      <label class="field-medium">Fecha: <input type="date" value="2026-02-12" /></label>
-      <label class="field-small">Año: <input type="text" value="2011" /></label>
+    <div class="form-row-multi row-acta">
+      <label>Fecha: <input type="date" /></label>
+      <label>Año: <input type="text" /></label>
     </div>
   </fieldset>
+
   <fieldset>
     <legend>Datos del Registrado</legend>
 
-    <div class="form-row-multi">
-      <label class="field-auto">Nombre(s): <input type="text" value="PRUEBA PRUEBA PRUEBA" /></label>
-      <label class="field-medium">Crip: <input type="text" value="20067011100001H" /></label>
+    <div class="form-row-multi row-acta">
+      <label class="field-auto">Nombre(s): <input type="text" /></label>
+      <label class="field-medium">Crip: <input type="text" /></label>
     </div>
 
     <div class="form-row-multi">
       <div class="field-group">
         <span class="label-inline">Entidad nac:</span>
-        <input type="text" value="20" class="field-tiny" />
-        <input type="text" value="OAXACA" class="field-auto" />
+        <input type="text" class="field-tiny" />
+        <input type="text" class="field-auto" />
       </div>
 
       <div class="field-group">
         <span class="label-inline">Municipio nac:</span>
-        <input type="text" value="67" class="field-small" />
-        <input type="text" value="OAXACA DE JUAREZ" class="field-auto" />
+        <input type="text" class="field-tiny" />
+        <input type="text" class="field-auto" />
       </div>
     </div>
 
     <div class="form-row-multi">
       <div class="field-group">
         <span class="label-inline">Distrito nac:</span>
-        <input type="text" value="1" class="field-tiny" />
-        <input type="text" value="CENTRO" class="field-auto" />
+        <input type="text" class="field-tiny" />
+        <input type="text" class="field-auto" />
       </div>
 
       <div class="field-group">
         <span class="label-inline">Localidad nac:</span>
-        <input type="text" value="" class="field-auto" />
+        <input type="text" class="field-tiny" />
+        <input type="text" class="field-auto" />
       </div>
     </div>
 
-    <div class="form-row-multi">
+    <div class="form-row-multi row-acta">
       <label class="field-auto">Padre: <input type="text" /></label>
       <label class="field-auto">Madre: <input type="text" /></label>
     </div>
   </fieldset>
+
   <fieldset>
     <legend>Servicio</legend>
 
@@ -130,20 +138,21 @@
       <label class="field-small">Copias Solicitadas: <input type="number" /></label>
     </div>
 
-    <div class="form-row-multi">
+    <div class="form-row-multi row-acta">
       <label class="field-small">Años de búsqueda: <input type="text" /></label>
       <label class="field-small">Rango búsqueda: <input type="text" /></label>
     </div>
 
-    <div class="form-row-multi">
-      <label class="field-medium">Fecha Entrega: <input type="date" /></label>
-      <label class="field-small">Hora Entrega: <input type="time" value="11:00" /></label>
+    <div class="form-row-multi row-acta">
+      <label>Fecha Entrega: <input type="date" /></label>
+      <label>Hora Entrega: <input type="time" /></label>
     </div>
   </fieldset>
+
   <fieldset>
     <legend>Facturación</legend>
 
-    <label class="field-full">Nombre: <input type="text" value="PRUEBA PRUEBA PRUEBA" /></label>
+    <label class="field-full">Nombre: <input type="text" /></label>
 
     <div class="form-row-multi">
       <label class="field-auto">CFDI:
@@ -156,7 +165,7 @@
         </select>
       </label>
 
-      <label class="field-medium">RFC: <input type="text" value="XAXX010101000" /></label>
+      <label class="field-medium">RFC: <input type="text" /></label>
     </div>
 
     <label class="field-full">Régimen:
@@ -187,11 +196,12 @@
       </select>
     </label>
 
-    <div class="form-row-multi">
+    <div class="form-row-multi row-acta">
       <label class="field-medium">Correo: <input type="email" /></label>
-      <label class="field-medium">Codigo postal: <input type="text" /></label>
+      <label>Codigo postal: <input type="text" /></label>
     </div>
   </fieldset>
+
   <fieldset>
     <legend>Servicio Condonado</legend>
 
@@ -200,22 +210,41 @@
       <label><input type="radio" name="tipoCondonado" value="si" /> Condonado</label>
     </div>
 
-    <div class="form-row-multi">
+    <div class="form-row-multi row-acta">
       <label class="field-medium">No. Oficio: <input type="text" name="numeroOficio" /></label>
       <label class="field-medium">Fecha: <input type="date" name="fechaOficio" /></label>
     </div>
 
     <small>Anotar en caso de servicio CERTIF. C/ANOT. MARG YA PAGADA</small>
 
-    <div class="form-row-multi">
+    <div class="form-row-multi row-acta">
       <label class="field-medium">Recibo numero: <input type="text" /></label>
       <label class="field-medium">Fecha de pago: <input type="date" /></label>
     </div>
   </fieldset>
+
   <label class="field-full">Observaciones: <textarea rows="3"></textarea></label>
 
   <div class="actions">
-    <button type="button" (click)="imprimir()">imprimir</button>
-    <button type="button" (click)="certificar()">Certificar Solicitud</button>
+    <button type="button" (click)="crearNuevaSolicitud()">
+      💳 Generar Hoja de Pago
+    </button>
   </div>
 </form>
+
+<div *ngIf="urlPagoPdf" class="pdf-container">
+  <h2>🧾 Hoja de Pago - Finanzas</h2>
+
+  <iframe
+    [src]="urlPagoPdf"
+    width="100%"
+    height="700px"
+    style="border: 1px solid #ccc;">
+  </iframe>
+
+  <div class="actions">
+    <button type="button" (click)="imprimir()">
+      🖨️ Imprimir Hoja de Pago
+    </button>
+  </div>
+</div>

@@ -3,13 +3,9 @@
     <mat-card-title class="title">🔍 Búsqueda de Pagos</mat-card-title>
     <p class="subtitle">Consulte los pagos registrados por fecha</p>
   </div>
-
-  <div class="home-button-container">
-    <button mat-stroked-button color="primary" (click)="goHome()">
+    <button mat-stroked-button color="primary" (click)="goHome()" class="btn-home">
       🏠 Home
     </button>
-  </div>
-
   <mat-divider></mat-divider>
 
   <form [formGroup]="busquedaForm" class="search-form" (ngSubmit)="buscarPagos()">

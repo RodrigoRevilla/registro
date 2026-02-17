@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { AuthService } from '../auth';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { MatMenuModule } from '@angular/material/menu';
 
 @Component({
   selector: 'app-home',
@@ -17,7 +18,8 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
     MatButtonModule,
     MatIconModule,
     MatChipsModule,
-    MatProgressSpinner
+    MatProgressSpinner,
+    MatMenuModule
   ],
   templateUrl: './home.html',
   styleUrls: ['./home.scss'],
@@ -27,17 +29,17 @@ export class HomeComponent implements OnInit {
   constructor(
     private router: Router,
     public authService: AuthService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.isLoggedIn = this.authService.isLoggedIn();
 
-    if (!this.isLoggedIn){
+    if (!this.isLoggedIn) {
       this.router.navigate(['/login'])
     }
   }
 
-  logout():void{
+  logout(): void {
     this.authService.logout();
     this.router.navigate(['/login'])
   }
@@ -45,7 +47,7 @@ export class HomeComponent implements OnInit {
   navegarA(ruta: string) {
     this.router.navigate([ruta]);
   }
-  
+
   irANacimiento(event: MouseEvent) {
     event?.stopImmediatePropagation();
     this.router.navigate(['/nacimiento']);
@@ -60,4 +62,10 @@ export class HomeComponent implements OnInit {
     event?.stopImmediatePropagation();
     this.router.navigate(['/busqueda']);
   }
+
+  irAModificacion(event: Event) {
+    event.stopPropagation();
+    this.router.navigate(['/modificacion']);
+  }
 }
+

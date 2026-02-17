@@ -88,7 +88,7 @@
   }
 
   &:hover {
-    box-shadow: 
+    box-shadow:
       0 20px 40px rgba(0, 0, 0, 0.08),
       0 0 0 1px rgba(139, 21, 56, 0.1);
     transform: translateY(-6px);
@@ -157,7 +157,6 @@
   justify-content: flex-start;
 }
 
-// BOTONES REDISEÑADOS - Colores originales con animaciones optimizadas
 .action-chip {
   position: relative;
   display: inline-flex;
@@ -170,11 +169,10 @@
   letter-spacing: 0.01em;
   cursor: pointer;
   border: none;
-  overflow: visible; // Cambiado para evitar cortes
+  overflow: visible; 
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 
-  // Efecto de brillo animado
   &::before {
     content: '';
     position: absolute;
@@ -189,8 +187,7 @@
     z-index: 0;
   }
 
-  // Contenido del botón por encima del efecto
-  > * {
+  >* {
     position: relative;
     z-index: 1;
   }
@@ -200,11 +197,11 @@
     width: 1.1rem;
     height: 1.1rem;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    flex-shrink: 0; // Evita que se deforme
+    flex-shrink: 0; 
   }
 
   &:hover {
-    transform: translateY(-2px) scale(1.02); // Reducida la elevación
+    transform: translateY(-2px) scale(1.02); 
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
 
     &::before {
@@ -213,7 +210,7 @@
     }
 
     mat-icon {
-      transform: scale(1.1); // Quitada la rotación para evitar cortes
+      transform: scale(1.1); 
     }
   }
 
@@ -222,19 +219,17 @@
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
   }
 
-  // Efecto de foco para accesibilidad
   &:focus-visible {
     outline: 3px solid rgba(59, 130, 246, 0.5);
     outline-offset: 2px;
   }
 }
 
-// Variante Primary - Colores originales suaves
 .action-chip.primary {
   background: #eef2ff;
   color: #3730a3;
   border: 1px solid #c7d2fe;
-  
+
   &::after {
     content: '';
     position: absolute;
@@ -257,7 +252,6 @@
   }
 }
 
-// Variante Accent - Colores originales cyan
 .action-chip.accent {
   background: #ecfeff;
   color: #155e75;
@@ -285,7 +279,6 @@
   }
 }
 
-// Variante Warn - Colores originales naranja
 .action-chip.warn {
   background: #fff7ed;
   color: #9a3412;
@@ -313,7 +306,6 @@
   }
 }
 
-// Variante Success - Tonos suaves verde (opcional)
 .action-chip.success {
   background: #f0fdf4;
   color: #166534;
@@ -341,7 +333,6 @@
   }
 }
 
-// Variante Outline - Moderno con bordes
 .action-chip.outline {
   background: transparent;
   border: 2px solid #e5e7eb;
@@ -354,7 +345,6 @@
   }
 }
 
-// Animaciones mejoradas
 .fade-in {
   animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -367,6 +357,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -377,13 +368,13 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-// Responsive mejorado
 @media (max-width: 768px) {
   .header {
     padding: 1.25rem 1.5rem;
@@ -424,24 +415,85 @@
   }
 }
 
-    .btn-logout {
-      background-color: #ffffff;
-      color: #4c6ef5;
-      border: 2px solid #4c6ef5;
-      padding: 0.5rem 1.5rem;
-      font-size: 0.875rem;
-      border-radius: 12px;
-      font-weight: 600;
-      transition: all 0.3s ease;
-      cursor: pointer;
+.btn-logout {
+  background-color: #ffffff;
+  color: #4c6ef5;
+  border: 2px solid #4c6ef5;
+  padding: 0.5rem 1.5rem;
+  font-size: 0.875rem;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  cursor: pointer;
 
-      &:hover {
-        background-color: #4c6ef5;
-        color: #ffffff;
-        border-color: #3b56c7;
-      }
+  &:hover {
+    background-color: #4c6ef5;
+    color: #ffffff;
+    border-color: #3b56c7;
+  }
 
-      &:active {
-        transform: translateY(2px);
-      }
-    }
+  &:active {
+    transform: translateY(2px);
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-logout {
+  background: #fde8e8;              
+  color: #b91c1c;                  
+  border: 1.5px solid #ef4444;      
+  padding: 0.6rem 1.4rem;
+  border-radius: 12px;            
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.btn-logout:hover {
+  background: #ef4444;
+  color: white;
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.35);
+  transform: translateY(-2px);
+}
+
+.action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.action-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  padding: 0 1.6rem;
+  height: 48px;
+  border-radius: 12px;
+
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+/* Colores */
+.action-button.primary {
+  border: 1.5px solid #3f51b5;
+  background: #e8edf5;
+}
+
+.action-button.accent {
+  border: 1.5px solid #00838f;
+  background: #e0f7fa;
+}
+
+.action-button.warn {
+  border: 1.5px solid #8b1538;
+  background: #fdf2f8;
+}

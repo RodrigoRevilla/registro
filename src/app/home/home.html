@@ -4,9 +4,12 @@
       <mat-icon>account_balance</mat-icon>
       Sistema de Trámites y Consultas
     </h2>
-    <div>
-      <button mat-stroked-button (click)="logout()" class="btn-logout">Cerrar sesión</button>
-    </div>
+
+    <button class="btn-logout" (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      Cerrar sesión
+    </button>
+
     <ng-template #loadingTemplate>
       <div class="loading">
         <mat-spinner></mat-spinner>
@@ -21,36 +24,95 @@
     </p>
 
     <div class="cards-grid">
-      <mat-card class="service-card" (click)="navegarA('/buscadores')">
+      <mat-card class="service-card">
         <div class="card-icon">🔍</div>
 
         <mat-card-content>
-          <h3>Buscadores</h3>
+          <h3>SOFTWARE DE APOYO PARA TRAMITES Y SERVICIOS</h3>
           <p>
             Accede a sistemas especializados para localizar información
             oficial de manera rápida y segura.
           </p>
 
-          <mat-chip-set class="action-chips">
-            <mat-chip class="action-chip primary" (click)="irANacimiento($event)">
-              <mat-icon>child_care</mat-icon>
-              Nacimientos
-            </mat-chip>
+          <div class="action-buttons">
+            <button
+              mat-stroked-button
+              class="action-button primary"
+              [matMenuTriggerFor]="atencionMenu"
+            >
+              <mat-icon>groups</mat-icon>
+              Atención al Público
+              <mat-icon>arrow_drop_down</mat-icon>
+            </button>
 
-            <mat-chip class="action-chip accent" (click)="irATrabajo($event)">
-              <mat-icon>work</mat-icon>
-              Trabajo
-            </mat-chip>
+            <mat-menu #atencionMenu="matMenu">
+              <button mat-menu-item (click)="irANacimiento($event)">
+                <mat-icon>child_care</mat-icon>
+                Nacimientos
+              </button>
 
-            <mat-chip class="action-chip warn" (click)="irABusqueda($event)">
+              <button mat-menu-item disabled>
+                <mat-icon>favorite</mat-icon>
+                Matrimonio
+              </button>
+
+              <button mat-menu-item disabled>
+                <mat-icon>sentiment_very_dissatisfied</mat-icon>
+                Defunciones
+              </button>
+
+              <button mat-menu-item disabled>
+                <mat-icon>how_to_reg</mat-icon>
+                Reconocimientos
+              </button>
+
+              <button mat-menu-item disabled>
+                <mat-icon>gavel</mat-icon>
+                Divorcios
+              </button>
+
+              <button mat-menu-item disabled>
+                <mat-icon>child_friendly</mat-icon>
+                Adopciones
+              </button>
+
+              <button mat-menu-item disabled>
+                <mat-icon>assignment</mat-icon>
+                Inscripción de
+              </button>
+            </mat-menu>
+            <button
+              mat-stroked-button
+              class="action-button accent"
+              [matMenuTriggerFor]="buscadoresMenu"
+            >
               <mat-icon>search</mat-icon>
-              En búsqueda
-            </mat-chip>
-          </mat-chip-set>
+              buscadores
+              <mat-icon>arrow_drop_down</mat-icon>
+            </button>
+
+            <mat-menu #buscadoresMenu="matMenu">
+
+              <button mat-menu-item (click)="irATrabajo($event)">
+                <mat-icon>work</mat-icon>
+                Trabajo
+              </button>
+
+              <button mat-menu-item (click)="irABusqueda($event)">
+                <mat-icon>search</mat-icon>
+                En búsqueda
+              </button>
+              <button mat-menu-item (click)="irAModificacion($event)">
+                <mat-icon>edit</mat-icon>
+                Modificación
+              </button>
+
+            </mat-menu>
+
+          </div>
         </mat-card-content>
       </mat-card>
-
-      <mat-card class="service-card secondary" tabindex="0" (click)="navegarA('/tramites')">
+      <mat-card class="service-card secondary">
         <div class="card-icon">📋</div>
 
         <mat-card-content>
@@ -71,9 +133,11 @@
           </span>
         </mat-card-actions>
       </mat-card>
+
     </div>
   </div>
 </div>
+
 <ng-template #loading>
   <div class="loading">
     <mat-spinner></mat-spinner>

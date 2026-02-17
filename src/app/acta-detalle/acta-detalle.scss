@@ -102,7 +102,7 @@ mat-chip-set {
     width: 45px;
     height: 45px;
     object-fit: contain;
-    flex-shrink: 0; 
+    flex-shrink: 0;
     display: block;
     background-color: white;
     border-radius: 50%;
@@ -391,23 +391,13 @@ mat-dialog-actions {
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 @keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 @media (max-width: 1200px) {
@@ -441,14 +431,92 @@ mat-dialog-actions {
 }
 
 @media (max-width: 600px) {
+  .acta-detalle-container {
+    border-radius: 0;
+  }
+
+  .header {
+    padding: 0.75rem 1rem;
+
+    h2 {
+      font-size: 0.95rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: calc(100% - 48px); 
+    }
+  }
+
+  mat-dialog-content {
+    padding: 0.85rem 0.85rem;
+  }
+
   .estado-header {
     flex-direction: column;
-    gap: 0.65rem;
     align-items: stretch;
+    gap: 0.65rem;
+    padding: 0.75rem;
   }
 
   .btn-aguila-top {
     justify-content: center;
     width: 100%;
+    height: 44px;
+    border-radius: 8px; 
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+  }
+
+  .info-item {
+    padding: 0.7rem 0.8rem;
+
+    label {
+      font-size: 0.65rem;
+    }
+
+    p {
+      font-size: 0.85rem;
+
+      &.nombre-completo {
+        font-size: 0.98rem;
+      }
+
+      &.curp {
+        font-size: 0.78rem;
+        word-break: break-all; 
+      }
+    }
+  }
+
+  .parent-section {
+    padding: 0.75rem;
+  }
+
+  .info-section {
+    mat-card-content {
+      padding: 0.75rem;
+    }
+
+    mat-card-header {
+      padding: 0.7rem 0.85rem;
+
+      mat-card-title {
+        font-size: 0.9rem;
+      }
+    }
+  }
+
+  mat-dialog-actions {
+    padding: 0.85rem 1rem;
+    flex-direction: column;
+    gap: 0.6rem;
+
+    button {
+      width: 100%;
+      min-height: 44px; 
+    }
   }
 }
