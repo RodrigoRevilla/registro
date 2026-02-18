@@ -1,0 +1,152 @@
+<div class="modificacion-container fade-in">
+
+  <mat-card class="mod-card">
+
+    <mat-card-header>
+      <mat-card-title>
+        <div class="custom-title">
+          <span class="icon">💳</span>
+          <h1>Consulta de Pago</h1>
+        </div>
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-actions>
+      <button mat-stroked-button color="primary" (click)="goHome()" class="btn-home">
+        🏠 Home
+      </button>
+    </mat-card-actions>
+
+    <mat-card-content>
+      <div class="section search-section">
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Folio</mat-label>
+            <input matInput [(ngModel)]="folioBuscar" />
+          </mat-form-field>
+          <button mat-raised-button color="primary" (click)="buscarFolio()">
+            <mat-icon>search</mat-icon>
+            Buscar
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="solicitud" class="section">
+        <h3 class="section-title">Detalles de la Solicitud</h3>
+
+        <div class="form-grid-3">
+
+          <mat-form-field appearance="outline">
+            <mat-label>Años de Búsqueda</mat-label>
+            <input matInput [value]="solicitud.aniosBusqueda" readonly />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Solicitud</mat-label>
+            <input matInput [value]="solicitud.solicitud" readonly />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Oficialía</mat-label>
+            <input matInput [value]="solicitud.oficialia" readonly />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Número de Acta</mat-label>
+            <input matInput [value]="solicitud.numeroActa" readonly />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Número de Foja</mat-label>
+            <input matInput [value]="solicitud.numeroFoja" readonly />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Fecha de Registro</mat-label>
+            <input matInput type="date" [value]="solicitud.fechaRegistro | date:'yyyy-MM-dd'" readonly />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Lugar de Registro</mat-label>
+            <input matInput [value]="solicitud.lugarRegistro" readonly />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Rango de Búsqueda</mat-label>
+            <input matInput [value]="solicitud.rangoBusqueda" readonly />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Estado Biológico</mat-label>
+            <input matInput [value]="solicitud.estadoBiologico" readonly />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Estado del Acta</mat-label>
+            <input matInput [value]="solicitud.estadoActa" readonly />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Documento Presentado</mat-label>
+            <input matInput [value]="solicitud.documentoPresentado" readonly />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Nombres</mat-label>
+            <input matInput [value]="solicitud.nombres" readonly />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>CRIP</mat-label>
+            <input matInput [value]="solicitud.crip" readonly />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Sexo</mat-label>
+            <input matInput [value]="solicitud.sexo" readonly />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Copias Solicitadas</mat-label>
+            <input matInput [value]="solicitud.copiasSolicitadas" readonly />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Fecha de Entrega (día/hora)</mat-label>
+            <input matInput type="datetime-local" [value]="solicitud.fechaEntregaHora ? (solicitud.fechaEntregaHora | date:'yyyy-MM-ddTHH:mm') : ''" readonly />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Fecha de Solicitud (día/hora)</mat-label>
+            <input matInput type="datetime-local" [value]="solicitud.fechaSolicitudHora ? (solicitud.fechaSolicitudHora | date:'yyyy-MM-ddTHH:mm') : ''" readonly />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Status</mat-label>
+            <input matInput [value]="solicitud.status" readonly />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Línea de Captura</mat-label>
+            <input matInput [value]="solicitud.lineaCaptura" readonly />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Tipo de Acta</mat-label>
+            <input matInput [value]="solicitud.tipoActa" readonly />
+          </mat-form-field>
+
+        </div>
+      </div>
+
+    </mat-card-content>
+
+    <mat-card-actions align="end" *ngIf="solicitud">
+      <button mat-raised-button color="primary" (click)="marcarPagado()">
+        <mat-icon>payment</mat-icon>
+        Pagado
+      </button>
+    </mat-card-actions>
+
+  </mat-card>
+</div>

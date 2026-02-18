@@ -28,18 +28,14 @@
         <div class="card-icon">🔍</div>
 
         <mat-card-content>
-          <h3>SOFTWARE DE APOYO PARA TRAMITES Y SERVICIOS</h3>
+          <h3>SOFTWARE DE APOYO PARA TRÁMITES Y SERVICIOS</h3>
           <p>
             Accede a sistemas especializados para localizar información
             oficial de manera rápida y segura.
           </p>
 
           <div class="action-buttons">
-            <button
-              mat-stroked-button
-              class="action-button primary"
-              [matMenuTriggerFor]="atencionMenu"
-            >
+            <button mat-stroked-button class="action-button primary" [matMenuTriggerFor]="atencionMenu">
               <mat-icon>groups</mat-icon>
               Atención al Público
               <mat-icon>arrow_drop_down</mat-icon>
@@ -50,54 +46,43 @@
                 <mat-icon>child_care</mat-icon>
                 Nacimientos
               </button>
-
               <button mat-menu-item disabled>
                 <mat-icon>favorite</mat-icon>
                 Matrimonio
               </button>
-
               <button mat-menu-item disabled>
                 <mat-icon>sentiment_very_dissatisfied</mat-icon>
                 Defunciones
               </button>
-
               <button mat-menu-item disabled>
                 <mat-icon>how_to_reg</mat-icon>
                 Reconocimientos
               </button>
-
               <button mat-menu-item disabled>
                 <mat-icon>gavel</mat-icon>
                 Divorcios
               </button>
-
               <button mat-menu-item disabled>
                 <mat-icon>child_friendly</mat-icon>
                 Adopciones
               </button>
-
               <button mat-menu-item disabled>
                 <mat-icon>assignment</mat-icon>
                 Inscripción de
               </button>
             </mat-menu>
-            <button
-              mat-stroked-button
-              class="action-button accent"
-              [matMenuTriggerFor]="buscadoresMenu"
-            >
+
+            <button mat-stroked-button class="action-button accent" [matMenuTriggerFor]="buscadoresMenu">
               <mat-icon>search</mat-icon>
               buscadores
               <mat-icon>arrow_drop_down</mat-icon>
             </button>
 
             <mat-menu #buscadoresMenu="matMenu">
-
               <button mat-menu-item (click)="irATrabajo($event)">
                 <mat-icon>work</mat-icon>
                 Trabajo
               </button>
-
               <button mat-menu-item (click)="irABusqueda($event)">
                 <mat-icon>search</mat-icon>
                 En búsqueda
@@ -106,9 +91,12 @@
                 <mat-icon>edit</mat-icon>
                 Modificación
               </button>
-
             </mat-menu>
 
+            <button mat-stroked-button class="action-button warn" (click)="irAActualizarPago($event)">
+              <mat-icon>payment</mat-icon>
+              Actualizar pago de solicitud
+            </button>
           </div>
         </mat-card-content>
       </mat-card>

@@ -9,6 +9,7 @@ import { LoginComponent } from './login/login';
 import { AuthGuard } from './auth-guard'; 
 import { LogoutComponent } from './logout/logout';
 import { ModificacionComponent } from './modificacion/modificacion';
+import { ConsultaPagoComponent } from './act-pag/act-pag';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' }, 
@@ -20,6 +21,7 @@ export const routes: Routes = [
   { path: 'busqueda', component: BusquedaComponent, canActivate: [AuthGuard] },
   { path: 'generar', component: CertificacionComponent, canActivate: [AuthGuard] },
   { path: 'modificacion', component: ModificacionComponent },
+  { path: 'actualizar', component: ConsultaPagoComponent, canActivate: [AuthGuard]},
   { path: 'logout', component: LogoutComponent, canActivate: [AuthGuard]},
   { path: '**', redirectTo: '/login' }  
 ];

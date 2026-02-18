@@ -67,5 +67,10 @@ export class HomeComponent implements OnInit {
     event.stopPropagation();
     this.router.navigate(['/modificacion']);
   }
+
+  irAActualizarPago(event: Event): void {
+    event.preventDefault();
+    this.router.navigate(['/actualizar']);
+  }
 }
 
