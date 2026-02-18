@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from './auth';
-import { Observable, throwError } from 'rxjs';
+import { Observable, throwError, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 @Injectable({
@@ -33,7 +33,9 @@ export class ApiService {
 
   getSolicitudPorFolio(folio: string): Observable<any> {
     return this.http
-      .get<any>(`${this.baseUrl}/solicitudes/folio/${folio}`, { headers: this.getHeaders() })
+      .get<any>(`${this.baseUrl}/solicitudes/folio/${folio}`, {
+        headers: this.getHeaders(),
+      })
       .pipe(catchError((error) => throwError(() => error)));
   }
 
@@ -62,15 +64,25 @@ export class ApiService {
 
   getPago(id: number): Observable<any> {
     return this.http
-      .get<any>(`${this.baseUrl}/solicitudes/${id}/pago`, { headers: this.getHeaders() })
-      .pipe(catchError((error) => throwError(() => error)));
+      .get<any>(`${this.baseUrl}/solicitudes/${id}/pago`, {
+        headers: this.getHeaders(),
+      })
+      .pipe(
+        catchError((error) => {
+          console.warn('getPago error (puede ser normal si no tiene pago):', error.status);
+          return of({ data: null });
+        })
+      );
   }
 
-  confirmarPago(payload: { referencia_pago: string }): Observable<any> {
-    return this.http
-      .post<any>(`${this.baseUrl}/pagos/confirmacion`, payload, { headers: { 'Content-Type': 'application/json' } })
-      .pipe(catchError((error) => throwError(() => error)));
-  }
+    confirmarPago(solicitudId: number): Observable<any> {
+      console.log('Request confirmarPago:', { solicitudId, url: `TU_URL/${solicitudId}` });
+      return this.http.post<any>(
+        `${this.baseUrl}/pagos/confirmar`,
+        { solicitud_id: solicitudId },
+        { headers: this.getHeaders() }
+      );
+    }
 
   getActosRegistrales(): Observable<any> {
     return this.http

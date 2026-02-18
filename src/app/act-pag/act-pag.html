@@ -1,5 +1,4 @@
 <div class="modificacion-container fade-in">
-
   <mat-card class="mod-card">
 
     <mat-card-header>
@@ -22,131 +21,142 @@
         <div class="form-row">
           <mat-form-field appearance="outline">
             <mat-label>Folio</mat-label>
-            <input matInput [(ngModel)]="folioBuscar" />
+            <input matInput [(ngModel)]="folioBuscar" (keyup.enter)="buscarFolio()" />
           </mat-form-field>
-          <button mat-raised-button color="primary" (click)="buscarFolio()">
+          <button mat-raised-button color="primary"
+            (click)="buscarFolio()"
+            [disabled]="procesando$ | async">
             <mat-icon>search</mat-icon>
-            Buscar
+            {{ (procesando$ | async) ? 'Buscando...' : 'Buscar' }}
           </button>
         </div>
       </div>
 
-      <div *ngIf="solicitud" class="section">
-        <h3 class="section-title">Detalles de la Solicitud</h3>
+      <!-- ✅ async pipe se suscribe al BehaviorSubject y actualiza la vista automáticamente -->
+      <ng-container *ngIf="solicitud$ | async as sol">
+        <div class="section">
+          <h3 class="section-title">Detalles de la Solicitud</h3>
+          <div class="form-grid-3">
 
-        <div class="form-grid-3">
+            <mat-form-field appearance="outline">
+              <mat-label>Años de Búsqueda</mat-label>
+              <input matInput [value]="sol.aniosBusqueda" readonly />
+            </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Años de Búsqueda</mat-label>
-            <input matInput [value]="solicitud.aniosBusqueda" readonly />
-          </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Solicitud</mat-label>
+              <input matInput [value]="sol.solicitud" readonly />
+            </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Solicitud</mat-label>
-            <input matInput [value]="solicitud.solicitud" readonly />
-          </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Oficialía</mat-label>
+              <input matInput [value]="sol.oficialia" readonly />
+            </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Oficialía</mat-label>
-            <input matInput [value]="solicitud.oficialia" readonly />
-          </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Número de Acta</mat-label>
+              <input matInput [value]="sol.numeroActa" readonly />
+            </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Número de Acta</mat-label>
-            <input matInput [value]="solicitud.numeroActa" readonly />
-          </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Número de Foja</mat-label>
+              <input matInput [value]="sol.numeroFoja" readonly />
+            </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Número de Foja</mat-label>
-            <input matInput [value]="solicitud.numeroFoja" readonly />
-          </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Fecha de Registro</mat-label>
+              <input matInput type="date" [value]="sol.fechaRegistro | date:'yyyy-MM-dd'" readonly />
+            </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Fecha de Registro</mat-label>
-            <input matInput type="date" [value]="solicitud.fechaRegistro | date:'yyyy-MM-dd'" readonly />
-          </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Lugar de Registro</mat-label>
+              <input matInput [value]="sol.lugarRegistro" readonly />
+            </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Lugar de Registro</mat-label>
-            <input matInput [value]="solicitud.lugarRegistro" readonly />
-          </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Rango de Búsqueda</mat-label>
+              <input matInput [value]="sol.rangoBusqueda" readonly />
+            </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Rango de Búsqueda</mat-label>
-            <input matInput [value]="solicitud.rangoBusqueda" readonly />
-          </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Estado Biológico</mat-label>
+              <input matInput [value]="sol.estadoBiologico" readonly />
+            </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Estado Biológico</mat-label>
-            <input matInput [value]="solicitud.estadoBiologico" readonly />
-          </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Estado del Acta</mat-label>
+              <input matInput [value]="sol.estadoActa" readonly />
+            </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Estado del Acta</mat-label>
-            <input matInput [value]="solicitud.estadoActa" readonly />
-          </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Documento Presentado</mat-label>
+              <input matInput [value]="sol.documentoPresentado" readonly />
+            </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Documento Presentado</mat-label>
-            <input matInput [value]="solicitud.documentoPresentado" readonly />
-          </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Nombres</mat-label>
+              <input matInput [value]="sol.nombres" readonly />
+            </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Nombres</mat-label>
-            <input matInput [value]="solicitud.nombres" readonly />
-          </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>CRIP</mat-label>
+              <input matInput [value]="sol.crip" readonly />
+            </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>CRIP</mat-label>
-            <input matInput [value]="solicitud.crip" readonly />
-          </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Sexo</mat-label>
+              <input matInput [value]="sol.sexo" readonly />
+            </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Sexo</mat-label>
-            <input matInput [value]="solicitud.sexo" readonly />
-          </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Copias Solicitadas</mat-label>
+              <input matInput [value]="sol.copiasSolicitadas" readonly />
+            </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Copias Solicitadas</mat-label>
-            <input matInput [value]="solicitud.copiasSolicitadas" readonly />
-          </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Fecha de Entrega (día/hora)</mat-label>
+              <input matInput type="datetime-local"
+                [value]="sol.fechaEntregaHora ? (sol.fechaEntregaHora | date:'yyyy-MM-ddTHH:mm') : ''"
+                readonly />
+            </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Fecha de Entrega (día/hora)</mat-label>
-            <input matInput type="datetime-local" [value]="solicitud.fechaEntregaHora ? (solicitud.fechaEntregaHora | date:'yyyy-MM-ddTHH:mm') : ''" readonly />
-          </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Fecha de Solicitud (día/hora)</mat-label>
+              <input matInput type="datetime-local"
+                [value]="sol.fechaSolicitudHora ? (sol.fechaSolicitudHora | date:'yyyy-MM-ddTHH:mm') : ''"
+                readonly />
+            </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Fecha de Solicitud (día/hora)</mat-label>
-            <input matInput type="datetime-local" [value]="solicitud.fechaSolicitudHora ? (solicitud.fechaSolicitudHora | date:'yyyy-MM-ddTHH:mm') : ''" readonly />
-          </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Status</mat-label>
+              <input matInput [value]="sol.status" readonly />
+            </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Status</mat-label>
-            <input matInput [value]="solicitud.status" readonly />
-          </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Línea de Captura</mat-label>
+              <input matInput [value]="sol.lineaCaptura" readonly />
+            </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Línea de Captura</mat-label>
-            <input matInput [value]="solicitud.lineaCaptura" readonly />
-          </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Tipo de Acta</mat-label>
+              <input matInput [value]="sol.tipoActa" readonly />
+            </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Tipo de Acta</mat-label>
-            <input matInput [value]="solicitud.tipoActa" readonly />
-          </mat-form-field>
-
+          </div>
         </div>
-      </div>
+
+        <mat-card-actions align="end">
+          <button *ngIf="sol.status === 'PENDIENTE_PAGO'" class="btn-confirmar"
+            [disabled]="procesando$ | async"
+            (click)="confirmarPagoManual()">
+            <mat-icon>payments</mat-icon>
+            {{ (procesando$ | async) ? 'Procesando...' : 'Confirmar Pago' }}
+          </button>
+        </mat-card-actions>
+
+      </ng-container>
 
     </mat-card-content>
-
-    <mat-card-actions align="end" *ngIf="solicitud">
-      <button mat-raised-button color="primary" (click)="marcarPagado()">
-        <mat-icon>payment</mat-icon>
-        Pagado
-      </button>
-    </mat-card-actions>
 
   </mat-card>
 </div>
