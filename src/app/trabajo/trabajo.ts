@@ -3,14 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { MatCardModule }           from '@angular/material/card';
-import { MatButtonModule }         from '@angular/material/button';
-import { MatIconModule }           from '@angular/material/icon';
-import { MatDividerModule }        from '@angular/material/divider';
-import { MatFormFieldModule }      from '@angular/material/form-field';
-import { MatInputModule }          from '@angular/material/input';
-import { MatDatepickerModule }     from '@angular/material/datepicker';
-import { MatNativeDateModule }     from '@angular/material/core';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 interface Solicitud {
@@ -58,10 +58,10 @@ interface ApiResponse<T> {
 
 
 
-const PRIMER_ANIO        = 1916;
+const PRIMER_ANIO = 1916;
 const BLOQUE_INICIAL_FIN = 1949;
-const TAMANO_BLOQUE      = 10;
-const ULTIMO_ANIO        = new Date().getFullYear();
+const TAMANO_BLOQUE = 10;
+const ULTIMO_ANIO = new Date().getFullYear();
 
 function buildYearRanges(): Omit<YearRange, 'count'>[] {
   const ranges: Omit<YearRange, 'count'>[] = [
@@ -78,9 +78,9 @@ function buildYearRanges(): Omit<YearRange, 'count'>[] {
 }
 
 const ESTADOS_POR_FILTRO: Record<string, string[]> = {
-  busquedas:    ['EN_BUSQUEDA', 'ASIGNADA', 'PENDIENTE_ASIGNACION'],
-  negativos:    ['NO_ENCONTRADA'],
-  fotocopias:   ['EN_CERTIFICACION', 'CERTIFICACION_EMITIDA'],
+  busquedas: ['EN_BUSQUEDA', 'ASIGNADA', 'PENDIENTE_ASIGNACION'],
+  negativos: ['NO_ENCONTRADA'],
+  fotocopias: ['EN_CERTIFICACION', 'CERTIFICACION_EMITIDA'],
   validaciones: ['EN_VALIDACION', 'VALIDADA'],
   todos: [
     'RECIBIDA', 'PENDIENTE_PAGO', 'PAGADA', 'PENDIENTE_ASIGNACION',
@@ -108,6 +108,7 @@ const ESTADOS_POR_FILTRO: Record<string, string[]> = {
     MatProgressSpinnerModule,
   ],
   templateUrl: './trabajo.html',
+  styleUrls: ['./trabajo.scss']
 })
 export class TrabajoComponent implements OnInit {
 
@@ -119,11 +120,11 @@ export class TrabajoComponent implements OnInit {
   }
 
   filters = [
-    { label: 'BÚSQUEDAS',    value: 'busquedas'    },
-    { label: 'NEGATIVOS',    value: 'negativos'    },
-    { label: 'FOTOCOPIAS',   value: 'fotocopias'   },
+    { label: 'BÚSQUEDAS', value: 'busquedas' },
+    { label: 'NEGATIVOS', value: 'negativos' },
+    { label: 'FOTOCOPIAS', value: 'fotocopias' },
     { label: 'VALIDACIONES', value: 'validaciones' },
-    { label: 'TODOS',        value: 'todos'        },
+    { label: 'TODOS', value: 'todos' },
   ];
   currentFilter = 'todos';
   fechaPago: Date | null = new Date();
@@ -132,16 +133,16 @@ export class TrabajoComponent implements OnInit {
   isLoading = false;
   payments: Payment[] = [];
   private allPayments: Payment[] = [];
-  private catalogoActos:     Catalogo[] = [];
+  private catalogoActos: Catalogo[] = [];
   private catalogoServicios: Catalogo[] = [];
-  private catalogoEstados:   Catalogo[] = [];
+  private catalogoEstados: Catalogo[] = [];
 
   get resultsCount(): string {
     const n = this.payments.length;
     return n === 1 ? '1 resultado' : `${n} resultados`;
   }
 
-  constructor(private http: HttpClient, private router: Router, private cdr: ChangeDetectorRef) {}
+  constructor(private http: HttpClient, private router: Router, private cdr: ChangeDetectorRef) { }
 
   async ngOnInit() {
     await this.cargarCatalogos();
@@ -204,10 +205,10 @@ export class TrabajoComponent implements OnInit {
           .get<ApiResponse<Solicitud[]>>(url, { headers: this.headers })
           .toPromise();
         if (!resp?.ok || !resp.data || resp.data.length === 0) {
-              break;
+          break;
         }
 
-          acumulado.push(...resp.data);
+        acumulado.push(...resp.data);
 
         if (resp.meta) {
           total = resp.meta.total;
@@ -224,18 +225,18 @@ export class TrabajoComponent implements OnInit {
   }
 
   private toPayment(s: Solicitud): Payment {
-    const acto     = this.catalogoActos.find(a => a.id === s.acto_registral_id);
+    const acto = this.catalogoActos.find(a => a.id === s.acto_registral_id);
     const servicio = this.catalogoServicios.find(sv => sv.id === s.tipo_servicio_id);
-    const estado   = this.catalogoEstados.find(e => e.id === s.estado_id);
+    const estado = this.catalogoEstados.find(e => e.id === s.estado_id);
 
     return {
-      id:          s.folio,
-      fecha:       s.fecha_recepcion ? new Date(s.fecha_recepcion).toLocaleDateString('es-MX') : '—',
-      monto:       '—',
-      concepto:    `${acto?.nombre ?? 'Acto ' + s.acto_registral_id} — ${servicio?.nombre ?? 'Servicio ' + s.tipo_servicio_id}`,
-      referencia:  s.folio,
-      metodo:      'Línea de Captura',
-      anio:        this.extraerAnio(s),
+      id: s.folio,
+      fecha: s.fecha_recepcion ? new Date(s.fecha_recepcion).toLocaleDateString('es-MX') : '—',
+      monto: '—',
+      concepto: `${acto?.nombre ?? 'Acto ' + s.acto_registral_id} — ${servicio?.nombre ?? 'Servicio ' + s.tipo_servicio_id}`,
+      referencia: s.folio,
+      metodo: 'Línea de Captura',
+      anio: this.extraerAnio(s),
       estadoClave: estado?.clave ?? String(s.estado_id),
       rawSolicitud: s,
     };
@@ -279,12 +280,12 @@ export class TrabajoComponent implements OnInit {
     try {
       const [actos, servicios, estados] = await Promise.all([
         this.http.get<ApiResponse<Catalogo[]>>(`${this.API}/catalogos/actos-registrales`, { headers: this.headers }).toPromise(),
-        this.http.get<ApiResponse<Catalogo[]>>(`${this.API}/catalogos/tipos-servicio`,    { headers: this.headers }).toPromise(),
-        this.http.get<ApiResponse<Catalogo[]>>(`${this.API}/catalogos/estados`,           { headers: this.headers }).toPromise(),
+        this.http.get<ApiResponse<Catalogo[]>>(`${this.API}/catalogos/tipos-servicio`, { headers: this.headers }).toPromise(),
+        this.http.get<ApiResponse<Catalogo[]>>(`${this.API}/catalogos/estados`, { headers: this.headers }).toPromise(),
       ]);
-      this.catalogoActos     = actos?.data     ?? [];
+      this.catalogoActos = actos?.data ?? [];
       this.catalogoServicios = servicios?.data ?? [];
-      this.catalogoEstados   = estados?.data   ?? [];
+      this.catalogoEstados = estados?.data ?? [];
     } catch (err) {
       console.error('Error cargando catálogos:', err);
     }
@@ -298,14 +299,7 @@ export class TrabajoComponent implements OnInit {
           if (resp.ok && resp.data?.url_pdf) {
             window.open(resp.data.url_pdf, '_blank');
           } else {
-            const folio = prompt('Ingresa el folio de la hoja valorada para registrar la impresión:', '');
-            if (!folio) return;
-            const urlImp = `${this.API}/solicitudes/${payment.rawSolicitud.id}/impresion`;
-            this.http.post(urlImp, { folio_hoja_valorada: folio }, { headers: this.headers })
-              .subscribe({
-                next: () => window.print(),
-                error: () => alert('Error al registrar la impresión.'),
-              });
+            window.print();
           }
         },
         error: () => alert('Error al obtener el comprobante para imprimir.'),

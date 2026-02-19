@@ -14,72 +14,165 @@ import { FormsModule } from '@angular/forms';
 })
 export class CertificacionComponent implements OnInit {
 
-  solicitudId!: number;
-  folio: string = '';
-  actosRegistrales: any[] = [];
-  folioGenerado: string | null = null;
-  lineaCaptura: string | null = null;
+  mostrarPdf = false;
+  procesando = false;
   urlPdf: string | null = null;
-  mostrarPdf: boolean = false;
-  procesando: boolean = false;
-
-  datosSolicitud = {
-    acto_registral_id: 1,
-    tipo_servicio_id: 1,
-    ventanilla_id: 1,
-    fecha_entrega_resultado: '2026-02-20T00:00:00Z',
-    nombre_contribuyente: 'JUAN PEREZ LOPEZ',
-    rfc: 'XAXX010101000',
-    email: 'juan@example.com',
-    codigo_postal: '68000',
-    uso_cfdi: 'S01',
-    regimen_fiscal: '616'
-  };
+  actosRegistrales: any[] = [];
+  tiposServicio: any[] = [];
+  entidadCodigo = '';
+  entidadNombre = '';
+  distritoCodigo = '';
+  distritoNombre = '';
+  municipioCodigo = '';
+  municipioNombre = '';
+  localidadCodigo = '';
+  localidadNombre = '';
+  foja = '';
+  oficialia = '';
+  acta = '';
+  enDoc = '';
+  fechaActa = '';
+  anioActa = '';
+  nombreRegistrado = '';
+  crip = '';
+  entidadNacCodigo = '';
+  entidadNacNombre = '';
+  municipioNacCodigo = '';
+  municipioNacNombre = '';
+  distritoNacCodigo = '';
+  distritoNacNombre = '';
+  localidadNacCodigo = '';
+  localidadNacNombre = '';
+  padre = '';
+  madre = '';
+  tipoServicioId = 1;
+  documentoPresentado = '';
+  copiasSOlicitadas = 1;
+  aniosBusqueda = '';
+  rangoBusqueda = '';
+  fechaEntrega = '';
+  horaEntrega = '';
+  nombreContribuyente = '';
+  usoCfdi = '';
+  rfc = '';
+  regimenFiscal = '';
+  email = '';
+  codigoPostal = '';
+  tipoCondonado = '';
+  numeroOficio = '';
+  fechaOficio = '';
+  reciboNumero = '';
+  fechaPagoRecibo = '';
+  observaciones = '';
 
   constructor(
     private router: Router,
     private apiService: ApiService,
     private authService: AuthService,
-    private ngZone: NgZone
+    private ngZone: NgZone,
   ) { }
 
   ngOnInit(): void {
-    this.cargarActosRegistrales();
-  }
-
-  cargarActosRegistrales(): void {
-    const token = this.authService.getToken();
-    if (!token) {
+    if (!this.authService.getToken()) {
       this.router.navigate(['/login']);
       return;
     }
+    this.cargarCatalogos();
+  }
+
+  private cargarCatalogos(): void {
+    console.log('Cargando catálogos...');
 
     this.apiService.getActosRegistrales().subscribe({
-      next: (response) => {
-        if (response.ok) {
-          this.actosRegistrales = response.data;
-        }
+      next: resp => {
+        console.log('Actos registrales:', resp.ok ? resp.data : 'sin datos', resp);
+        if (resp.ok) this.actosRegistrales = resp.data;
       },
-      error: (error) => {
-        console.error('Error al cargar actos registrales', error);
-      }
+      error: err => console.error('Error actos registrales:', err.status, err.message),
+    });
+
+    this.apiService.getTiposServicio().subscribe({
+      next: resp => {
+        console.log('Tipos de servicio:', resp.ok ? resp.data : 'sin datos', resp);
+        if (resp.ok) this.tiposServicio = resp.data;
+      },
+      error: err => console.error('Error tipos de servicio:', err.status, err.message),
     });
   }
 
   crearNuevaSolicitud(): void {
-    this.apiService.crearSolicitud(this.datosSolicitud).subscribe({
-      next: (response) => {
-        const url = response.data.linea_pago.url_pdf;
+    if (!this.fechaEntrega) {
+      alert('Falta la Fecha de Entrega.');
+      return;
+    }
+
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    if (new Date(this.fechaEntrega) <= hoy) {
+      alert('La Fecha de Entrega debe ser una fecha futura.');
+      return;
+    }
+
+    console.log('Botón presionado — iniciando creación de solicitud');
+    console.log('Fecha de entrega:', this.fechaEntrega);
+    console.log('Contribuyente:', this.nombreContribuyente || '(vacío → PUBLICO EN GENERAL)');
+    console.log('Tipo servicio ID:', this.tipoServicioId);
+
+    this.procesando = true;
+    this.mostrarPdf = false;
+    this.urlPdf = null;
+
+    const payload = {
+      acto_registral_id: 1,
+      tipo_servicio_id: Number(this.tipoServicioId),
+      ventanilla_id: 1,
+      fecha_entrega_resultado: `${this.fechaEntrega}T00:00:00Z`,
+      nombre_contribuyente: this.nombreContribuyente || '',
+      rfc: this.rfc || '',
+      email: this.email || '',
+      codigo_postal: this.codigoPostal || '',
+      uso_cfdi: this.usoCfdi || '',
+      regimen_fiscal: this.regimenFiscal || '',
+    };
+    console.log('Payload exacto:', JSON.stringify(payload, null, 2));
+    console.log('Tipos:', {
+      acto: typeof payload.acto_registral_id,
+      servicio: typeof payload.tipo_servicio_id,
+      ventanilla: typeof payload.ventanilla_id,
+      fecha: payload.fecha_entrega_resultado,
+    });
+
+    console.log('Enviando payload a la API:', JSON.stringify(payload, null, 2));
+
+    this.apiService.crearSolicitud(payload).subscribe({
+      next: response => {
+        console.log('Respuesta completa del backend:', response);
+        const url = response?.data?.linea_pago?.url_pdf;
+        console.log('URL del PDF:', url ?? 'No recibida');
+        console.log('Folio generado:', response?.data?.solicitud?.folio ?? 'No recibido');
+        console.log('Línea de captura:', response?.data?.pago?.referencia_pago ?? 'No recibida');
+
         this.ngZone.run(() => {
-          this.urlPdf = url;
-          this.mostrarPdf = true;
-          const ventana = window.open(url, '_blank', `width=${screen.width},height=${screen.height},top=0,left=0`);
-          ventana?.addEventListener('load', () => ventana.print());
+          this.procesando = false;
+          if (url) {
+            this.urlPdf = url;
+            this.mostrarPdf = true;
+            console.log('Abriendo PDF en nueva ventana...');
+            const ventana = window.open(url, '_blank', `width=${screen.width},height=${screen.height},top=0,left=0`);
+            ventana?.addEventListener('load', () => ventana.print());
+          } else {
+            alert('Solicitud creada pero no se recibió URL del PDF. Verifica con Finanzas.');
+          }
         });
       },
-      error: (error) => {
-        console.log('Error backend completo:', error.error);
-      }
+      error: err => {
+        this.procesando = false;
+        const code = err?.error?.error?.code;
+        const msg = code === 'ERROR_FINANZAS'
+          ? 'Error de conexión'
+          : err?.error?.error?.message ?? 'Error desconocido';
+        alert(msg);
+      },
     });
   }
 

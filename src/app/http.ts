@@ -28,7 +28,7 @@ export class ApiService {
   }
 
   getSolicitud(folio: string) {
-    return this.http.get(`${this.baseUrl}/api/v1/solicitudes/folio/${folio}`);
+    return this.http.get(`${this.baseUrl}/solicitudes/folio/${folio}`);
   }
 
   getSolicitudPorFolio(folio: string): Observable<any> {
