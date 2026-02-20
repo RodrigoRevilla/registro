@@ -2,33 +2,33 @@ import { Component } from '@angular/core';
 import { AuthService } from '../auth';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-header',
-  standalone: true, 
-  imports: [CommonModule, MatButtonModule],  
+  standalone: true,
+  imports: [CommonModule, MatButtonModule, MatIconModule],
   template: `
-    <header *ngIf="auth.isLoggedIn()" class="header-bar">
+    <header *ngIf="auth.isLoggedIn() && !esLogin()" class="header-bar">
       <span>Hola, {{ auth.getNombre() }} ({{ auth.getRol() }})</span>
-      <button mat-button color="warn" (click)="logout()">Salir</button>
+      <button class="btn-salir" (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        Cerrar sesión
+      </button>
     </header>
   `,
-  styles: [`
-    .header-bar {
-      display: flex;
-      justify-content: space-between;
-      padding: 1rem;
-      background-color: #3f51b5;
-      color: white;
-      align-items: center;
-    }
-  `]
+  styleUrls: ['./header.scss']
 })
 export class HeaderComponent {
-  constructor(public auth: AuthService) {}
+  constructor(public auth: AuthService, private router: Router) {}
+
+  esLogin(): boolean {
+    return this.router.url === '/login';
+  }
 
   logout() {
     this.auth.logout();
-    window.location.reload();
+    this.router.navigate(['/login']);
   }
 }
