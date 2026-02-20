@@ -123,6 +123,11 @@ mat-card-content {
   }
 }
 
+.readonly-field input {
+  background-color: #f5f7fa;
+  font-weight: 500;
+}
+
 .search-section {
   background: #f0f4ff;
   border-color: #c7d2fe;

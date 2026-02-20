@@ -69,8 +69,10 @@ export class NacimientoComponent {
       status: [''],
       nombrePadre: [''],
       edadPadre: [''],
+      nacionalidadPadre: [''],
       nombreMadre: [''],
-      edadMadre: ['']
+      edadMadre: [''],
+      nacionalidadMadre: ['']
     });
     this.nacimientoForm.get('fechaRegistro')?.valueChanges.subscribe((fecha: Date) => {
       if (fecha) {

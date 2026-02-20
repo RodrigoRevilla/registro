@@ -1,193 +1,181 @@
-<mat-card class="container">
-  <div class="header-section">
-    <mat-card-title class="title">🔍 Consulta de Nacimientos</mat-card-title>
-    <p class="subtitle">Ingrese uno o más criterios para localizar un acta de nacimiento</p>
-  </div>
-  <div class="home-button-container">
-    <button class="home-btn" (click)="goHome()">
-      🏠 Home
-    </button>
-  </div>
-
-  <mat-divider></mat-divider>
-
-  <form [formGroup]="nacimientoForm">
-    <div class="section-block">
-      <h3 class="section-title">📄 Datos del Acta</h3>
-      <div class="form-grid">
-
-        <mat-form-field appearance="outline">
-          <mat-label>Entidad</mat-label>
-          <input matInput formControlName="entidad" placeholder="Ej: Oaxaca">
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Municipio</mat-label>
-          <input matInput formControlName="municipio">
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Oficialía</mat-label>
-          <input matInput formControlName="oficialia">
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Distrito</mat-label>
-          <input matInput formControlName="distrito">
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Fecha de registro</mat-label>
-          <input matInput [matDatepicker]="picker" formControlName="fechaRegistro">
-          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-          <mat-datepicker #picker></mat-datepicker>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Año de registro</mat-label>
-          <input matInput type="number" formControlName="anioRegistro">
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Foja</mat-label>
-          <input matInput formControlName="foja">
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Número de Acta</mat-label>
-          <input matInput formControlName="numeroActa">
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>CURP</mat-label>
-          <input matInput maxlength="18" formControlName="curp" style="text-transform: uppercase;">
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>CURP registro civil</mat-label>
-          <input matInput formControlName="curp_regciv">
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Localidad</mat-label>
-          <input matInput formControlName="localidad">
-        </mat-form-field>
-
+<div class="page-wrapper">
+  <div class="page-header">
+    <div class="header-left">
+      <span class="header-icon">📄</span>
+      <div>
+        <h1>Consulta de Nacimientos</h1>
+        <span>Ingrese uno o más criterios para localizar un acta</span>
       </div>
     </div>
+    <button class="home-btn" (click)="goHome()">🏠 Home</button>
+  </div>
 
-    <div class="section-block">
-      <h3 class="section-title">🎂 Datos de Nacimiento</h3>
-      <div class="form-grid">
+  <form [formGroup]="nacimientoForm" class="form-body">
+    <div class="row-top">
+      <fieldset class="panel">
+        <legend>📄 Datos del Acta</legend>
 
-        <mat-form-field appearance="outline">
-          <mat-label>Entidad de nacimiento</mat-label>
-          <input matInput formControlName="entidadNacimiento">
-        </mat-form-field>
+        <div class="field-row">
+          <label>Entidad</label>
+          <input matInput formControlName="entidad" placeholder="Ej: Oaxaca" />
+        </div>
+        <div class="field-row">
+          <label>Municipio</label>
+          <input matInput formControlName="municipio" />
+        </div>
+        <div class="field-row">
+          <label>Oficialía</label>
+          <input matInput formControlName="oficialia" />
+        </div>
+        <div class="field-row">
+          <label>Distrito</label>
+          <input matInput formControlName="distrito" />
+        </div>
+        <div class="field-row">
+          <label>Localidad</label>
+          <input matInput formControlName="localidad" />
+        </div>
+        <div class="field-row">
+          <label>Fecha registro</label>
+          <input matInput type="date" formControlName="fechaRegistro" />
+        </div>
+        <div class="field-row">
+          <label>Año</label>
+          <input matInput type="number" formControlName="anioRegistro" />
+        </div>
+        <div class="field-row">
+          <label>Foja</label>
+          <input matInput formControlName="foja" />
+        </div>
+        <div class="field-row">
+          <label>Núm. Acta</label>
+          <input matInput formControlName="numeroActa" />
+        </div>
+        <div class="field-row">
+          <label>CURP Renapo</label>
+          <input matInput formControlName="curp" maxlength="18" style="text-transform:uppercase" />
+        </div>
+        <div class="field-row">
+          <label>CURP Reg. Civil</label>
+          <input matInput formControlName="curp_regciv" />
+        </div>
+      </fieldset>
 
-        <mat-form-field appearance="outline">
-          <mat-label>Municipio de nacimiento</mat-label>
-          <input matInput formControlName="municipioNacimiento">
-        </mat-form-field>
+      <fieldset class="panel">
+        <legend>🎂 Datos de Nacimiento</legend>
 
-        <mat-form-field appearance="outline">
-          <mat-label>Distrito</mat-label>
-          <input matInput formControlName="distritoNacimiento">
-        </mat-form-field>
+        <div class="field-row">
+          <label>Entidad nac.</label>
+          <input matInput formControlName="entidadNacimiento" />
+        </div>
+        <div class="field-row">
+          <label>Municipio nac.</label>
+          <input matInput formControlName="municipioNacimiento" />
+        </div>
+        <div class="field-row">
+          <label>Distrito nac.</label>
+          <input matInput formControlName="distritoNacimiento" />
+        </div>
+        <div class="field-row">
+          <label>Localidad nac.</label>
+          <input matInput formControlName="localidadNacimiento" />
+        </div>
+        <div class="field-row">
+          <label>Fecha nac.</label>
+          <input matInput type="date" formControlName="fechaNacimiento" />
+        </div>
+        <div class="field-row">
+          <label>Hora nac.</label>
+          <input matInput type="time" formControlName="horaNacimiento" />
+        </div>
 
-        <mat-form-field appearance="outline">
-          <mat-label>Localidad</mat-label>
-          <input matInput formControlName="localidad">
-        </mat-form-field>
+        <div class="panel-divider">👨‍👩‍👦 Datos de los Padres</div>
 
-        <mat-form-field appearance="outline">
-          <mat-label>Fecha de nacimiento</mat-label>
-          <input matInput type="date" formControlName="fechaNacimiento">
-        </mat-form-field>
+        <div class="field-row">
+          <label>Nombre padre</label>
+          <input matInput formControlName="nombrePadre" />
+        </div>
 
-        <mat-form-field appearance="outline">
-          <mat-label>Hora de nacimiento</mat-label>
-          <input matInput type="time" formControlName="horaNacimiento">
-        </mat-form-field>
+        <div class="field-row padres-inline">
+          <label>Edad padre</label>
+          <div class="padres-group">
+            <input matInput type="number" formControlName="edadPadre" class="edad-input" />
+            <input matInput type="text" formControlName="nacionalidadPadre" placeholder="Nacionalidad" />
+          </div>
+        </div>
 
-      </div>
+        <div class="field-row">
+          <label>Nombre madre</label>
+          <input matInput formControlName="nombreMadre" />
+        </div>
+
+        <div class="field-row padres-inline">
+          <label>Edad madre</label>
+          <div class="padres-group">
+            <input matInput type="number" formControlName="edadMadre" class="edad-input" />
+            <input matInput type="text" formControlName="nacionalidadMadre" placeholder="Nacionalidad" />
+          </div>
+        </div>
+
+      </fieldset>
     </div>
 
-    <div class="section-block">
-      <h3 class="section-title">👤 Datos del Registrado</h3>
-      <div class="form-grid">
+    <fieldset class="panel panel-full">
+      <legend>👤 Datos del Registrado</legend>
 
-        <mat-form-field appearance="outline">
-          <mat-label>Nombre(s)</mat-label>
-          <input matInput formControlName="nombre">
-        </mat-form-field>
+      <div class="registrado-grid">
+        <div class="field-row">
+          <label>Nombre(s)</label>
+          <input matInput formControlName="nombre" />
+        </div>
+        <div class="field-row">
+          <label>Ap. Paterno</label>
+          <input matInput formControlName="apellidoPaterno" />
+        </div>
+        <div class="field-row">
+          <label>Ap. Materno</label>
+          <input matInput formControlName="apellidoMaterno" />
+        </div>
+        <div class="field-row">
+          <label>Sexo</label>
+          <select formControlName="sexo">
+            <option value="">—</option>
+            <option value="M">Masculino</option>
+            <option value="F">Femenino</option>
+            <option value="N">No especificado</option>
+          </select>
+        </div>
+        <div class="field-row">
+          <label>Libro</label>
+          <input matInput type="number" formControlName="libro" />
+        </div>
+        <div class="field-row">
+          <label>Status</label>
+          <input matInput formControlName="status" />
+        </div>
+        <div class="field-row">
+          <label>Estado del Acta</label>
+          <select>
+            <option>Original</option>
+            <option>Modificada</option>
+            <option>Reimpresión</option>
+          </select>
+        </div>
 
-        <mat-form-field appearance="outline">
-          <mat-label>Apellido paterno</mat-label>
-          <input matInput formControlName="apellidoPaterno">
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Apellido materno</mat-label>
-          <input matInput formControlName="apellidoMaterno">
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Sexo</mat-label>
-          <mat-select formControlName="sexo">
-            <mat-option value="M">Masculino</mat-option>
-            <mat-option value="F">Femenino</mat-option>
-            <mat-option value="N">No especificado</mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Libro</mat-label>
-          <input matInput type="number" formControlName="libro">
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Status</mat-label>
-          <input matInput formControlName="status">
-        </mat-form-field>
-
+        <div class="field-row">
+          <label>Estado Biológico</label>
+          <select>
+            <option>Vivo</option>
+            <option>Fallecido</option>
+          </select>
+        </div>
       </div>
+    </fieldset>
 
-      <h3 class="section-title" style="margin-top: 20px;">👨‍👩‍👦 Datos de los Padres</h3>
-      <div class="form-grid-parents">
-
-        <mat-form-field appearance="outline" class="parent-name">
-          <mat-label>Nombre del padre</mat-label>
-          <input matInput formControlName="nombrePadre">
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="parent-age">
-          <mat-label>Edad del padre</mat-label>
-          <input matInput type="number" formControlName="edadPadre">
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="parent-name">
-          <mat-label>Nombre de la madre</mat-label>
-          <input matInput formControlName="nombreMadre">
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="parent-age">
-          <mat-label>Edad de la madre</mat-label>
-          <input matInput type="number" formControlName="edadMadre">
-        </mat-form-field>
-
-      </div>
+    <div class="actions">
+      <button type="button" class="btn-secondary" (click)="limpiarFormulario()">🗑️ Limpiar</button>
+      <button type="button" class="btn-primary" (click)="buscarActa()">🔍 Buscar</button>
     </div>
 
   </form>
-
-  <div class="actions">
-    <button mat-stroked-button color="warn" (click)="limpiarFormulario()">
-      🗑️ Limpiar
-    </button>
-
-    <button mat-raised-button color="primary" (click)="buscarActa()">
-      🔍 Buscar
-    </button>
-  </div>
-</mat-card>
+</div>
