@@ -4,11 +4,13 @@ import { ApiService } from '../http';
 import { AuthService } from '../auth';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MatCardModule
 
+ } from '@angular/material/card';
 @Component({
   selector: 'app-certificacion',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatCardModule],
   templateUrl: './certificacion.html',
   styleUrls: ['./certificacion.scss'],
 })
@@ -106,13 +108,16 @@ export class CertificacionComponent implements OnInit {
       return;
     }
 
+    const [anio, mes, dia] = this.fechaEntrega.split('-').map(Number);
+    const fechaSeleccionada = new Date(anio, mes - 1, dia); // local, sin zona horaria
+
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
-    if (new Date(this.fechaEntrega) <= hoy) {
-      alert('La Fecha de Entrega debe ser una fecha futura.');
+
+    if (fechaSeleccionada < hoy) {
+      alert('La Fecha de Entrega no puede ser anterior a hoy.');
       return;
     }
-
     console.log('Botón presionado — iniciando creación de solicitud');
     console.log('Fecha de entrega:', this.fechaEntrega);
     console.log('Contribuyente:', this.nombreContribuyente || '(vacío → PUBLICO EN GENERAL)');

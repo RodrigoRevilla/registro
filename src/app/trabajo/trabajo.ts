@@ -149,7 +149,7 @@ export class TrabajoComponent implements OnInit {
   }
 
   goHome() {
-    this.router.navigate(['/']);
+    this.router.navigate(['/home']);
   }
 
   setFilter(value: string) {

@@ -118,6 +118,26 @@ export class ConsultaPagoComponent implements OnDestroy {
       next: transRes => {
         this.transiciones = (transRes as any)?.data || [];
         this.procesando$.next(false);
+        const status = this.solicitud$.getValue()?.status;
+        if (status && status !== 'PENDIENTE_PAGO') {
+          const mensajes: Record<string, string> = {
+            'PAGADA': 'Este folio ya fue pagado.',
+            'PENDIENTE_ASIGNACION': 'Este folio ya fue pagado y está pendiente de asignación.',
+            'ASIGNADA': 'Este folio ya fue pagado y tiene buscador asignado.',
+            'CERTIFICACION_EMITIDA': 'Este folio ya fue certificado',
+            'EN_BUSQUEDA': 'Este folio ya fue pagado y está en búsqueda.',
+            'EN_CERTIFICACION': 'Este folio ya fue pagado y está en certificación.',
+            'EN_VALIDACION': 'Este folio ya fue pagado y está en validación.',
+            'VALIDADA': 'Este folio ya fue pagado y está validado.',
+            'LISTA_ENTREGA': 'Este folio ya fue pagado y está listo para entrega.',
+            'ENTREGADA': 'Este folio ya fue pagado y entregado.',
+            'CANCELADA': 'Este folio fue cancelado.',
+            'RECHAZADA': 'Este folio fue rechazado.',
+            'NO_ENCONTRADA': 'Este folio fue marcado como no encontrado.',
+          };
+          const msg = mensajes[status];
+          if (msg) alert(msg);
+        }
       },
       error: err => {
         console.error('Error buscando folio:', err);
@@ -129,11 +149,23 @@ export class ConsultaPagoComponent implements OnDestroy {
   }
 
   private mapearSolicitud(data: any): Solicitud {
-     console.log('estado_id recibido:', data.estado_id);
+    console.log('estado_id recibido:', data.estado_id);
     const estadosMap: Record<number, string> = {
       1: 'RECIBIDA',
       2: 'PENDIENTE_PAGO',
-      3: 'PAGADA'
+      3: 'PAGADA',
+      4: 'CERTIFICACION_EMITIDA',
+      5: 'PENDIENTE_ASIGNACION',
+      6: 'ASIGNADA',
+      7: 'EN_BUSQUEDA',
+      8: 'EN_CERTIFICACION',
+      9: 'EN_VALIDACION',
+      10: 'VALIDADA',
+      11: 'LISTA_ENTREGA',
+      12: 'ENTREGADA',
+      13: 'NO_ENCONTRADA',
+      14: 'RECHAZADA',
+      15: 'CANCELADA'
     };
 
     return {
@@ -210,10 +242,19 @@ export class ConsultaPagoComponent implements OnDestroy {
     this.apiService.confirmarPago(solicitudId).pipe(
       takeUntil(this.destroy$),
       switchMap(res => {
-        return this.apiService.getSolicitudPorFolio(this.folioBuscar);
+        console.log('Respuesta confirmarPago:', res); 
+        if (!res?.data?.verificado) {
+          alert(`${res?.data?.mensaje ?? 'Pago no verificado'}`);
+          this.procesando$.next(false);
+          return of(null);
+        }
+        return of(res).pipe(
+          switchMap(() => this.apiService.getSolicitudPorFolio(this.folioBuscar))
+        );
       })
     ).subscribe({
       next: (res) => {
+        if (!res) return;
         if (res?.data) {
           const solicitudActualizada = this.mapearSolicitud(res.data);
           this.solicitud$.next({

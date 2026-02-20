@@ -1,17 +1,17 @@
-<div class="page-header">
-  <div class="page-header-content">
-    <h1>📄 Solicitud de Servicios de Nacimientos</h1>
-    <p>Captura la información del acta y del solicitante</p>
-    <button mat-stroked-button color="primary" (click)="goHome()" class="btn-home">
+<div class="header-section">
+  <div class="header-text">
+    <mat-card-title class="title">🔍 Consulta de Nacimientos</mat-card-title>
+    <p class="subtitle">Ingrese uno o más criterios para localizar un acta de nacimiento</p>
+  </div>
+  <div class="home-button-container">
+    <button class="home-btn" (click)="goHome()">
       🏠 Home
     </button>
   </div>
 </div>
-
 <form>
   <fieldset>
     <legend>Datos del Acta</legend>
-
     <div class="form-row-multi">
       <div class="field-group">
         <span class="label-inline">Entidad:</span>

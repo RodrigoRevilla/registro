@@ -86,7 +86,7 @@ export class BusquedaComponent implements OnInit, AfterViewInit {
   inicializarFormulario(): void {
     this.busquedaForm = this.fb.group({
       fecha: [null, Validators.required],
-      estado: [null]
+      estado: ['todos']
     });
   }
 
@@ -127,8 +127,7 @@ export class BusquedaComponent implements OnInit, AfterViewInit {
         pago.fecha.getMonth() === fechaSeleccionada.getMonth() &&
         pago.fecha.getDate() === fechaSeleccionada.getDate();
 
-      const mismoEstado = estado ? pago.estado === estado : true;
-
+      const mismoEstado = estado === 'todos' ? true : pago.estado === estado;
       return mismaFecha && mismoEstado;
     });
   }
