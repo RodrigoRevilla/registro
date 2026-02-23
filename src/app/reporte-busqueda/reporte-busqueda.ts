@@ -32,6 +32,10 @@ interface DatosSolicitud {
   anotaciones: string;
 }
 
+const SK_FOLIO_ACTUAL = 'hv_folio_actual';
+const SK_FOLIO_USADOS = 'hv_folios_usados';
+const SK_BLOQUEADO    = 'hv_bloqueado';
+
 @Injectable({ providedIn: 'root' })
 export class ReporteBusquedaService {
 
@@ -42,6 +46,39 @@ export class ReporteBusquedaService {
   private get headers(): HttpHeaders {
     const token = sessionStorage.getItem('token') ?? '';
     return new HttpHeaders({ Authorization: `Bearer ${token}` });
+  }
+
+  private leerFolioActual(): number | null {
+    const raw = sessionStorage.getItem(SK_FOLIO_ACTUAL);
+    const n   = raw ? parseInt(raw, 10) : NaN;
+    return !isNaN(n) && n > 0 ? n : null;
+  }
+
+  private leerUsados(): Set<number> {
+    try {
+      const raw = sessionStorage.getItem(SK_FOLIO_USADOS);
+      return raw ? new Set<number>(JSON.parse(raw)) : new Set<number>();
+    } catch { return new Set<number>(); }
+  }
+
+  private marcarUsado(folio: number): void {
+    const usados = this.leerUsados();
+    usados.add(folio);
+    sessionStorage.setItem(SK_FOLIO_USADOS, JSON.stringify([...usados]));
+    console.log(`[HV] Folio ${folio} marcado como usado | usados en sesión:`, [...usados]);
+  }
+
+  private siguienteLibre(desde: number): number {
+    const usados = this.leerUsados();
+    while (usados.has(desde)) { desde++; }
+    return desde;
+  }
+
+  private avanzarFolio(folioUsado: number): number {
+    const siguiente = this.siguienteLibre(folioUsado + 1);
+    sessionStorage.setItem(SK_FOLIO_ACTUAL, String(siguiente));
+    console.log(`[HV] Autoincremento: ${folioUsado} → ${siguiente} | sessionStorage[${SK_FOLIO_ACTUAL}]="${siguiente}"`);
+    return siguiente;
   }
 
   private async obtenerDatos(folio: string): Promise<DatosSolicitud | null> {
@@ -135,19 +172,21 @@ export class ReporteBusquedaService {
     }
   }
 
-  private async cambiarAAsignada(solicitudId: number, folio: string): Promise<void> {
+  private async cambiarAAsignada(solicitudId: number, folio: string, folioHV: number): Promise<void> {
     try {
-      console.log(`[reporte] 🔄 ${folio} (id:${solicitudId}) → ASIGNADA...`);
+      console.log(`[reporte] ${folio} (id:${solicitudId}) → ASIGNADA con hoja valorada ${folioHV}...`);
       const resp = await firstValueFrom(
         this.http.post<any>(
           `${this.API}/solicitudes/${solicitudId}/cambio-estado`,
-          { estado_destino_clave: 'ASIGNADA', comentario: '' },
+          {
+            estado_destino_clave: 'ASIGNADA',
+            comentario: `Hoja valorada: ${folioHV}`
+          },
           { headers: this.headers }
         )
       );
-
       if (resp?.ok) {
-        console.log(`[reporte] ${folio} → ASIGNADA OK`, resp.data);
+        console.log(`[reporte] ${folio} → ASIGNADA OK (hoja valorada: ${folioHV})`, resp.data);
       } else {
         console.warn(`[reporte] Respuesta inesperada para ${folio}:`, resp);
       }
@@ -240,7 +279,20 @@ export class ReporteBusquedaService {
   }
 
   async generarReporte(folios: string[]): Promise<void> {
+    if (sessionStorage.getItem(SK_BLOQUEADO) !== '1') {
+      alert('Es necesario ingresar un folio inicial de hoja valorada antes de generar el reporte.');
+      return;
+    }
+
+    let folioHVActual = this.leerFolioActual();
+    if (!folioHVActual) {
+      alert('No se encontró el folio de hoja valorada en sesión. Por favor establécelo nuevamente.');
+      return;
+    }
+
     console.log(`[reporte] Generando para ${folios.length} solicitudes...`);
+    console.log(`[HV] Folio inicial para este lote: ${folioHVActual}`);
+
     const resultados = await Promise.all(folios.map(f => this.obtenerDatos(f)));
     const datos = resultados.filter((d): d is DatosSolicitud => d !== null);
 
@@ -273,10 +325,18 @@ export class ReporteBusquedaService {
 
     console.log(`[reporte] PDF generado con ${datos.length} órdenes`);
     doc.save(`ordenes-busqueda-${new Date().toISOString().slice(0, 10)}.pdf`);
-    console.log(`[reporte] Cambiando estados a ASIGNADA...`);
-    await Promise.allSettled(
-      datos.map(d => this.cambiarAAsignada(d._id, d.folio))
-    );
+    console.log(`[reporte] Procesando hojas valoradas y estados...`);
+
+    for (const d of datos) {
+      folioHVActual = this.siguienteLibre(folioHVActual);
+      console.log(`[HV] Asignando folio ${folioHVActual} a solicitud ${d.folio} (solo sessionStorage)`);
+      this.marcarUsado(folioHVActual);
+      const folioUsado = folioHVActual;
+      folioHVActual = this.avanzarFolio(folioUsado);
+      await this.cambiarAAsignada(d._id, d.folio, folioUsado);
+    }
+
     console.log(`[reporte] Proceso completo — PDF generado con ${datos.length} órdenes`);
+    console.log(`[HV] Siguiente folio disponible tras el lote: ${this.leerFolioActual()}`);
   }
 }

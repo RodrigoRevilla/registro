@@ -19,18 +19,40 @@
     </div>
 
     <div class="search-controls">
+
       <mat-form-field appearance="outline" class="input-group" floatLabel="always">
         <mat-label>Fecha de Pago</mat-label>
         <input matInput [matDatepicker]="picker" [(ngModel)]="fechaPago" placeholder="dd/mm/aaaa">
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
       </mat-form-field>
+      
+      <ng-container *ngIf="!folioHojaBloqueado">
+        <mat-form-field appearance="outline" class="input-group" floatLabel="always">
+          <mat-label>Folio inicial hoja valorada</mat-label>
+          <input matInput type="number" min="1"
+            [(ngModel)]="folioInput"
+            placeholder="Ej. 1042">
+          <mat-hint>Se bloqueará al presionar <strong>Establecer</strong></mat-hint>
+        </mat-form-field>
+        <button mat-stroked-button color="warn"
+          (click)="establecerFolioInicial()"
+          matTooltip="Establece el folio inicial. No podrá editarse en esta sesión.">
+          <mat-icon>lock</mat-icon> Establecer folio
+        </button>
+      </ng-container>
+
+      <div *ngIf="folioHojaBloqueado" class="folio-bloqueado-box">
+        <mat-icon>lock</mat-icon>
+        <span>Siguiente hoja valorada: <strong>{{ folioHojaValorada }}</strong></span>
+      </div>
 
       <div class="search-buttons">
         <button mat-raised-button color="primary" (click)="buscarPagos()">
           <mat-icon>search</mat-icon> Buscar
         </button>
       </div>
+
     </div>
 
     <div class="year-groups">
@@ -107,6 +129,10 @@
           <div class="detail-item"><strong>Concepto:</strong> {{ payment.concepto }}</div>
           <div class="detail-item"><strong>Referencia:</strong> {{ payment.referencia }}</div>
           <div class="detail-item"><strong>Método:</strong> {{ payment.metodo }}</div>
+          <div class="detail-item" *ngIf="payment.folioHojaUsado">
+            <strong>Hoja valorada:</strong>
+            <span class="folio-badge">{{ payment.folioHojaUsado }}</span>
+          </div>
         </div>
 
         <mat-divider></mat-divider>
@@ -116,12 +142,7 @@
             Seleccionar
           </mat-checkbox>
 
-          <button mat-raised-button color="accent"
-            *ngIf="payment.impreso"
-            (click)="confirmarImpresion(payment)"
-            matTooltip="Confirma que el documento fue impreso físicamente">
-            <mat-icon>check_circle</mat-icon> Confirmar impresión
-          </button>
+
         </div>
 
       </mat-card>

@@ -58,11 +58,6 @@ export class HomeComponent implements OnInit {
     this.router.navigate(['/trabajo']);
   }
 
-  irABusqueda(event: MouseEvent) {
-    event?.stopImmediatePropagation();
-    this.router.navigate(['/busqueda']);
-  }
-
   irAModificacion(event: Event) {
     event.stopPropagation();
     this.router.navigate(['/modificacion']);

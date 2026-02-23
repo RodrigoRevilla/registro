@@ -47,6 +47,7 @@ interface Payment {
   selected: boolean;
   impreso: boolean;
   urlPdf: string | null;
+  folioHojaUsado: number | null;
   rawSolicitud: Solicitud;
 }
 
@@ -90,6 +91,10 @@ const ESTADOS_POR_FILTRO: Record<string, string[]> = {
   todos:        ['PENDIENTE_ASIGNACION'],
 };
 
+const SK_FOLIO_ACTUAL = 'hv_folio_actual';
+const SK_FOLIO_USADOS = 'hv_folios_usados';
+const SK_BLOQUEADO    = 'hv_bloqueado';
+
 @Component({
   selector: 'app-trabajo',
   standalone: true,
@@ -128,9 +133,13 @@ export class TrabajoComponent implements OnInit {
     { label: 'TODOS',        value: 'todos'        },
   ];
 
-  currentFilter      = 'todos';
+  currentFilter          = 'todos';
   fechaPago: Date | null = null;
-  yearRanges: YearRange[] = buildYearRanges().map(r => ({ ...r, count: 0 }));
+  folioInput: number | null    = null;  
+  folioHojaValorada: number | null = null;  
+  folioHojaBloqueado           = false;
+
+  yearRanges: YearRange[]          = buildYearRanges().map(r => ({ ...r, count: 0 }));
   selectedYearRange: string | null = null;
   isLoading  = false;
   payments:  Payment[] = [];
@@ -138,6 +147,38 @@ export class TrabajoComponent implements OnInit {
   private catalogoActos:     Catalogo[] = [];
   private catalogoServicios: Catalogo[] = [];
   private catalogoEstados:   Catalogo[] = [];
+
+  private leerUsados(): Set<number> {
+    try {
+      const raw = sessionStorage.getItem(SK_FOLIO_USADOS);
+      return raw ? new Set<number>(JSON.parse(raw)) : new Set<number>();
+    } catch { return new Set<number>(); }
+  }
+
+  private guardarFolioActual(folio: number): void {
+    const anterior = this.folioHojaValorada;
+    sessionStorage.setItem(SK_FOLIO_ACTUAL, String(folio));
+    sessionStorage.setItem(SK_BLOQUEADO, '1');
+    this.folioHojaValorada  = folio;
+    this.folioHojaBloqueado = true;
+    if (anterior !== null && anterior !== folio) {
+      console.log(`[HV] Folio autoIncrementado: ${anterior} → ${folio}`);
+    } else {
+      console.log(`[HV] Folio establecido: ${folio} | sessionStorage[${SK_FOLIO_ACTUAL}]="${folio}"`);
+    }
+    console.log(`[HV] Usados en sesión:`, JSON.parse(sessionStorage.getItem(SK_FOLIO_USADOS) ?? '[]'));
+  }
+
+  private restaurarDesdeSession(): void {
+    if (sessionStorage.getItem(SK_BLOQUEADO) !== '1') return;
+    const raw = sessionStorage.getItem(SK_FOLIO_ACTUAL);
+    const n   = raw ? parseInt(raw, 10) : NaN;
+    if (!isNaN(n) && n > 0) {
+      this.folioHojaValorada  = n;
+      this.folioHojaBloqueado = true;
+      console.log(`[HV] Restaurado desde sessionStorage: folio actual = ${n}`);
+    }
+  }
 
   get resultsCount(): string {
     const n = this.payments.length;
@@ -156,12 +197,29 @@ export class TrabajoComponent implements OnInit {
   ) {}
 
   async ngOnInit() {
+    this.restaurarDesdeSession();
     await this.cargarCatalogos();
   }
 
-  goHome() {
-    this.router.navigate(['/home']);
+  establecerFolioInicial(): void {
+    if (this.folioHojaBloqueado) return;
+
+    const n = Number(this.folioInput);
+    if (!n || isNaN(n) || n <= 0 || !Number.isInteger(n)) {
+      alert('El folio debe ser un número entero mayor a 0.');
+      return;
+    }
+    if (this.leerUsados().has(n)) {
+      alert(`El folio ${n} ya fue usado en esta sesión.`);
+      return;
+    }
+
+    this.guardarFolioActual(n);
+    this.folioInput = null;
+    this.cdr.detectChanges();
   }
+
+  goHome() { this.router.navigate(['/home']); }
 
   setFilter(value: string) {
     this.currentFilter = value;
@@ -185,31 +243,10 @@ export class TrabajoComponent implements OnInit {
           `${this.API}/solicitudes/${payment.rawSolicitud.id}/pago`,
           { headers: this.headers }
         ).toPromise();
-
-      if (resp?.ok && resp.data?.url_pdf) {
-        console.log(`[PDF] ${payment.id}:`, resp.data.url_pdf);
-        return resp.data.url_pdf;
-      }
-      console.warn(`[PDF] Sin url_pdf para ${payment.id}:`, resp);
-      return null;
+      return resp?.ok && resp.data?.url_pdf ? resp.data.url_pdf : null;
     } catch (err: any) {
       console.error(`[PDF] Error obteniendo pago de ${payment.id}:`, err?.error?.error ?? err);
       return null;
-    }
-  }
-
-  async imprimirSeleccionados(): Promise<void> {
-    const seleccionados = this.payments.filter(p => p.selected);
-    if (!seleccionados.length) { alert('Selecciona al menos un registro'); return; }
-    for (const p of seleccionados) {
-      await this.abrirPdf(p);
-    }
-  }
-
-  async imprimirTodos(): Promise<void> {
-    if (!this.payments.length) { alert('No hay registros para imprimir'); return; }
-    for (const p of this.payments) {
-      await this.abrirPdf(p);
     }
   }
 
@@ -225,48 +262,27 @@ export class TrabajoComponent implements OnInit {
     }
   }
 
-  confirmarImpresion(payment: Payment): void {
-    const url = `${this.API}/solicitudes/${payment.rawSolicitud.id}/cambio-estado`;
-    console.log(`[confirmarImpresion] Cambiando ${payment.id} → ASIGNADA...`);
-
-    this.http.post<ApiResponse<any>>(url, {
-      estado_destino_clave: 'ASIGNADA',
-      comentario: ''
-    }, { headers: this.headers }).subscribe({
-      next: resp => {
-        if (resp.ok) {
-          console.log(`[confirmarImpresion] ${payment.id} → ASIGNADA`, resp.data);
-          payment.estadoClave  = 'ASIGNADA';
-          payment.estadoNombre = 'Asignada';
-          payment.impreso      = false;
-          this.cdr.detectChanges();
-        }
-      },
-      error: err => {
-        console.error(`[confirmarImpresion] ${payment.id}:`, err?.error?.error ?? err);
-        const msg = err?.error?.error?.message ?? 'Error al cambiar estado';
-        alert(`No se pudo confirmar impresión de ${payment.id}: ${msg}`);
-      }
-    });
-  }
-
   async buscarPagos() {
+    if (!this.folioHojaBloqueado) {
+      alert('Es necesario ingresar un folio inicial de hoja valorada antes de buscar registros.');
+      return;
+    }
+
     this.isLoading         = true;
     this.allPayments       = [];
     this.payments          = [];
     this.selectedYearRange = null;
 
     try {
-      const estados    = ESTADOS_POR_FILTRO[this.currentFilter] ?? ESTADOS_POR_FILTRO['todos'];
-      const promesas   = estados.map(clave => this.cargarPorEstado(clave));
-      const resultados = await Promise.all(promesas);
+      const estados     = ESTADOS_POR_FILTRO[this.currentFilter] ?? ESTADOS_POR_FILTRO['todos'];
+      const promesas    = estados.map(clave => this.cargarPorEstado(clave));
+      const resultados  = await Promise.all(promesas);
       const solicitudes = resultados.flat();
 
       this.allPayments = solicitudes.map(s => this.toPayment(s));
       this.recalcularConteos();
       this.aplicarFiltros();
       setTimeout(() => this.cdr.detectChanges(), 0);
-
     } catch (err) {
       console.error('Error en buscarPagos:', err);
       alert('Error al buscar registros. Verifica tu conexión.');
@@ -295,9 +311,7 @@ export class TrabajoComponent implements OnInit {
           total   = resp.meta.total;
           offset += LIMIT;
           if (offset >= total) break;
-        } else {
-          break;
-        }
+        } else { break; }
       }
     } catch (err) {
       console.error(`Error cargando estado ${estadoClave}:`, err);
@@ -312,21 +326,22 @@ export class TrabajoComponent implements OnInit {
     const estado   = this.catalogoEstados.find(e => e.id === s.estado_id);
 
     return {
-      id:           s.folio,
-      fecha:        s.fecha_recepcion
-                      ? new Date(s.fecha_recepcion).toLocaleDateString('es-MX')
-                      : '—',
-      monto:        '—',
-      concepto:     `${acto?.nombre ?? 'Acto ' + s.acto_registral_id} — ${servicio?.nombre ?? 'Servicio ' + s.tipo_servicio_id}`,
-      referencia:   s.folio,
-      metodo:       'Línea de Captura',
-      anio:         this.extraerAnio(s),
-      estadoClave:  estado?.clave  ?? String(s.estado_id),
-      estadoNombre: estado?.nombre ?? String(s.estado_id),
-      selected:     false,
-      impreso:      false,
-      urlPdf:       null,
-      rawSolicitud: s,
+      id:             s.folio,
+      fecha:          s.fecha_recepcion
+                        ? new Date(s.fecha_recepcion).toLocaleDateString('es-MX')
+                        : '—',
+      monto:          '—',
+      concepto:       `${acto?.nombre ?? 'Acto ' + s.acto_registral_id} — ${servicio?.nombre ?? 'Servicio ' + s.tipo_servicio_id}`,
+      referencia:     s.folio,
+      metodo:         'Línea de Captura',
+      anio:           this.extraerAnio(s),
+      estadoClave:    estado?.clave  ?? String(s.estado_id),
+      estadoNombre:   estado?.nombre ?? String(s.estado_id),
+      selected:       false,
+      impreso:        false,
+      urlPdf:         null,
+      folioHojaUsado: null,
+      rawSolicitud:   s,
     };
   }
 
@@ -345,9 +360,7 @@ export class TrabajoComponent implements OnInit {
       ...yr,
       count: yr.desde === null
         ? this.allPayments.length
-        : this.allPayments.filter(
-            p => p.anio >= yr.desde! && p.anio <= yr.hasta!
-          ).length,
+        : this.allPayments.filter(p => p.anio >= yr.desde! && p.anio <= yr.hasta!).length,
     }));
   }
 
@@ -357,33 +370,32 @@ export class TrabajoComponent implements OnInit {
     if (this.selectedYearRange && this.selectedYearRange !== 'TODOS') {
       const bloque = this.yearRanges.find(yr => yr.range === this.selectedYearRange);
       if (bloque?.desde !== null) {
-        resultado = resultado.filter(
-          p => p.anio >= bloque!.desde! && p.anio <= bloque!.hasta!
-        );
+        resultado = resultado.filter(p => p.anio >= bloque!.desde! && p.anio <= bloque!.hasta!);
       }
     }
 
     if (this.fechaPago instanceof Date && !isNaN(this.fechaPago.getTime())) {
-      const fechaSeleccionada = new Date(this.fechaPago);
-      fechaSeleccionada.setHours(0, 0, 0, 0);
-
+      const fechaSel = new Date(this.fechaPago);
+      fechaSel.setHours(0, 0, 0, 0);
       resultado = resultado.filter(p => {
         if (!p.rawSolicitud.fecha_recepcion) return false;
-        const fechaSolicitud = new Date(p.rawSolicitud.fecha_recepcion);
-        fechaSolicitud.setHours(0, 0, 0, 0);
-        return fechaSolicitud.getTime() === fechaSeleccionada.getTime();
+        const fs = new Date(p.rawSolicitud.fecha_recepcion);
+        fs.setHours(0, 0, 0, 0);
+        return fs.getTime() === fechaSel.getTime();
       });
     }
 
     this.payments = resultado;
   }
-  
+
   async generarReporte(): Promise<void> {
     const folios = this.payments.map(p => p.id);
     if (!folios.length) { alert('No hay registros para generar el reporte'); return; }
     const ok = confirm(`¿Estás seguro? Se generará el reporte con ${folios.length} solicitud(es) y su estado cambiará a ASIGNADA.`);
     if (!ok) return;
     await this.reporte.generarReporte(folios);
+    this.restaurarDesdeSession();
+    this.cdr.detectChanges();
   }
 
   async generarReporteSeleccionados(): Promise<void> {
@@ -392,6 +404,8 @@ export class TrabajoComponent implements OnInit {
     const ok = confirm(`¿Estás seguro? Se generará el reporte con ${folios.length} solicitud(es) seleccionada(s) y su estado cambiará a ASIGNADA.`);
     if (!ok) return;
     await this.reporte.generarReporte(folios);
+    this.restaurarDesdeSession();
+    this.cdr.detectChanges();
   }
 
   private async cargarCatalogos() {
