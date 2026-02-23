@@ -55,7 +55,7 @@ export class LoginComponent {
     const { username, password } = this.loginForm.value;
 
     this.http.post<any>(
-      'https://uncarolled-kaylene-unplentiful.ngrok-free.dev/api/v1/auth/login',
+      '/api/v1/auth/login',
       { username, password }
     ).subscribe({
       next: (res) => {

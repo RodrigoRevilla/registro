@@ -1,9 +1,5 @@
 @use 'sass:color';
 
-// =========================
-// VARIABLES
-// =========================
-
 $primary: #9e2a47;
 $primary-dark: #7d1f38;
 $primary-light: #fdf2f6;
@@ -29,10 +25,6 @@ $shadow-primary: 0 8px 20px rgba(139, 21, 56, 0.2);
 
 $transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
-// =========================
-// HOST
-// =========================
-
 :host {
   display: block;
   padding: 2rem;
@@ -41,10 +33,6 @@ $transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
   color: $text-body;
 }
-
-// =========================
-// CONTAINER
-// =========================
 
 .container {
   max-width: 1180px;
@@ -55,10 +43,6 @@ $transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
   border: 1px solid $border;
 }
-
-// =========================
-// HEADER
-// =========================
 
 .header-section {
   padding: 2.2rem 2.5rem 2rem;
@@ -107,18 +91,10 @@ $transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
-// =========================
-// SEARCH SECTION
-// =========================
-
 .search-section {
   padding: 2rem 2.5rem;
   border-bottom: 1px solid $border;
 }
-
-// -------------------------
-// FILTER TABS
-// -------------------------
 
 .filter-tabs {
   display: flex;
@@ -152,10 +128,6 @@ $transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
-// -------------------------
-// SEARCH CONTROLS
-// -------------------------
-
 .search-controls {
   display: flex;
   align-items: flex-start;
@@ -174,7 +146,7 @@ $transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  margin-top: 28px; // mat-form-field outline label ocupa ~28px arriba
+  margin-top: 28px;
 
   button[mat-raised-button] {
     height: 40px;
@@ -237,10 +209,6 @@ $transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
-// =========================
-// YEAR GROUPS
-// =========================
-
 .year-groups {
   display: flex;
   flex-wrap: wrap;
@@ -290,10 +258,6 @@ $transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     font-weight: 500;
   }
 }
-
-// =========================
-// RESULTS SECTION
-// =========================
 
 .results-section {
   padding: 2rem 2.5rem;
@@ -393,10 +357,6 @@ $transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
   }
 }
-
-// =========================
-// PAYMENT CARD
-// =========================
 
 .payment-card {
   border-radius: $radius-md;
@@ -540,10 +500,6 @@ $transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
   }
 }
-
-// =========================
-// EMPTY / LOADING
-// =========================
 
 .empty-state,
 .loading {
