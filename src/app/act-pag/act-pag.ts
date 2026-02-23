@@ -85,6 +85,7 @@ export class ConsultaPagoComponent implements OnDestroy {
       return;
     }
     if (this.procesando) return;
+    this.folioBuscar = this.folioBuscar.trim();
 
     this.procesando$.next(true);
     this.solicitud$.next(null);

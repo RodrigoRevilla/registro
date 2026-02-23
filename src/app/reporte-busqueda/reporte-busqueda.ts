@@ -4,6 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import jsPDF from 'jspdf';
 
 interface DatosSolicitud {
+  _id: number;
   folio: string;
   servicio: string;
   tipoActa: string;
@@ -45,21 +46,29 @@ export class ReporteBusquedaService {
 
   private async obtenerDatos(folio: string): Promise<DatosSolicitud | null> {
     try {
+      console.log(`[reporte] Obteniendo datos de ${folio}...`);
       const respSol = await firstValueFrom(
         this.http.get<any>(`${this.API}/solicitudes/folio/${folio}`, { headers: this.headers })
       );
-      if (!respSol?.ok || !respSol.data) return null;
+      if (!respSol?.ok || !respSol.data) {
+        console.warn(`[reporte] No se encontró la solicitud ${folio}`);
+        return null;
+      }
       const d = respSol.data;
-      let observaciones = '';
+      console.log(`[reporte] Solicitud ${folio} — id: ${d.id}, estado_id: ${d.estado_id}`);
 
+      let observaciones = '';
       try {
         const respCom = await firstValueFrom(
           this.http.get<any>(`${this.API}/solicitudes/${d.id}/comentarios`, { headers: this.headers })
         );
         if (respCom?.ok && respCom.data?.length) {
           observaciones = respCom.data.map((c: any) => c.comentario).join(' | ');
+          console.log(`[reporte] ${folio} — ${respCom.data.length} comentario(s)`);
         }
-      } catch {}
+      } catch (e) {
+        console.warn(`[reporte] Sin comentarios para ${folio}`);
+      }
 
       let fechaPago = '';
       try {
@@ -70,12 +79,18 @@ export class ReporteBusquedaService {
           fechaPago = new Date(respPago.data.fecha_confirmacion).toLocaleDateString('es-MX', {
             day: '2-digit', month: 'short', year: 'numeric'
           }).toUpperCase();
+          console.log(`[reporte] ${folio} — fecha pago: ${fechaPago}`);
+        } else {
+          console.warn(`[reporte] ${folio} sin fecha de confirmación de pago`);
         }
-      } catch {}
+      } catch (e) {
+        console.warn(`[reporte] No se pudo obtener pago de ${folio}`);
+      }
 
       const rb = d.resultado_busqueda ? this.parsearResultado(d.resultado_busqueda) : {};
 
       return {
+        _id:                 d.id,
         folio:               d.folio ?? '',
         servicio:            rb['servicio']            ?? '',
         tipoActa:            rb['tipoActa']            ?? 'NACIMIENTO',
@@ -96,12 +111,12 @@ export class ReporteBusquedaService {
         copiasSolicitadas:   rb['copiasSolicitadas']   ?? '1',
         documentoPresentado: rb['documentoPresentado'] ?? '',
         fechaSolicitud:      d.fecha_recepcion
-                               ? new Date(d.fecha_recepcion).toLocaleDateString('es-MX', { day:'2-digit', month:'2-digit', year:'numeric' })
-                               : '',
+          ? new Date(d.fecha_recepcion).toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' })
+          : '',
         fechaPago,
         fechaEntrega:        d.fecha_entrega_resultado
-                               ? new Date(d.fecha_entrega_resultado).toLocaleDateString('es-MX', { day:'2-digit', month:'short', year:'numeric' }).toUpperCase()
-                               : '',
+          ? new Date(d.fecha_entrega_resultado).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase()
+          : '',
         elaboro:             rb['elaboro']             ?? 'JEFE VENTANILLA',
         observaciones,
         anotaciones:         `PAGO: ${fechaPago}`,
@@ -117,6 +132,28 @@ export class ReporteBusquedaService {
       return JSON.parse(texto);
     } catch {
       return {};
+    }
+  }
+
+  private async cambiarAAsignada(solicitudId: number, folio: string): Promise<void> {
+    try {
+      console.log(`[reporte] 🔄 ${folio} (id:${solicitudId}) → ASIGNADA...`);
+      const resp = await firstValueFrom(
+        this.http.post<any>(
+          `${this.API}/solicitudes/${solicitudId}/cambio-estado`,
+          { estado_destino_clave: 'ASIGNADA', comentario: '' },
+          { headers: this.headers }
+        )
+      );
+
+      if (resp?.ok) {
+        console.log(`[reporte] ${folio} → ASIGNADA OK`, resp.data);
+      } else {
+        console.warn(`[reporte] Respuesta inesperada para ${folio}:`, resp);
+      }
+    } catch (err: any) {
+      console.warn(`[reporte] No se pudo cambiar estado de ${folio}:`,
+        err?.error?.error?.message ?? err?.status);
     }
   }
 
@@ -162,14 +199,13 @@ export class ReporteBusquedaService {
     doc.text(`FOLIO: ${datos.folio}`, lm + pw, yBase + lh * 0.5, { align: 'right' });
     doc.setFont('courier', 'normal');
     y += 1;
-    line('SERVICIO',          datos.servicio,    lm + 90, 'NACIMIENTO', datos.tipoActa);
+    line('SERVICIO',          datos.servicio,       lm + 90, 'NACIMIENTO', datos.tipoActa);
     line('AÑOS DE BUSQUEDA',  datos.aniosBusqueda);
     line('RANGO DE BUSQUEDA', datos.rangoBusqueda);
     y += 1;
     center('DATOS DEL ACTA');
     y -= 1;
-
-    line('OFICIALIA',          datos.oficialia,    lm + 90, 'AÑO', datos.anio);
+    line('OFICIALIA',          datos.oficialia,      lm + 90, 'AÑO', datos.anio);
     line('ACTA',               datos.acta);
     line('FECHA DE REGISTRO',  datos.fechaRegistro);
     line('LOCALIDAD REGISTRO', `[${datos.localidad}]`);
@@ -178,7 +214,6 @@ export class ReporteBusquedaService {
     y += 1;
     center('DATOS DEL REGISTRADO');
     y -= 1;
-
     line('NOMBRE',             datos.nombre);
     line('FECHA NACIMIENTO',   datos.fechaNacimiento);
     line('LUGAR NACIMIENTO',   `[] ${datos.lugarNacimiento}`);
@@ -196,12 +231,12 @@ export class ReporteBusquedaService {
     doc.text('ANOTACIONES', lm, y);
     doc.setFont('courier', 'normal');
     doc.text(' :', lm + 24, y);
-    y += lh;                   
+    y += lh;
     doc.text(datos.anotaciones, lm + 4, y);
-    y += lh + 4;              
+    y += lh + 4;
     separator();
 
-    return y;  
+    return y;
   }
 
   async generarReporte(folios: string[]): Promise<void> {
@@ -215,10 +250,10 @@ export class ReporteBusquedaService {
     }
 
     const doc          = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'letter' });
-    const alturaHoja   = 279;  
+    const alturaHoja   = 279;
     const margenTop    = 10;
-    const margenBot    = 10;   
-    const espacioEntre = 4;     
+    const margenBot    = 10;
+    const espacioEntre = 4;
 
     let y = margenTop;
 
@@ -227,7 +262,6 @@ export class ReporteBusquedaService {
       if (i + 1 < datos.length) {
         const alturaEstimada = yFinal - y;
         const yProxima       = yFinal + espacioEntre;
-
         if (yProxima + alturaEstimada > alturaHoja - margenBot) {
           doc.addPage();
           y = margenTop;
@@ -239,5 +273,10 @@ export class ReporteBusquedaService {
 
     console.log(`[reporte] PDF generado con ${datos.length} órdenes`);
     doc.save(`ordenes-busqueda-${new Date().toISOString().slice(0, 10)}.pdf`);
+    console.log(`[reporte] Cambiando estados a ASIGNADA...`);
+    await Promise.allSettled(
+      datos.map(d => this.cambiarAAsignada(d._id, d.folio))
+    );
+    console.log(`[reporte] Proceso completo — PDF generado con ${datos.length} órdenes`);
   }
 }

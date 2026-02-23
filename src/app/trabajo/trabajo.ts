@@ -198,6 +198,21 @@ export class TrabajoComponent implements OnInit {
     }
   }
 
+  async imprimirSeleccionados(): Promise<void> {
+    const seleccionados = this.payments.filter(p => p.selected);
+    if (!seleccionados.length) { alert('Selecciona al menos un registro'); return; }
+    for (const p of seleccionados) {
+      await this.abrirPdf(p);
+    }
+  }
+
+  async imprimirTodos(): Promise<void> {
+    if (!this.payments.length) { alert('No hay registros para imprimir'); return; }
+    for (const p of this.payments) {
+      await this.abrirPdf(p);
+    }
+  }
+
   async abrirPdf(payment: Payment): Promise<void> {
     const url = await this.obtenerUrlPdf(payment);
     if (url) {
@@ -212,17 +227,17 @@ export class TrabajoComponent implements OnInit {
 
   confirmarImpresion(payment: Payment): void {
     const url = `${this.API}/solicitudes/${payment.rawSolicitud.id}/cambio-estado`;
-    console.log(`[confirmarImpresion] Cambiando ${payment.id} → EN_BUSQUEDA...`);
+    console.log(`[confirmarImpresion] Cambiando ${payment.id} → ASIGNADA...`);
 
     this.http.post<ApiResponse<any>>(url, {
-      estado_destino_clave: 'EN_BUSQUEDA',
+      estado_destino_clave: 'ASIGNADA',
       comentario: ''
     }, { headers: this.headers }).subscribe({
       next: resp => {
         if (resp.ok) {
-          console.log(`[confirmarImpresion] ${payment.id} → EN_BUSQUEDA`, resp.data);
-          payment.estadoClave  = 'EN_BUSQUEDA';
-          payment.estadoNombre = 'En Búsqueda';
+          console.log(`[confirmarImpresion] ${payment.id} → ASIGNADA`, resp.data);
+          payment.estadoClave  = 'ASIGNADA';
+          payment.estadoNombre = 'Asignada';
           payment.impreso      = false;
           this.cdr.detectChanges();
         }
@@ -362,16 +377,20 @@ export class TrabajoComponent implements OnInit {
 
     this.payments = resultado;
   }
-
+  
   async generarReporte(): Promise<void> {
     const folios = this.payments.map(p => p.id);
     if (!folios.length) { alert('No hay registros para generar el reporte'); return; }
+    const ok = confirm(`¿Estás seguro? Se generará el reporte con ${folios.length} solicitud(es) y su estado cambiará a ASIGNADA.`);
+    if (!ok) return;
     await this.reporte.generarReporte(folios);
   }
 
   async generarReporteSeleccionados(): Promise<void> {
     const folios = this.payments.filter(p => p.selected).map(p => p.id);
     if (!folios.length) { alert('Selecciona al menos un registro'); return; }
+    const ok = confirm(`¿Estás seguro? Se generará el reporte con ${folios.length} solicitud(es) seleccionada(s) y su estado cambiará a ASIGNADA.`);
+    if (!ok) return;
     await this.reporte.generarReporte(folios);
   }
 

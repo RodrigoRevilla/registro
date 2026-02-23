@@ -10,7 +10,6 @@ import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
-import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ApiService } from '../http';
 import { AuthService } from '../auth';
@@ -80,7 +79,7 @@ export class ModificacionComponent {
   }
 
   private getHeaders(): HttpHeaders | null {
-    const token = localStorage.getItem('token');
+    const token = this.authService.getToken();
     if (!token) { alert('Primero debes hacer login'); return null; }
     return new HttpHeaders({ Authorization: `Bearer ${token}` });
   }
@@ -92,7 +91,7 @@ export class ModificacionComponent {
       next: (resp: any) => {
         console.log('Login response:', resp);
         if (resp.ok) {
-          localStorage.setItem('token', resp.data.token);
+          this.authService.login(resp.data.token, resp.data.usuario);
           alert('Login correcto');
         }
       },
@@ -104,7 +103,7 @@ export class ModificacionComponent {
   }
 
   buscarSolicitud(): void {
-    const folio = this.formulario.get('folio')?.value;
+    const folio = this.formulario.get('folio')?.value?.trim();
     console.log('[buscarSolicitud] folio:', folio);
     if (!folio) { alert('Ingresa un folio'); return; }
 
@@ -149,7 +148,7 @@ export class ModificacionComponent {
     const id = this.respuestaBackend?.data?.id;
     if (!id) { alert('Primero busca una solicitud'); return; }
 
-    const folioHoja = this.formulario.get('folio')?.value;
+    const folioHoja = this.formulario.get('folio')?.value?.trim();
     if (!folioHoja) { alert('No hay folio para reimprimir'); return; }
 
     const headers = this.getHeaders();
@@ -214,11 +213,14 @@ export class ModificacionComponent {
     if (!id) { alert('Primero busca una solicitud'); return; }
 
     const estadoClave = this.formulario.get('estadoSeleccionado')?.value;
-    const comentario = this.formulario.get('observaciones')?.value ?? '';
+    const comentario  = this.formulario.get('observaciones')?.value ?? '';
+    const usuario = this.authService.getUsuario();
+    const areaId  = usuario?.area_id ?? null;
 
     console.log('[guardarCambios] id:', id);
     console.log('[guardarCambios] estadoClave:', estadoClave);
     console.log('[guardarCambios] comentario:', comentario);
+    console.log('[guardarCambios] area_id:', areaId);
 
     if (!estadoClave && !comentario) {
       alert('Selecciona un estado o escribe un comentario');
@@ -226,12 +228,15 @@ export class ModificacionComponent {
     }
 
     if (comentario) {
+      const bodyComentario: any = { comentario };
+      if (areaId) bodyComentario.area_id = areaId;
+
       this.http.post(
         `${this.baseUrl}/solicitudes/${id}/comentarios`,
-        { comentario },
+        bodyComentario,
         { headers }
       ).subscribe({
-        next: (resp: any) => console.log('[guardarCambios] comentario guardado:', resp),
+        next: (resp: any) => console.log('[guardarCambios] comentario guardado con area_id:', areaId, resp),
         error: (err) => console.error('[guardarCambios] error comentario:', err)
       });
     }
