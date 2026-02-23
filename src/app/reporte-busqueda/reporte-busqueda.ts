@@ -36,6 +36,14 @@ export class ReporteBusquedaService {
 
   private readonly API = '/api/v1';
 
+  private readonly LAYOUT = {
+    margenIzq: 15,
+    pageWidth: 180,
+    fontSize: 7,
+    lineHeight: 4.5,
+    margenTop: 10
+  };
+
   constructor(private http: HttpClient) {}
 
   private get headers(): HttpHeaders {
@@ -48,196 +56,156 @@ export class ReporteBusquedaService {
       const respSol = await firstValueFrom(
         this.http.get<any>(`${this.API}/solicitudes/folio/${folio}`, { headers: this.headers })
       );
+
       if (!respSol?.ok || !respSol.data) return null;
       const d = respSol.data;
-      let observaciones = '';
-      let anotaciones   = '';
-      try {
-        const respCom = await firstValueFrom(
-          this.http.get<any>(`${this.API}/solicitudes/${d.id}/comentarios`, { headers: this.headers })
-        );
-        if (respCom?.ok && respCom.data?.length) {
-          observaciones = respCom.data.map((c: any) => c.comentario).join(' | ');
-        }
-      } catch {}
+      const [respCom, respPago] = await Promise.allSettled([
+        firstValueFrom(this.http.get<any>(`${this.API}/solicitudes/${d.id}/comentarios`, { headers: this.headers })),
+        firstValueFrom(this.http.get<any>(`${this.API}/solicitudes/${d.id}/pago`, { headers: this.headers }))
+      ]);
 
+      let observaciones = '';
       let fechaPago = '';
-      try {
-        const respPago = await firstValueFrom(
-          this.http.get<any>(`${this.API}/solicitudes/${d.id}/pago`, { headers: this.headers })
-        );
-        if (respPago?.ok && respPago.data?.fecha_confirmacion) {
-          fechaPago = new Date(respPago.data.fecha_confirmacion).toLocaleDateString('es-MX', {
-            day: '2-digit', month: 'short', year: 'numeric'
-          }).toUpperCase();
-        }
-      } catch {}
+
+      if (respCom.status === 'fulfilled' && respCom.value?.ok && respCom.value.data?.length) {
+        observaciones = respCom.value.data.map((c: any) => c.comentario).join(' | ');
+      }
+
+      if (respPago.status === 'fulfilled' && respPago.value?.ok && respPago.value.data?.fecha_confirmacion) {
+        fechaPago = new Date(respPago.value.data.fecha_confirmacion)
+          .toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' })
+          .toUpperCase();
+      }
 
       const rb = d.resultado_busqueda ? this.parsearResultado(d.resultado_busqueda) : {};
 
       return {
-        folio:               d.folio ?? '',
-        servicio:            rb['servicio']            ?? '',
-        tipoActa:            rb['tipoActa']            ?? 'NACIMIENTO',
-        aniosBusqueda:       rb['aniosBusqueda']       ?? '----',
-        rangoBusqueda:       rb['rangoBusqueda']       ?? '-----',
-        oficialia:           rb['oficialia']           ?? '',
-        acta:                rb['acta']                ?? '',
-        anio:                rb['anio']                ?? (d.fecha_recepcion ? String(new Date(d.fecha_recepcion).getFullYear()) : ''),
-        fechaRegistro:       rb['fechaRegistro']       ?? '0-0-0',
-        localidad:           rb['localidad']           ?? '',
-        municipio:           rb['municipio']           ?? '',
-        distrito:            rb['distrito']            ?? '',
-        nombre:              rb['nombre']              ?? '',
-        fechaNacimiento:     rb['fechaNacimiento']     ?? '0-0-0',
-        lugarNacimiento:     rb['lugarNacimiento']     ?? '',
-        padre:               rb['padre']               ?? '',
-        madre:               rb['madre']               ?? '',
-        copiasSolicitadas:   rb['copiasSolicitadas']   ?? '1',
+        folio: d.folio ?? '',
+        servicio: rb['servicio'] ?? '',
+        tipoActa: rb['tipoActa'] ?? 'NACIMIENTO',
+        aniosBusqueda: rb['aniosBusqueda'] ?? '----',
+        rangoBusqueda: rb['rangoBusqueda'] ?? '-----',
+        oficialia: rb['oficialia'] ?? '',
+        acta: rb['acta'] ?? '',
+        anio: rb['anio'] ?? '',
+        fechaRegistro: rb['fechaRegistro'] ?? '',
+        localidad: rb['localidad'] ?? '',
+        municipio: rb['municipio'] ?? '',
+        distrito: rb['distrito'] ?? '',
+        nombre: rb['nombre'] ?? '',
+        fechaNacimiento: rb['fechaNacimiento'] ?? '',
+        lugarNacimiento: rb['lugarNacimiento'] ?? '',
+        padre: rb['padre'] ?? '',
+        madre: rb['madre'] ?? '',
+        copiasSolicitadas: rb['copiasSolicitadas'] ?? '1',
         documentoPresentado: rb['documentoPresentado'] ?? '',
-        fechaSolicitud:      d.fecha_recepcion
-                               ? new Date(d.fecha_recepcion).toLocaleDateString('es-MX', { day:'2-digit', month:'2-digit', year:'numeric' })
-                               : '',
+        fechaSolicitud: d.fecha_recepcion
+          ? new Date(d.fecha_recepcion).toLocaleDateString('es-MX')
+          : '',
         fechaPago,
-        fechaEntrega:        d.fecha_entrega_resultado
-                               ? new Date(d.fecha_entrega_resultado).toLocaleDateString('es-MX', { day:'2-digit', month:'short', year:'numeric' }).toUpperCase()
-                               : '',
-        elaboro:             rb['elaboro']             ?? 'JEFE VENTANILLA',
+        fechaEntrega: d.fecha_entrega_resultado
+          ? new Date(d.fecha_entrega_resultado).toLocaleDateString('es-MX')
+          : '',
+        elaboro: rb['elaboro'] ?? 'JEFE VENTANILLA',
         observaciones,
-        anotaciones:         `PAGO: ${fechaPago}`,
+        anotaciones: `PAGO: ${fechaPago}`
       };
+
     } catch (err) {
-      console.error(`[reporte] Error obteniendo ${folio}:`, err);
+      console.error(err);
       return null;
     }
   }
 
   private parsearResultado(texto: string): Record<string, string> {
-    try {
-      return JSON.parse(texto);
-    } catch {
-      return {};
-    }
+    try { return JSON.parse(texto); }
+    catch { return {}; }
   }
 
-  private dibujarOrden(doc: any, datos: DatosSolicitud, yBase: number): void {
-    const lm   = 15; 
-    const pw   = 180;
-    const fs   = 7;
-    const lh   = 4.5; 
+  private dibujarTextoMultiLinea(doc: jsPDF, texto: string, x: number, y: number, maxWidth: number): number {
+    const { lineHeight } = this.LAYOUT;
+    const lineas = doc.splitTextToSize(texto || '', maxWidth);
+    doc.text(lineas, x, y);
+    return lineas.length * lineHeight;
+  }
+
+  private dibujarOrden(doc: jsPDF, datos: DatosSolicitud, yBase: number): number {
+
+    const { margenIzq: lm, pageWidth: pw, fontSize: fs, lineHeight: lh } = this.LAYOUT;
 
     doc.setFontSize(fs);
     doc.setFont('courier', 'normal');
 
     let y = yBase;
 
-    const line = (label: string, value: string, x2?: number, label2?: string, value2?: string) => {
-      doc.setFont('courier', 'normal');
+    const line = (label: string, value: string) => {
       doc.text(label, lm, y);
-      doc.text(`: ${value}`, lm + 38, y);
-      if (x2 && label2 !== undefined && value2 !== undefined) {
-        doc.text(label2, x2, y);
-        doc.text(`: ${value2}`, x2 + 30, y);
-      }
-      y += lh;
+      const altura = this.dibujarTextoMultiLinea(doc, `: ${value}`, lm + 38, y, 120);
+      y += Math.max(lh, altura);
     };
 
-    const center = (texto: string, bold = false) => {
-      doc.setFont('courier', bold ? 'bold' : 'normal');
-      doc.text(texto, lm + pw / 2, y, { align: 'center' });
-      doc.setFont('courier', 'normal');
-      y += lh;
-    };
-
-    const separator = () => {
-      doc.setLineDashPattern([1, 1], 0);
-      doc.line(lm, y, lm + pw, y);
-      doc.setLineDashPattern([], 0);
-      y += lh;
-    };
-
-    center('ARCHIVO CENTRAL DEL REGISTRO CIVIL', true);
-    center('ORDEN DE BUSQUEDA', true);
     doc.setFont('courier', 'bold');
-    doc.text(`FOLIO: ${datos.folio}`, lm + pw, yBase + lh * 0.5, { align: 'right' });
+    doc.text('ARCHIVO CENTRAL DEL REGISTRO CIVIL', lm + pw / 2, y, { align: 'center' });
+    y += lh;
+    doc.text('ORDEN DE BUSQUEDA', lm + pw / 2, y, { align: 'center' });
     doc.setFont('courier', 'normal');
+    y += lh;
 
-    y += 1;
-    line('SERVICIO',        datos.servicio,    lm + 90, 'NACIMIENTO', datos.tipoActa);
+    doc.text(`FOLIO: ${datos.folio}`, lm + pw, yBase + 2, { align: 'right' });
+
+    y += lh;
+
+    line('SERVICIO', datos.servicio);
     line('AÑOS DE BUSQUEDA', datos.aniosBusqueda);
     line('RANGO DE BUSQUEDA', datos.rangoBusqueda);
 
-    y += 1;
-    center('DATOS DEL ACTA');
-    y -= 1;
-
-    line('OFICIALIA',           datos.oficialia,    lm + 90, 'AÑO', datos.anio);
-    line('ACTA',                datos.acta);
-    line('FECHA DE REGISTRO',   datos.fechaRegistro);
-    line('LOCALIDAD REGISTRO',  `[${datos.localidad}]`);
-    line('MUNICIPIO REGISTRO',  `[${datos.municipio}]`);
-    line('DISTRITO REGISTRO',   `[${datos.distrito}]`);
-
-    y += 1;
-    center('DATOS DEL REGISTRADO');
-    y -= 1;
-
-    line('NOMBRE',              datos.nombre);
-    line('FECHA NACIMIENTO',    datos.fechaNacimiento);
-    line('LUGAR NACIMIENTO',    `[] ${datos.lugarNacimiento}`);
-    line('PADRE',               datos.padre);
-    line('MADRE',               datos.madre);
-    line('COPIAS SOLICITADAS',  datos.copiasSolicitadas,  lm + 90, 'DOCUMENTO PRESENTADO', datos.documentoPresentado);
-    line('FECHA SOLICITUD',     datos.fechaSolicitud,     lm + 90, 'FECHA DE PAGO',         datos.fechaPago);
-    line('FECHA ENTREGA',       datos.fechaEntrega);
-    line('ELABORO SOLICITUD',   datos.elaboro);
-
-    doc.setFont('courier', 'normal');
-    doc.text('OBSERVACIONES', lm, y);
-    doc.text(`: ${datos.observaciones}`, lm + 38, y);
     y += lh;
+    line('NOMBRE', datos.nombre);
+    line('PADRE', datos.padre);
+    line('MADRE', datos.madre);
 
-    doc.setFont('courier', 'bold');
-    doc.text('ANOTACIONES', lm, y);
-    doc.setFont('courier', 'normal');
-    doc.text(` :`, lm + 24, y);
-    y += lh;
-    doc.text(datos.anotaciones, lm + 4, y);
-    y += lh + 2;
+    line('OBSERVACIONES', datos.observaciones);
+    line('ANOTACIONES', datos.anotaciones);
 
-    separator();
+    doc.setLineDashPattern([1, 1], 0);
+    doc.line(lm, y + 2, lm + pw, y + 2);
+    doc.setLineDashPattern([], 0);
+    return y - yBase + 10;
   }
 
   async generarReporte(folios: string[]): Promise<void> {
-    console.log(`[reporte] Generando para ${folios.length} solicitudes...`);
+
     const resultados = await Promise.all(folios.map(f => this.obtenerDatos(f)));
     const datos = resultados.filter((d): d is DatosSolicitud => d !== null);
 
     if (!datos.length) {
-      alert('No se pudieron obtener datos para generar el reporte');
+      alert('No se pudieron obtener datos');
       return;
     }
 
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'letter' });
-    const alturaOrden  = 95; 
-    const alturaHoja   = 279;
-    const margenTop    = 10;
-    const ordenesPorPagina = Math.floor((alturaHoja - margenTop) / alturaOrden);
 
-    let y      = margenTop;
-    let cuenta = 0;
+    const pageHeight = 279;
+    let y = this.LAYOUT.margenTop;
 
-    for (let i = 0; i < datos.length; i++) {
-      if (cuenta > 0 && cuenta % ordenesPorPagina === 0) {
+    datos.forEach((dato, index) => {
+      const altura = this.dibujarOrden(doc, dato, y);
+      if (y + altura > pageHeight - 10) {
         doc.addPage();
-        y = margenTop;
+        y = this.LAYOUT.margenTop;
+        this.dibujarOrden(doc, dato, y);
+        y += altura;
+      } else {
+        y += altura;
       }
-      this.dibujarOrden(doc, datos[i], y);
-      y      += alturaOrden;
-      cuenta += 1;
-    }
 
-    console.log(`[reporte] PDF generado con ${datos.length} órdenes`);
-    doc.save(`ordenes-busqueda-${new Date().toISOString().slice(0, 10)}.pdf`);
+    });
+
+    const totalPages = doc.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i);
+      doc.text(`Página ${i} de ${totalPages}`, 200, 275, { align: 'right' });
+    }
+    doc.save(`ordenes-${new Date().toISOString().slice(0,10)}.pdf`);
   }
 }
