@@ -1,17 +1,18 @@
-<div class="header-section">
-  <div class="header-text">
-    <mat-card-title class="title">🔍 Consulta de Nacimientos</mat-card-title>
-    <p class="subtitle">Ingrese uno o más criterios para localizar un acta de nacimiento</p>
-  </div>
-  <div class="home-button-container">
-    <button class="home-btn" (click)="goHome()">
+<div class="page-header">
+  <div class="page-header-content">
+    <h1>📄 Solicitud de Servicios de Nacimientos</h1>
+    <p>Captura la información del acta y del solicitante</p>
+    <button mat-stroked-button color="primary" (click)="goHome()" class="btn-home">
       🏠 Home
     </button>
   </div>
 </div>
+
 <form>
+  <!-- ── Datos del Acta ─────────────────────────────────────────────────── -->
   <fieldset>
     <legend>Datos del Acta</legend>
+
     <div class="form-row-multi">
       <div class="field-group">
         <span class="label-inline">Entidad:</span>
@@ -51,6 +52,7 @@
     </div>
   </fieldset>
 
+  <!-- ── Datos del Registrado ──────────────────────────────────────────── -->
   <fieldset>
     <legend>Datos del Registrado</legend>
 
@@ -91,6 +93,7 @@
     </div>
   </fieldset>
 
+  <!-- ── Servicio ──────────────────────────────────────────────────────── -->
   <fieldset>
     <legend>Servicio</legend>
 
@@ -99,6 +102,7 @@
         <select [(ngModel)]="tipoServicioId" name="tipoServicioId">
           <option [value]="0">Seleccione un tipo de Servicio</option>
           <option *ngFor="let ts of tiposServicio" [value]="ts.id">{{ ts.nombre }}</option>
+          <!-- Opciones fijas como fallback si el catálogo no carga -->
           <ng-container *ngIf="tiposServicio.length === 0">
             <option value="1">C: Certificacion de acta</option>
             <option value="2">E: Const. Reg. Extem.</option>
@@ -150,6 +154,7 @@
     </div>
   </fieldset>
 
+  <!-- ── Facturación ───────────────────────────────────────────────────── -->
   <fieldset>
     <legend>Facturación</legend>
 
@@ -210,6 +215,7 @@
     </div>
   </fieldset>
 
+  <!-- ── Servicio Condonado ─────────────────────────────────────────────── -->
   <fieldset>
     <legend>Servicio Condonado</legend>
 
@@ -231,9 +237,30 @@
     </div>
   </fieldset>
 
+  <!-- ── Observaciones ─────────────────────────────────────────────────── -->
   <label class="field-full">Observaciones:
     <textarea rows="3" [(ngModel)]="observaciones" name="observaciones"></textarea>
   </label>
+
+  <!-- ── Acciones ──────────────────────────────────────────────────────── -->
+
+  <!-- ── Resultado generado ───────────────────────────────────────────── -->
+  <div class="resultado-folio" *ngIf="folioGenerado">
+    <div class="resultado-row">
+      <span class="resultado-label">Folio:</span>
+      <span class="resultado-valor">{{ folioGenerado }}</span>
+      <button type="button" class="btn-copiar" (click)="copiarFolio()" title="Copiar folio">
+        📋 Copiar
+      </button>
+    </div>
+    <div class="resultado-row" *ngIf="lineaCaptura">
+      <span class="resultado-label">Línea de captura:</span>
+      <span class="resultado-valor">{{ lineaCaptura }}</span>
+      <button type="button" class="btn-copiar" (click)="copiarLineaCaptura()" title="Copiar línea de captura">
+        📋 Copiar
+      </button>
+    </div>
+  </div>
 
   <div class="actions">
     <button type="button" (click)="crearNuevaSolicitud()" [disabled]="procesando">
@@ -241,3 +268,9 @@
     </button>
   </div>
 </form>
+
+<div *ngIf="mostrarPdf" class="actions">
+  <button type="button" (click)="imprimir()">
+    🖨️ Imprimir Hoja de Pago
+  </button>
+</div>

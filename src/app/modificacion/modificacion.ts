@@ -41,6 +41,35 @@ export class ModificacionComponent {
 
   respuestaBackend: any = null;
 
+  readonly opcionesPorRol: Record<string, { value: string; label: string }[]> = {
+    BUSQUEDA: [
+      { value: 'NO_HAY_LIBRO', label: 'No hay libro' },
+      { value: 'NO_HAY_FORMATO', label: 'No hay formato' },
+      { value: 'NO_HAY_CUADERNO', label: 'No hay cuaderno' },
+      { value: 'NO_HAY_REGISTRO', label: 'No hay registro' },
+      { value: 'ENCONTRADA', label: 'Encontrada' },
+    ],
+    VALIDACION: [
+      { value: 'COTEJADA', label: 'Cotejada' },
+      { value: 'ACLARACION', label: 'Para aclaración' },
+    ],
+    ADMINISTRADOR: [
+      { value: 'NO_HAY_LIBRO', label: 'No hay libro' },
+      { value: 'NO_HAY_FORMATO', label: 'No hay formato' },
+      { value: 'NO_HAY_CUADERNO', label: 'No hay cuaderno' },
+      { value: 'NO_HAY_REGISTRO', label: 'No hay registro' },
+      { value: 'ENCONTRADA', label: 'Encontrada' },
+      { value: 'COTEJADA', label: 'Cotejada' },
+      { value: 'ACLARACION', label: 'Para aclaración' },
+    ],
+  };
+
+  get opcionesEstado(): { value: string; label: string }[] {
+    const rol = this.authService.getRol().toUpperCase();
+    const key = Object.keys(this.opcionesPorRol).find(k => rol.includes(k));
+    return key ? this.opcionesPorRol[key] : [];
+  }
+
   constructor(
     private router: Router,
     private fb: FormBuilder,
@@ -213,9 +242,9 @@ export class ModificacionComponent {
     if (!id) { alert('Primero busca una solicitud'); return; }
 
     const estadoClave = this.formulario.get('estadoSeleccionado')?.value;
-    const comentario  = this.formulario.get('observaciones')?.value ?? '';
+    const comentario = this.formulario.get('observaciones')?.value ?? '';
     const usuario = this.authService.getUsuario();
-    const areaId  = usuario?.area_id ?? null;
+    const areaId = usuario?.area_id ?? null;
 
     console.log('[guardarCambios] id:', id);
     console.log('[guardarCambios] estadoClave:', estadoClave);
@@ -227,45 +256,31 @@ export class ModificacionComponent {
       return;
     }
 
-    if (comentario) {
-      const bodyComentario: any = { comentario };
-      if (areaId) bodyComentario.area_id = areaId;
+    const opcionLabel = estadoClave
+      ? (this.opcionesEstado.find(o => o.value === estadoClave)?.label ?? estadoClave)
+      : null;
+    const textoFinal = [opcionLabel, comentario].filter(Boolean).join(' — ');
 
-      this.http.post(
-        `${this.baseUrl}/solicitudes/${id}/comentarios`,
-        bodyComentario,
-        { headers }
-      ).subscribe({
-        next: (resp: any) => console.log('[guardarCambios] comentario guardado con area_id:', areaId, resp),
-        error: (err) => console.error('[guardarCambios] error comentario:', err)
-      });
-    }
+    console.log('[guardarCambios] textoFinal comentario:', textoFinal);
 
-    if (estadoClave) {
-      const body = { estado_destino_clave: estadoClave, comentario };
-      console.log('[guardarCambios] body cambio-estado:', body);
+    const bodyComentario: any = { comentario: textoFinal };
+    if (areaId) bodyComentario.area_id = areaId;
 
-      this.http.post(
-        `${this.baseUrl}/solicitudes/${id}/cambio-estado`,
-        body,
-        { headers }
-      ).subscribe({
-        next: (resp: any) => {
-          console.log('[guardarCambios] cambio-estado respuesta:', resp);
-          this.respuestaBackend = resp;
-          alert('Cambios guardados correctamente');
-        },
-        error: (err) => {
-          console.error('[guardarCambios] error cambio-estado:', err);
-          console.error('[guardarCambios] status:', err.status);
-          console.error('[guardarCambios] error.error:', err.error);
-          this.respuestaBackend = err.error;
-          alert('Error al cambiar estado: ' + (err.error?.error?.message ?? 'Error desconocido'));
-        }
-      });
-    } else {
-      alert('Comentario guardado correctamente');
-    }
+    this.http.post(
+      `${this.baseUrl}/solicitudes/${id}/comentarios`,
+      bodyComentario,
+      { headers }
+    ).subscribe({
+      next: (resp: any) => {
+        console.log('[guardarCambios] comentario guardado:', resp);
+        this.respuestaBackend = resp;
+        alert('Cambios guardados correctamente');
+      },
+      error: (err) => {
+        console.error('[guardarCambios] error comentario:', err);
+        alert('Error al guardar: ' + (err.error?.error?.message ?? 'Error desconocido'));
+      }
+    });
   }
 
   goHome(): void {

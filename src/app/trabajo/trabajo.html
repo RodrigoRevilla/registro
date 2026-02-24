@@ -26,7 +26,7 @@
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
       </mat-form-field>
-      
+
       <ng-container *ngIf="!folioHojaBloqueado">
         <mat-form-field appearance="outline" class="input-group" floatLabel="always">
           <mat-label>Folio inicial hoja valorada</mat-label>
@@ -36,6 +36,7 @@
           <mat-hint>Se bloqueará al presionar <strong>Establecer</strong></mat-hint>
         </mat-form-field>
         <button mat-stroked-button color="warn"
+          class="btn-establecer"
           (click)="establecerFolioInicial()"
           matTooltip="Establece el folio inicial. No podrá editarse en esta sesión.">
           <mat-icon>lock</mat-icon> Establecer folio
@@ -47,11 +48,9 @@
         <span>Siguiente hoja valorada: <strong>{{ folioHojaValorada }}</strong></span>
       </div>
 
-      <div class="search-buttons">
-        <button mat-raised-button color="primary" (click)="buscarPagos()">
-          <mat-icon>search</mat-icon> Buscar
-        </button>
-      </div>
+      <button mat-raised-button (click)="buscarPagos()" class="btn-buscar">
+        <mat-icon>search</mat-icon> Buscar
+      </button>
 
     </div>
 
@@ -141,8 +140,6 @@
           <mat-checkbox [(ngModel)]="payment.selected" color="primary">
             Seleccionar
           </mat-checkbox>
-
-
         </div>
 
       </mat-card>

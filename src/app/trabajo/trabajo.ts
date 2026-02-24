@@ -135,7 +135,7 @@ export class TrabajoComponent implements OnInit {
 
   currentFilter          = 'todos';
   fechaPago: Date | null = null;
-  folioInput: number | null    = null;  
+  folioInput: number | null    = null; 
   folioHojaValorada: number | null = null;  
   folioHojaBloqueado           = false;
 
@@ -393,7 +393,9 @@ export class TrabajoComponent implements OnInit {
     if (!folios.length) { alert('No hay registros para generar el reporte'); return; }
     const ok = confirm(`¿Estás seguro? Se generará el reporte con ${folios.length} solicitud(es) y su estado cambiará a ASIGNADA.`);
     if (!ok) return;
-    await this.reporte.generarReporte(folios);
+    const asignaciones = await this.reporte.generarReporte(folios);
+    this.aplicarAsignaciones(asignaciones);
+    this.quitarProcesados(new Set(folios));
     this.restaurarDesdeSession();
     this.cdr.detectChanges();
   }
@@ -403,10 +405,30 @@ export class TrabajoComponent implements OnInit {
     if (!folios.length) { alert('Selecciona al menos un registro'); return; }
     const ok = confirm(`¿Estás seguro? Se generará el reporte con ${folios.length} solicitud(es) seleccionada(s) y su estado cambiará a ASIGNADA.`);
     if (!ok) return;
-    await this.reporte.generarReporte(folios);
+    const asignaciones = await this.reporte.generarReporte(folios);
+    this.aplicarAsignaciones(asignaciones);
+    this.quitarProcesados(new Set(folios));
     this.restaurarDesdeSession();
     this.cdr.detectChanges();
   }
+
+  private aplicarAsignaciones(asignaciones: Map<string, number> | undefined): void {
+    if (!asignaciones?.size) return;
+    asignaciones.forEach((folioHV, folioSolicitud) => {
+      const p = this.payments.find(p => p.id === folioSolicitud);
+      if (p) {
+        p.folioHojaUsado = folioHV;
+        console.log(`[HV] UI actualizada: ${folioSolicitud} → hoja valorada ${folioHV}`);
+      }
+    });
+  }
+
+  private quitarProcesados(folios: Set<string>): void {
+    this.payments    = this.payments.filter(p => !folios.has(p.id));
+    this.allPayments = this.allPayments.filter(p => !folios.has(p.id));
+    this.recalcularConteos();
+  }
+
 
   private async cargarCatalogos() {
     try {

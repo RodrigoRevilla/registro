@@ -38,17 +38,15 @@
                     </button>
 
                     <mat-form-field appearance="outline">
-                        <mat-label>Seleccione una</mat-label>
+                        <mat-label>Seleccione una opción</mat-label>
                         <mat-select formControlName="estadoSeleccionado">
-                            <mat-option value="1">No hay libro</mat-option>
-                            <mat-option value="2">No hay formato</mat-option>
-                            <mat-option value="3">No hay cuaderno</mat-option>
-                            <mat-option value="4">No hay registro</mat-option>
-                            <mat-option value="5">Procesada</mat-option>
-                            <mat-option value="6">Encontrada</mat-option>
-                            <mat-option value="7">Fotocopiada</mat-option>
-                            <mat-option value="8">Para aclaración</mat-option>
+                            <mat-option *ngFor="let op of opcionesEstado" [value]="op.value">
+                                {{ op.label }}
+                            </mat-option>
                         </mat-select>
+                        <mat-hint *ngIf="opcionesEstado.length === 0" style="color: #f44336">
+                            Sin opciones para tu rol
+                        </mat-hint>
                     </mat-form-field>
 
                     <button mat-stroked-button color="accent" (click)="reImprimir()">

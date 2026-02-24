@@ -278,16 +278,16 @@ export class ReporteBusquedaService {
     return y;
   }
 
-  async generarReporte(folios: string[]): Promise<void> {
+  async generarReporte(folios: string[]): Promise<Map<string, number>> {
     if (sessionStorage.getItem(SK_BLOQUEADO) !== '1') {
       alert('Es necesario ingresar un folio inicial de hoja valorada antes de generar el reporte.');
-      return;
+      return new Map();
     }
 
     let folioHVActual = this.leerFolioActual();
     if (!folioHVActual) {
       alert('No se encontró el folio de hoja valorada en sesión. Por favor establécelo nuevamente.');
-      return;
+      return new Map();
     }
 
     console.log(`[reporte] Generando para ${folios.length} solicitudes...`);
@@ -298,7 +298,7 @@ export class ReporteBusquedaService {
 
     if (!datos.length) {
       alert('No se pudieron obtener datos para generar el reporte');
-      return;
+      return new Map();
     }
 
     const doc          = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'letter' });
@@ -327,16 +327,24 @@ export class ReporteBusquedaService {
     doc.save(`ordenes-busqueda-${new Date().toISOString().slice(0, 10)}.pdf`);
     console.log(`[reporte] Procesando hojas valoradas y estados...`);
 
+    const asignaciones = new Map<string, number>();
+
     for (const d of datos) {
       folioHVActual = this.siguienteLibre(folioHVActual);
-      console.log(`[HV] Asignando folio ${folioHVActual} a solicitud ${d.folio} (solo sessionStorage)`);
+      console.log(`[HV] Asignación: ${d.folio} → hoja valorada ${folioHVActual}`);
+
       this.marcarUsado(folioHVActual);
       const folioUsado = folioHVActual;
       folioHVActual = this.avanzarFolio(folioUsado);
+
+      asignaciones.set(d.folio, folioUsado);
       await this.cambiarAAsignada(d._id, d.folio, folioUsado);
     }
 
     console.log(`[reporte] Proceso completo — PDF generado con ${datos.length} órdenes`);
     console.log(`[HV] Siguiente folio disponible tras el lote: ${this.leerFolioActual()}`);
+    console.log(`[HV] Resumen de asignaciones:`, Object.fromEntries(asignaciones));
+
+    return asignaciones;
   }
 }

@@ -1,112 +1,210 @@
+@use 'sass:color';
+
+// ─────────────────────────────────────────────
+// PALETA — misma que busqueda-pagos-rojo.scss
+// ─────────────────────────────────────────────
+
+$gov-red:        #9e2a47;
+$gov-red-dark:   #7d1f38;
+$gov-red-mid:    #b83558;
+$gov-red-light:  #fdf2f6;
+$gov-red-subtle: #fef7f9;
+
+$navy:           #1a3a5c;
+$navy-light:     #e8f0f7;
+$navy-subtle:    #f0f5fb;
+
+$gold:           #b8890a;
+$gold-light:     #fdf8ed;
+
+$text-heading:   #0d1f2d;
+$text-body:      #2d3f50;
+$text-muted:     #6b7f8f;
+$text-inverse:   #ffffff;
+
+$border:         #ddd0d5;
+$border-strong:  #c4a8b2;
+$surface:        #ffffff;
+$bg:             #f7f2f4;
+
+$radius-sm:  6px;
+$radius-md:  10px;
+$radius-lg:  14px;
+$radius-pill:999px;
+
+$shadow-sm:      0 1px 3px rgba(158, 42, 71, 0.07), 0 1px 2px rgba(0,0,0,0.04);
+$shadow-md:      0 4px 14px rgba(158, 42, 71, 0.10), 0 2px 4px rgba(0,0,0,0.05);
+$shadow-lg:      0 12px 36px rgba(158, 42, 71, 0.10), 0 4px 8px rgba(0,0,0,0.05);
+$shadow-primary: 0 6px 18px rgba(158, 42, 71, 0.28);
+
+$transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+
+// ─────────────────────────────────────────────
+// CONTENEDOR PRINCIPAL
+// ─────────────────────────────────────────────
+
 .modificacion-container {
-  padding: 24px;
+  padding: 2rem;
   display: flex;
   justify-content: center;
   min-height: 100vh;
-  background: #f4f6f9;
+  background: $bg;
+  font-family: 'Lato', 'Segoe UI', system-ui, sans-serif;
+  color: $text-body;
 }
+
+// ─────────────────────────────────────────────
+// TARJETA PRINCIPAL
+// ─────────────────────────────────────────────
 
 .mod-card {
   width: 100%;
-  max-width: 1200px;
-  border-radius: 16px;
-  background: #ffffff;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04), 0 20px 40px rgba(0, 0, 0, 0.08);
+  max-width: 1180px;
+  border-radius: $radius-lg;
+  background: $surface;
+  box-shadow: $shadow-lg;
   overflow: hidden;
+  border: 1px solid $border;
+  height: fit-content;
 }
+
+// ─────────────────────────────────────────────
+// CABECERA — rojo institucional + franja dorada
+// ─────────────────────────────────────────────
 
 mat-card-header {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2rem 2rem 1.5rem;
+  padding: 2rem 2.5rem 1.8rem;
   margin-bottom: 0;
-  background: #ffffff;
-  border-bottom: 1px solid #e5e7eb;
-  border-top: 5px solid #8b1538;
+  background: $gov-red;
+  border-bottom: 4px solid $gold;
+  position: relative;
+
+  // Textura diagonal — papel oficial
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      135deg,
+      transparent,
+      transparent 20px,
+      rgba(0,0,0,0.018) 20px,
+      rgba(0,0,0,0.018) 40px
+    );
+    pointer-events: none;
+  }
 
   .custom-title {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.6rem;
+    position: relative; // sobre la textura
 
     .icon {
       font-size: 1.4rem;
       line-height: 1;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2));
     }
 
     h1 {
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: #8b1538;
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: $text-inverse;
       margin: 0;
-      letter-spacing: -0.02em;
+      letter-spacing: 0.01em;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.25);
       text-align: center;
     }
   }
-
-  &::after {
-    content: "";
-    display: block;
-    width: 40px;
-    height: 3px;
-    margin: 0.75rem auto 0;
-    background: #8b1538;
-    border-radius: 2px;
-    opacity: 0.6;
-  }
 }
 
-mat-card-header+mat-card-actions {
+// ─── BOTÓN HOME ──────────────────────────────
+
+mat-card-header + mat-card-actions {
   display: flex;
   justify-content: flex-start;
-  padding: 0 24px 8px;
+  padding: 0.8rem 1.5rem 0.4rem;
+  background: $surface;
+  border-bottom: 1px solid $border;
 }
 
 .btn-home {
   display: inline-flex;
-  justify-content: center;
-  gap: 0.5rem;
-  margin: 0 auto;
-  padding: 0.6rem 1.5rem;
-  border-radius: 12px;
-  border: 1.5px solid #8b1538;
-  background: #ffffff;
-  color: #8b1538;
-  font-weight: 600;
-  font-size: 0.85rem;
-  transition: all 0.25s ease;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1.3rem;
+  border-radius: $radius-sm;
+  border: 1.5px solid $gov-red;
+  background: $surface;
+  color: $gov-red;
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: $transition;
 
   &:hover {
-    background: #fdf2f8;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(139, 21, 56, 0.15);
+    background: $gov-red-light;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(158, 42, 71, 0.15);
   }
 }
 
-mat-card-content {
-  padding: 8px 24px 16px !important;
-}
+// ─── BOTÓN LIMPIAR (flotante) ─────────────────
 
-.section {
-  margin-bottom: 20px;
-  padding: 20px 20px 8px;
-  border: 1px solid #e8eaed;
-  border-radius: 10px;
-  background: #fafbfc;
-  transition: box-shadow 0.2s ease;
+.clean-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  color: $text-muted !important;
+  transition: $transition;
 
   &:hover {
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    color: $gov-red !important;
+    transform: rotate(-15deg);
+  }
+}
+
+// ─────────────────────────────────────────────
+// CONTENIDO
+// ─────────────────────────────────────────────
+
+mat-card-content {
+  padding: 1.5rem 2rem 1rem !important;
+  background: $bg;
+}
+
+// ─────────────────────────────────────────────
+// SECCIONES
+// ─────────────────────────────────────────────
+
+.section {
+  margin-bottom: 1.2rem;
+  padding: 1.4rem 1.6rem 1rem;
+  border: 1px solid $border;
+  border-left: 4px solid transparent;
+  border-radius: $radius-md;
+  background: $surface;
+  box-shadow: $shadow-sm;
+  transition: $transition;
+
+  &:hover {
+    box-shadow: $shadow-md;
+    border-left-color: $gov-red-mid;
+    border-color: $border-strong;
+    transform: translateY(-1px);
   }
 }
 
 .section-title {
-  margin-bottom: 16px;
-  font-weight: 700;
-  font-size: 0.8rem;
-  color: #8b1538;
+  margin-bottom: 1.1rem;
+  font-weight: 800;
+  font-size: 0.72rem;
+  color: $gov-red;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   display: flex;
@@ -114,29 +212,34 @@ mat-card-content {
   gap: 0.5rem;
 
   &::before {
-    content: "";
+    content: '';
     display: inline-block;
     width: 4px;
     height: 14px;
-    background: #8b1538;
+    background: $gov-red;
     border-radius: 2px;
+    flex-shrink: 0;
   }
 }
 
-.readonly-field input {
-  background-color: #f5f7fa;
-  font-weight: 500;
-}
+// ─── SECCIÓN BÚSQUEDA ────────────────────────
 
 .search-section {
-  background: #f0f4ff;
-  border-color: #c7d2fe;
+  background: $navy-subtle;
+  border-color: color.adjust($navy-light, $lightness: -4%);
+  border-left-color: $navy !important;
+
+  &:hover {
+    border-left-color: $navy !important;
+    border-color: color.adjust($navy-light, $lightness: -10%);
+  }
 }
 
 .form-row {
   display: flex;
-  gap: 16px;
+  gap: 1rem;
   align-items: center;
+  flex-wrap: wrap;
 
   mat-form-field {
     width: 220px;
@@ -145,50 +248,238 @@ mat-card-content {
 
   button {
     margin-bottom: 4px;
+    border-radius: $radius-sm;
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    transition: $transition;
+
+    // Botón Buscar
+    &[color="primary"] {
+      background: $gov-red;
+      color: $text-inverse;
+      border: none;
+      box-shadow: $shadow-primary;
+      padding: 0 1.2rem;
+
+      &:hover {
+        background: $gov-red-dark;
+        transform: translateY(-1px);
+        box-shadow: 0 8px 22px rgba(158, 42, 71, 0.35);
+      }
+    }
+
+    // Botón Re-imprimir
+    &[color="accent"] {
+      border: 1.5px solid $navy;
+      color: $navy;
+      background: $surface;
+
+      &:hover {
+        background: $navy-light;
+        transform: translateY(-1px);
+      }
+    }
   }
 }
+
+// ─────────────────────────────────────────────
+// GRIDS DE FORMULARIO
+// ─────────────────────────────────────────────
 
 .form-grid-4 {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  gap: 1rem;
+  align-items: start;
 }
 
 .form-grid-3 {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  gap: 1rem;
 }
 
 .full-width {
   width: 100%;
 }
 
+// ─── CAMPOS READONLY ─────────────────────────
+
+.readonly-field input {
+  background-color: color.adjust($bg, $lightness: 2%);
+  font-weight: 500;
+  color: $text-muted;
+  cursor: default;
+}
+
+// ─── BOTÓN LIMPIAR EN GRID ───────────────────
+
+.form-grid-4 mat-icon-button,
+.form-grid-4 button[mat-icon-button] {
+  margin-top: 0.5rem;
+  color: $text-muted;
+  transition: $transition;
+
+  &:hover {
+    color: $gov-red;
+    transform: rotate(-15deg);
+  }
+}
+
+// ─────────────────────────────────────────────
+// ACCIONES FINALES
+// ─────────────────────────────────────────────
+
 mat-card-actions {
-  padding: 16px 24px !important;
-  border-top: 1px solid #f0f0f0;
-  background: #fafafa;
+  padding: 1rem 1.5rem !important;
+  border-top: 1px solid $border;
+  background: $surface;
 
   &[align="end"] {
     display: flex;
     justify-content: flex-end;
-    gap: 12px;
+    gap: 0.75rem;
+
+    // Cancelar
+    button[color="warn"] {
+      border-radius: $radius-sm;
+      border: 1.5px solid $border-strong;
+      color: $text-muted;
+      font-weight: 700;
+      font-size: 0.76rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      transition: $transition;
+
+      &:hover {
+        border-color: $gov-red;
+        color: $gov-red;
+        background: $gov-red-light;
+      }
+    }
+
+    // Guardar Cambios
+    button[color="primary"] {
+      border-radius: $radius-sm;
+      background: $gov-red;
+      color: $text-inverse;
+      font-weight: 800;
+      font-size: 0.78rem;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      border: none;
+      box-shadow: $shadow-primary;
+      transition: $transition;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+
+      mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+      }
+
+      &:hover {
+        background: $gov-red-dark;
+        transform: translateY(-1px);
+        box-shadow: 0 8px 22px rgba(158, 42, 71, 0.38);
+      }
+
+      &:active {
+        transform: translateY(0);
+        box-shadow: $shadow-sm;
+      }
+    }
   }
 }
 
+// ─────────────────────────────────────────────
+// ANIMACIÓN DE ENTRADA
+// ─────────────────────────────────────────────
 
 .fade-in {
-  animation: fadeInUp 0.4s ease both;
+  animation: fadeInUp 0.35s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(14px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+// ─────────────────────────────────────────────
+// RESPONSIVE
+// ─────────────────────────────────────────────
+
+@media (max-width: 900px) {
+  .form-grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .modificacion-container {
+    padding: 0.6rem;
+  }
+
+  mat-card-header {
+    padding: 1.4rem 1.2rem 1.6rem;
+  }
+
+  mat-card-content {
+    padding: 1rem 1rem 0.8rem !important;
+  }
+
+  mat-card-header + mat-card-actions {
+    padding: 0.7rem 1rem 0.4rem;
+  }
+
+  .section {
+    padding: 1.1rem 1rem 0.8rem;
+  }
+
+  .form-row {
+    flex-direction: column;
+    align-items: stretch;
+
+    mat-form-field {
+      width: 100%;
+    }
+
+    button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  .form-grid-4 {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .form-grid-3 {
+    grid-template-columns: 1fr;
+  }
+
+  mat-card-actions[align="end"] {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .form-grid-4 {
+    grid-template-columns: 1fr;
   }
 }

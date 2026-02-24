@@ -17,47 +17,49 @@
 
         <div class="field-row">
           <label>Entidad</label>
-          <input matInput formControlName="entidad" placeholder="Ej: Oaxaca" />
+          <input formControlName="entidad" placeholder="Ej: Oaxaca" />
         </div>
+
         <div class="field-row">
           <label>Municipio</label>
-          <input matInput formControlName="municipio" />
+          <input formControlName="municipio" />
         </div>
+
         <div class="field-row">
           <label>Oficialía</label>
-          <input matInput formControlName="oficialia" />
+          <input formControlName="oficialia" />
         </div>
         <div class="field-row">
           <label>Distrito</label>
-          <input matInput formControlName="distrito" />
+          <input formControlName="distrito" />
         </div>
         <div class="field-row">
           <label>Localidad</label>
-          <input matInput formControlName="localidad" />
+          <input formControlName="localidad" />
         </div>
         <div class="field-row">
           <label>Fecha registro</label>
-          <input matInput type="date" formControlName="fechaRegistro" />
+          <input type="date" formControlName="fechaRegistro" />
         </div>
         <div class="field-row">
           <label>Año</label>
-          <input matInput type="number" formControlName="anioRegistro" />
+          <input type="number" formControlName="anioRegistro" />
         </div>
         <div class="field-row">
           <label>Foja</label>
-          <input matInput formControlName="foja" />
+          <input formControlName="foja" />
         </div>
         <div class="field-row">
           <label>Núm. Acta</label>
-          <input matInput formControlName="numeroActa" />
+          <input formControlName="numeroActa" />
         </div>
         <div class="field-row">
-          <label>CURP Renapo</label>
-          <input matInput formControlName="curp" maxlength="18" style="text-transform:uppercase" />
+          <label>CURP</label>
+          <input formControlName="curp" maxlength="18" style="text-transform:uppercase" />
         </div>
         <div class="field-row">
           <label>CURP Reg. Civil</label>
-          <input matInput formControlName="curp_regciv" />
+          <input formControlName="curp_regciv" />
         </div>
       </fieldset>
 
@@ -66,58 +68,51 @@
 
         <div class="field-row">
           <label>Entidad nac.</label>
-          <input matInput formControlName="entidadNacimiento" />
+          <input formControlName="entidadNacimiento" />
         </div>
+
         <div class="field-row">
           <label>Municipio nac.</label>
-          <input matInput formControlName="municipioNacimiento" />
+          <input formControlName="municipioNacimiento" />
         </div>
+
         <div class="field-row">
           <label>Distrito nac.</label>
-          <input matInput formControlName="distritoNacimiento" />
+          <input formControlName="distritoNacimiento" />
         </div>
         <div class="field-row">
           <label>Localidad nac.</label>
-          <input matInput formControlName="localidadNacimiento" />
+          <input formControlName="localidadNacimiento" />
         </div>
         <div class="field-row">
           <label>Fecha nac.</label>
-          <input matInput type="date" formControlName="fechaNacimiento" />
+          <input type="date" formControlName="fechaNacimiento" />
         </div>
         <div class="field-row">
           <label>Hora nac.</label>
-          <input matInput type="time" formControlName="horaNacimiento" />
+          <input type="time" formControlName="horaNacimiento" />
         </div>
 
         <div class="panel-divider">👨‍👩‍👦 Datos de los Padres</div>
 
         <div class="field-row">
           <label>Nombre padre</label>
-          <input matInput formControlName="nombrePadre" />
+          <input formControlName="nombrePadre" />
         </div>
-
-        <div class="field-row padres-inline">
+        <div class="field-row">
           <label>Edad padre</label>
-          <div class="padres-group">
-            <input matInput type="number" formControlName="edadPadre" class="edad-input" />
-            <input matInput type="text" formControlName="nacionalidadPadre" placeholder="Nacionalidad" />
-          </div>
+          <input type="number" formControlName="edadPadre" />
         </div>
-
         <div class="field-row">
           <label>Nombre madre</label>
-          <input matInput formControlName="nombreMadre" />
+          <input formControlName="nombreMadre" />
         </div>
-
-        <div class="field-row padres-inline">
+        <div class="field-row">
           <label>Edad madre</label>
-          <div class="padres-group">
-            <input matInput type="number" formControlName="edadMadre" class="edad-input" />
-            <input matInput type="text" formControlName="nacionalidadMadre" placeholder="Nacionalidad" />
-          </div>
+          <input type="number" formControlName="edadMadre" />
         </div>
-
       </fieldset>
+
     </div>
 
     <fieldset class="panel panel-full">
@@ -126,15 +121,15 @@
       <div class="registrado-grid">
         <div class="field-row">
           <label>Nombre(s)</label>
-          <input matInput formControlName="nombre" />
+          <input formControlName="nombre" />
         </div>
         <div class="field-row">
           <label>Ap. Paterno</label>
-          <input matInput formControlName="apellidoPaterno" />
+          <input formControlName="apellidoPaterno" />
         </div>
         <div class="field-row">
           <label>Ap. Materno</label>
-          <input matInput formControlName="apellidoMaterno" />
+          <input formControlName="apellidoMaterno" />
         </div>
         <div class="field-row">
           <label>Sexo</label>
@@ -147,34 +142,22 @@
         </div>
         <div class="field-row">
           <label>Libro</label>
-          <input matInput type="number" formControlName="libro" />
+          <input type="number" formControlName="libro" />
         </div>
         <div class="field-row">
           <label>Status</label>
-          <input matInput formControlName="status" />
-        </div>
-        <div class="field-row">
-          <label>Estado del Acta</label>
-          <select>
-            <option>Original</option>
-            <option>Modificada</option>
-            <option>Reimpresión</option>
-          </select>
-        </div>
-
-        <div class="field-row">
-          <label>Estado Biológico</label>
-          <select>
-            <option>Vivo</option>
-            <option>Fallecido</option>
-          </select>
+          <input formControlName="status" />
         </div>
       </div>
     </fieldset>
 
     <div class="actions">
-      <button type="button" class="btn-secondary" (click)="limpiarFormulario()">🗑️ Limpiar</button>
-      <button type="button" class="btn-primary" (click)="buscarActa()">🔍 Buscar</button>
+      <button type="button" class="btn-secondary" (click)="limpiarFormulario()">
+        🗑️ Limpiar
+      </button>
+      <button type="button" class="btn-primary" (click)="buscarActa()">
+        🔍 Buscar
+      </button>
     </div>
 
   </form>
