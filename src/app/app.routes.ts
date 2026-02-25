@@ -5,13 +5,14 @@ import { HomeComponent } from './home/home';
 import { TrabajoComponent } from './trabajo/trabajo';
 import { CertificacionComponent } from './certificacion/certificacion';
 import { LoginComponent } from './login/login';
-import { AuthGuard } from './auth-guard'; 
+import { AuthGuard } from './auth-guard';
 import { LogoutComponent } from './logout/logout';
 import { ModificacionComponent } from './modificacion/modificacion';
 import { ConsultaPagoComponent } from './act-pag/act-pag';
+import { ImpresionesComponent } from './impresiones/impresiones';
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/login', pathMatch: 'full' }, 
+  { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'home', component: HomeComponent, canActivate: [AuthGuard] },
   { path: 'nacimiento', component: NacimientoComponent, canActivate: [AuthGuard] },
@@ -19,7 +20,8 @@ export const routes: Routes = [
   { path: 'trabajo', component: TrabajoComponent, canActivate: [AuthGuard] },
   { path: 'generar', component: CertificacionComponent, canActivate: [AuthGuard] },
   { path: 'modificacion', component: ModificacionComponent },
-  { path: 'actualizar', component: ConsultaPagoComponent, canActivate: [AuthGuard]},
-  { path: 'logout', component: LogoutComponent, canActivate: [AuthGuard]},
-  { path: '**', redirectTo: '/login' }  
+  { path: 'actualizar', component: ConsultaPagoComponent, canActivate: [AuthGuard] },
+  { path: 'impresiones', component: ImpresionesComponent, canActivate: [AuthGuard] },
+  { path: 'logout', component: LogoutComponent, canActivate: [AuthGuard] },
+  { path: '**', redirectTo: '/login' }
 ];

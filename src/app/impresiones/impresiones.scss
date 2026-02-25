@@ -1,0 +1,72 @@
+.cert-container {
+  min-height: calc(100vh - 80px);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 100px;
+  background: #f4f6f9;
+}
+
+.cert-card {
+  width: 750px;
+  padding: 40px 50px;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  transition: 0.3s ease;
+}
+
+.cert-card:hover {
+  transform: translateY(-3px);
+}
+
+mat-card-header {
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.header-icon {
+  font-size: 42px;
+  margin-right: 15px;
+  color: #3949ab;
+}
+
+mat-card-title {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+mat-card-subtitle {
+  font-size: 14px;
+  color: #666;
+}
+
+mat-divider {
+  margin: 20px 0 30px 0;
+}
+
+.folio-form {
+  display: flex;
+  align-items: flex-end;
+  gap: 25px;
+}
+
+.folio-field {
+  flex: 1;
+}
+
+::ng-deep .mat-mdc-form-field {
+  font-size: 15px;
+}
+
+button {
+  height: 56px;
+  min-width: 130px;
+  margin-bottom: 1.25em;
+  font-weight: 500;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+button mat-icon {
+  margin-right: 6px;
+}

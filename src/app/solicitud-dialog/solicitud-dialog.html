@@ -1,0 +1,176 @@
+<div class="dialog-wrapper">
+
+  <div class="dialog-header">
+    <div class="dialog-title-row">
+      <span class="dialog-icon">📋</span>
+      <div>
+        <h2 class="dialog-title">Datos de la Solicitud</h2>
+        <span class="dialog-folio">{{ datos.folio }}</span>
+      </div>
+    </div>
+    <button class="btn-close" (click)="cerrar()" matTooltip="Cerrar">✕</button>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <section class="seccion">
+    <h3 class="seccion-titulo">Datos</h3>
+    <div class="grid-datos">
+      <div class="campo">
+        <span class="campo-label">Oficialía</span>
+        <span class="campo-valor">{{ datos.oficialia || '—' }}</span>
+      </div>
+      <div class="campo">
+        <span class="campo-label">No. de Acta</span>
+        <span class="campo-valor">{{ datos.noActa || '—' }}</span>
+      </div>
+      <div class="campo">
+        <span class="campo-label">Fecha de Registro</span>
+        <span class="campo-valor">{{ datos.fechaRegistro || '—' }}</span>
+      </div>
+    </div>
+    <div class="campo campo-full">
+      <span class="campo-label">Lugar de Registro</span>
+      <span class="campo-valor">{{ datos.lugarRegistro || '—' }}</span>
+    </div>
+  </section>
+
+  <mat-divider></mat-divider>
+
+  <section class="seccion">
+    <h3 class="seccion-titulo">El Contrayente</h3>
+    <div class="campo campo-full">
+      <span class="campo-label">Nombre</span>
+      <span class="campo-valor nombre-grande">{{ datos.nombreRegistrado || '—' }}</span>
+    </div>
+    <div class="campo campo-full">
+      <span class="campo-label">Lugar de Nacimiento</span>
+      <span class="campo-valor">{{ datos.lugarNacimiento || '—' }}</span>
+    </div>
+    <div class="grid-datos">
+      <div class="campo">
+        <span class="campo-label">Edad</span>
+        <span class="campo-valor">{{ datos.edad || '—' }}</span>
+      </div>
+      <div class="campo">
+        <span class="campo-label">Nacionalidad</span>
+        <span class="campo-valor">{{ datos.nacionalidad || '—' }}</span>
+      </div>
+      <div class="campo">
+        <span class="campo-label">Sexo</span>
+        <span class="campo-valor">{{ datos.sexo || '—' }}</span>
+      </div>
+    </div>
+    <div class="grid-datos">
+      <div class="campo">
+        <span class="campo-label">Padre</span>
+        <span class="campo-valor">{{ datos.padre || '—' }}</span>
+      </div>
+      <div class="campo">
+        <span class="campo-label">Nacionalidad</span>
+        <span class="campo-valor">{{ datos.nacionalidadPadre || '—' }}</span>
+      </div>
+    </div>
+    <div class="grid-datos">
+      <div class="campo">
+        <span class="campo-label">Madre</span>
+        <span class="campo-valor">{{ datos.madre || '—' }}</span>
+      </div>
+      <div class="campo">
+        <span class="campo-label">Nacionalidad</span>
+        <span class="campo-valor">{{ datos.nacionalidadMadre || '—' }}</span>
+      </div>
+    </div>
+  </section>
+
+  <mat-divider></mat-divider>
+
+  <section class="seccion">
+    <h3 class="seccion-titulo">La Contrayente</h3>
+    <div class="campo campo-full">
+      <span class="campo-label">Nombre</span>
+      <span class="campo-valor nombre-grande">{{ datos.nombreContrayente2 || '—' }}</span>
+    </div>
+    <div class="campo campo-full">
+      <span class="campo-label">Lugar de Nacimiento</span>
+      <span class="campo-valor">{{ datos.lugarNacimiento2 || '—' }}</span>
+    </div>
+    <div class="grid-datos">
+      <div class="campo">
+        <span class="campo-label">Edad</span>
+        <span class="campo-valor">{{ datos.edad2 || '—' }}</span>
+      </div>
+      <div class="campo">
+        <span class="campo-label">Nacionalidad</span>
+        <span class="campo-valor">{{ datos.nacionalidad2 || '—' }}</span>
+      </div>
+      <div class="campo">
+        <span class="campo-label">Sexo</span>
+        <span class="campo-valor">{{ datos.sexo2 || '—' }}</span>
+      </div>
+    </div>
+    <div class="grid-datos">
+      <div class="campo">
+        <span class="campo-label">Padre</span>
+        <span class="campo-valor">{{ datos.padre2 || '—' }}</span>
+      </div>
+      <div class="campo">
+        <span class="campo-label">Nacionalidad</span>
+        <span class="campo-valor">{{ datos.nacionalidadPadre2 || '—' }}</span>
+      </div>
+    </div>
+    <div class="grid-datos">
+      <div class="campo">
+        <span class="campo-label">Madre</span>
+        <span class="campo-valor">{{ datos.madre2 || '—' }}</span>
+      </div>
+      <div class="campo">
+        <span class="campo-label">Nacionalidad</span>
+        <span class="campo-valor">{{ datos.nacionalidadMadre2 || '—' }}</span>
+      </div>
+    </div>
+    <div class="grid-datos">
+      <div class="campo">
+        <span class="campo-label">Copias</span>
+        <span class="campo-valor">{{ datos.copias || 1 }}</span>
+      </div>
+    </div>
+  </section>
+
+  <mat-divider></mat-divider>
+
+  <div class="hv-form" *ngIf="mostrarFormHV">
+    <h3 class="seccion-titulo" style="padding: 0 0 10px 8px; border-left: 3px solid #e65100;">
+      Asignar Hoja Valorada
+    </h3>
+    <div class="hv-fields">
+      <div class="campo">
+        <span class="campo-label">Folio hoja valorada *</span>
+        <input class="campo-input" type="number" min="1"
+          [(ngModel)]="folioHV"
+          placeholder="Ej. 1042" />
+      </div>
+      <div class="campo campo-full">
+        <span class="campo-label">Observaciones</span>
+        <input class="campo-input"
+          [(ngModel)]="observacionesHV"
+          placeholder="Opcional..." />
+      </div>
+    </div>
+    <div class="hv-actions">
+      <button class="btn-secundario" (click)="cancelarHV()">Cancelar</button>
+      <button class="btn-primario" (click)="confirmarLigar()" [disabled]="ligando">
+        ✅ Confirmar
+      </button>
+    </div>
+  </div>
+
+  <mat-divider></mat-divider>
+  <div class="dialog-actions">
+    <button class="btn-secundario" (click)="cerrar()">Cancelar</button>
+    <button class="btn-primario" (click)="abrirFormHV()" [disabled]="ligando || mostrarFormHV">
+      🔗 Ligar Solicitud
+    </button>
+  </div>
+
+</div>

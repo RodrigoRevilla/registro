@@ -4,30 +4,31 @@
       <mat-icon>account_balance</mat-icon>
       Sistema de Trámites y Consultas
     </h2>
-
-    <ng-template #loadingTemplate>
-      <div class="loading">
-        <mat-spinner></mat-spinner>
-        <p>Cargando información...</p>
-      </div>
-    </ng-template>
+    <div class="header-actions">
+      <button *ngIf="esAdmin && vistaActual === 'home'"
+        mat-stroked-button class="action-button accent"
+        (click)="irAGestionUsuarios()">
+        <mat-icon>manage_accounts</mat-icon>
+        Gestión de Usuarios
+      </button>
+      <button *ngIf="vistaActual === 'usuarios'"
+        mat-stroked-button class="action-button"
+        (click)="volverAHome()">
+        <mat-icon>arrow_back</mat-icon>
+        Volver
+      </button>
+    </div>
   </div>
 
-  <div class="dashboard-content slide-up">
-    <p class="dashboard-subtitle">
-      ¿Qué deseas hacer hoy?
-    </p>
+  <div class="dashboard-content slide-up" *ngIf="vistaActual === 'home'">
+    <p class="dashboard-subtitle">¿Qué deseas hacer hoy?</p>
 
     <div class="cards-grid">
       <mat-card class="service-card">
         <div class="card-icon">🔍</div>
-
         <mat-card-content>
           <h3>SOFTWARE DE APOYO PARA TRÁMITES Y SERVICIOS</h3>
-          <p>
-            Accede a sistemas especializados para localizar información
-            oficial de manera rápida y segura.
-          </p>
+          <p>Accede a sistemas especializados para localizar información oficial de manera rápida y segura.</p>
 
           <div class="action-buttons">
             <button mat-stroked-button class="action-button primary" [matMenuTriggerFor]="atencionMenu">
@@ -38,66 +39,195 @@
 
             <mat-menu #atencionMenu="matMenu">
               <button mat-menu-item (click)="irANacimiento($event)">
-                <mat-icon>child_care</mat-icon>
-                Nacimientos
+                <mat-icon>child_care</mat-icon> Nacimientos
               </button>
-              <button mat-menu-item disabled>
-                <mat-icon>favorite</mat-icon>
-                Matrimonio
-              </button>
-              <button mat-menu-item disabled>
-                <mat-icon>sentiment_very_dissatisfied</mat-icon>
-                Defunciones
-              </button>
-              <button mat-menu-item disabled>
-                <mat-icon>how_to_reg</mat-icon>
-                Reconocimientos
-              </button>
-              <button mat-menu-item disabled>
-                <mat-icon>gavel</mat-icon>
-                Divorcios
-              </button>
-              <button mat-menu-item disabled>
-                <mat-icon>child_friendly</mat-icon>
-                Adopciones
-              </button>
-              <button mat-menu-item disabled>
-                <mat-icon>assignment</mat-icon>
-                Inscripción de
-              </button>
+              <button mat-menu-item disabled><mat-icon>favorite</mat-icon> Matrimonio</button>
+              <button mat-menu-item disabled><mat-icon>sentiment_very_dissatisfied</mat-icon> Defunciones</button>
+              <button mat-menu-item disabled><mat-icon>how_to_reg</mat-icon> Reconocimientos</button>
+              <button mat-menu-item disabled><mat-icon>gavel</mat-icon> Divorcios</button>
+              <button mat-menu-item disabled><mat-icon>child_friendly</mat-icon> Adopciones</button>
+              <button mat-menu-item disabled><mat-icon>assignment</mat-icon> Inscripción de</button>
             </mat-menu>
 
             <button mat-stroked-button class="action-button accent" [matMenuTriggerFor]="buscadoresMenu">
               <mat-icon>search</mat-icon>
-              buscadores
+              Buscadores
               <mat-icon>arrow_drop_down</mat-icon>
             </button>
 
             <mat-menu #buscadoresMenu="matMenu">
               <button mat-menu-item (click)="irATrabajo($event)">
-                <mat-icon>work</mat-icon>
-                Trabajo
+                <mat-icon>work</mat-icon> Trabajo
               </button>
               <button mat-menu-item (click)="irAModificacion($event)">
-                <mat-icon>edit</mat-icon>
-                Modificación
+                <mat-icon>edit</mat-icon> Modificación
               </button>
             </mat-menu>
 
             <button mat-stroked-button class="action-button warn" (click)="irAActualizarPago($event)">
-              <mat-icon>payment</mat-icon>
+              <mat-icon>attach_money</mat-icon>
               Actualizar pago de solicitud
             </button>
+
+            <button mat-stroked-button class="action-button primary" [matMenuTriggerFor]="certificacionmenu">
+              <mat-icon>print</mat-icon>
+              Impresión de Certificaciones
+              <mat-icon>arrow_drop_down</mat-icon>
+            </button>
+
+            <mat-menu #certificacionmenu="matMenu">
+              <button mat-menu-item (click)="irAImpresiones($event)">
+                <mat-icon>print</mat-icon> Imprimir
+              </button>
+            </mat-menu>
           </div>
         </mat-card-content>
       </mat-card>
     </div>
   </div>
-</div>
 
-<ng-template #loading>
-  <div class="loading">
-    <mat-spinner></mat-spinner>
-    <p>Cargando información...</p>
+  <div class="usuarios-container slide-up" *ngIf="vistaActual === 'usuarios'">
+
+    <div class="usuarios-topbar">
+      <div class="usuarios-topbar-left">
+        <h3 class="usuarios-heading">
+          <mat-icon>manage_accounts</mat-icon>
+          Gestión de Usuarios
+        </h3>
+        <span class="usuarios-count" *ngIf="!cargando">
+          {{ usuarios.length }} usuario{{ usuarios.length !== 1 ? 's' : '' }}
+        </span>
+      </div>
+      <button class="btn-nuevo" (click)="abrirFormNuevo()" [disabled]="mostrarFormNuevo">
+        <mat-icon>person_add</mat-icon>
+        Nuevo usuario
+      </button>
+    </div>
+
+    <div class="form-panel" *ngIf="mostrarFormNuevo">
+      <div class="form-panel-header">
+        <mat-icon>person_add</mat-icon>
+        <h4>Crear nuevo usuario</h4>
+      </div>
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Username <span class="req">*</span></label>
+          <input [(ngModel)]="nuevoUsuario.username" placeholder="ej. operador01" />
+        </div>
+        <div class="form-field">
+          <label>Contraseña <span class="req">*</span> <small>mín. 8 caracteres</small></label>
+          <input type="password" [(ngModel)]="nuevoUsuario.password" placeholder="••••••••" />
+        </div>
+        <div class="form-field">
+          <label>Nombre <span class="req">*</span></label>
+          <input [(ngModel)]="nuevoUsuario.nombre" placeholder="Nombre(s)" />
+        </div>
+        <div class="form-field">
+          <label>Apellido Paterno <span class="req">*</span></label>
+          <input [(ngModel)]="nuevoUsuario.apellido_paterno" placeholder="Apellido paterno" />
+        </div>
+        <div class="form-field">
+          <label>Apellido Materno</label>
+          <input [(ngModel)]="nuevoUsuario.apellido_materno" placeholder="Apellido materno" />
+        </div>
+        <div class="form-field">
+          <label>Rol <span class="req">*</span></label>
+          <select [(ngModel)]="nuevoUsuario.rol_id">
+            <option *ngFor="let r of roles" [value]="r.id">{{ r.nombre }}</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Área <span class="req">*</span></label>
+          <select [(ngModel)]="nuevoUsuario.area_id">
+            <option *ngFor="let a of areas" [value]="a.id">{{ a.nombre }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-footer">
+        <button class="btn-cancel" (click)="cancelarNuevo()">Cancelar</button>
+        <button class="btn-save" (click)="guardarNuevo()" [disabled]="guardandoNuevo">
+          <mat-icon>{{ guardandoNuevo ? 'hourglass_empty' : 'check' }}</mat-icon>
+          {{ guardandoNuevo ? 'Guardando...' : 'Guardar usuario' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="loading-state" *ngIf="cargando">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Cargando usuarios...</p>
+    </div>
+
+    <div class="usuarios-grid" *ngIf="!cargando">
+
+      <div class="usuario-row" *ngFor="let u of usuarios" [class.inactivo]="!u.activo">
+
+        <div class="urow-identity">
+          <div class="urow-avatar" [class.inactivo]="!u.activo">
+            {{ u.nombre[0] }}{{ u.apellido_paterno[0] }}
+          </div>
+          <div class="urow-info">
+            <span class="urow-nombre">{{ nombreCompleto(u) }}</span>
+            <span class="urow-username">@{{ u.username }}</span>
+          </div>
+        </div>
+
+        <div class="urow-meta">
+          <span class="badge-rol" [class]="'rol-' + u.rol.clave.toLowerCase()">
+            {{ u.rol.nombre }}
+          </span>
+          <span class="badge-estado" [class.off]="!u.activo">
+            <span class="dot"></span>
+            {{ u.activo ? 'Activo' : 'Inactivo' }}
+          </span>
+        </div>
+
+        <div class="urow-actions">
+
+          <div *ngIf="editandoPasswordId === u.id" class="inline-edit">
+            <input type="password" [(ngModel)]="nuevaPassword"
+              placeholder="Nueva contraseña (mín. 8)" class="inline-input" />
+            <button class="btn-ok" (click)="guardarPassword(u.id)" [disabled]="guardandoPassword">
+              <mat-icon>{{ guardandoPassword ? 'hourglass_empty' : 'check' }}</mat-icon>
+            </button>
+            <button class="btn-x" (click)="cancelarPassword()">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+
+          <div *ngIf="editandoRolId === u.id" class="inline-edit">
+            <select [(ngModel)]="nuevoRolId" class="inline-select">
+              <option *ngFor="let r of roles" [value]="r.id">{{ r.nombre }}</option>
+            </select>
+            <button class="btn-ok" (click)="guardarRol(usuarioEditando!)" [disabled]="guardandoRol">
+              <mat-icon>{{ guardandoRol ? 'hourglass_empty' : 'check' }}</mat-icon>
+            </button>
+            <button class="btn-x" (click)="cancelarRol()">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+
+          <div class="icon-btns" *ngIf="editandoPasswordId !== u.id && editandoRolId !== u.id">
+            <button class="icon-btn" (click)="abrirEditPassword(u.id)" matTooltip="Cambiar contraseña">
+              <mat-icon>lock_reset</mat-icon>
+            </button>
+            <button class="icon-btn" (click)="abrirEditRol(u)" matTooltip="Cambiar rol">
+              <mat-icon>admin_panel_settings</mat-icon>
+            </button>
+            <button class="icon-btn toggle-btn" [class.is-active]="u.activo"
+              (click)="toggleActivo(u)"
+              [matTooltip]="u.activo ? 'Desactivar usuario' : 'Activar usuario'">
+              <mat-icon>{{ u.activo ? 'person_off' : 'person' }}</mat-icon>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="empty-state" *ngIf="usuarios.length === 0">
+        <mat-icon>person_search</mat-icon>
+        <p>No hay usuarios registrados aún.</p>
+      </div>
+    </div>
+
   </div>
-</ng-template>
+</div>

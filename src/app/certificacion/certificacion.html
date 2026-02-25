@@ -9,7 +9,6 @@
 </div>
 
 <form>
-  <!-- ── Datos del Acta ─────────────────────────────────────────────────── -->
   <fieldset>
     <legend>Datos del Acta</legend>
 
@@ -52,7 +51,6 @@
     </div>
   </fieldset>
 
-  <!-- ── Datos del Registrado ──────────────────────────────────────────── -->
   <fieldset>
     <legend>Datos del Registrado</legend>
 
@@ -93,7 +91,6 @@
     </div>
   </fieldset>
 
-  <!-- ── Servicio ──────────────────────────────────────────────────────── -->
   <fieldset>
     <legend>Servicio</legend>
 
@@ -102,7 +99,6 @@
         <select [(ngModel)]="tipoServicioId" name="tipoServicioId">
           <option [value]="0">Seleccione un tipo de Servicio</option>
           <option *ngFor="let ts of tiposServicio" [value]="ts.id">{{ ts.nombre }}</option>
-          <!-- Opciones fijas como fallback si el catálogo no carga -->
           <ng-container *ngIf="tiposServicio.length === 0">
             <option value="1">C: Certificacion de acta</option>
             <option value="2">E: Const. Reg. Extem.</option>
@@ -154,7 +150,6 @@
     </div>
   </fieldset>
 
-  <!-- ── Facturación ───────────────────────────────────────────────────── -->
   <fieldset>
     <legend>Facturación</legend>
 
@@ -215,7 +210,6 @@
     </div>
   </fieldset>
 
-  <!-- ── Servicio Condonado ─────────────────────────────────────────────── -->
   <fieldset>
     <legend>Servicio Condonado</legend>
 
@@ -237,14 +231,10 @@
     </div>
   </fieldset>
 
-  <!-- ── Observaciones ─────────────────────────────────────────────────── -->
   <label class="field-full">Observaciones:
     <textarea rows="3" [(ngModel)]="observaciones" name="observaciones"></textarea>
   </label>
 
-  <!-- ── Acciones ──────────────────────────────────────────────────────── -->
-
-  <!-- ── Resultado generado ───────────────────────────────────────────── -->
   <div class="resultado-folio" *ngIf="folioGenerado">
     <div class="resultado-row">
       <span class="resultado-label">Folio:</span>

@@ -1,0 +1,51 @@
+<div class="cert-container">
+
+  <mat-card class="cert-card">
+
+    <mat-card-header>
+      <mat-icon class="header-icon">print</mat-icon>
+      <div>
+        <mat-card-title>Impresión de Certificaciones</mat-card-title>
+        <mat-card-subtitle>
+          Ingrese el folio correspondiente para generar la certificación
+        </mat-card-subtitle>
+      </div>
+    </mat-card-header>
+
+    <mat-divider></mat-divider>
+
+    <mat-card-content>
+
+      <form class="folio-form" (ngSubmit)="buscar()">
+
+        <mat-form-field appearance="outline" class="folio-field">
+          <mat-label>Folio</mat-label>
+          <input matInput
+            [(ngModel)]="folio"
+            name="folio"
+            placeholder="Ej. RC-20260224-0009"
+            autocomplete="off">
+          <mat-icon matSuffix>confirmation_number</mat-icon>
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" type="submit" [disabled]="buscando">
+          <mat-icon>search</mat-icon>
+          Buscar
+        </button>
+
+      </form>
+
+      <div class="buscando-msg" *ngIf="buscando">
+        <mat-spinner diameter="20"></mat-spinner>
+        <span>Buscando...</span>
+      </div>
+
+      <div class="error-msg" *ngIf="error">
+        ⚠️ {{ error }}
+      </div>
+
+    </mat-card-content>
+
+  </mat-card>
+
+</div>
