@@ -1,17 +1,21 @@
 @use 'sass:color';
 
-$red:       #9e2a47;
-$red-dark:  color.adjust(#9e2a47, $lightness: -8%);
+$red: #9e2a47;
+$red-dark: color.adjust(#9e2a47, $lightness: -8%);
 $red-light: #fdf2f6;
-$bg:        #f0f2f5;
-$surface:   #ffffff;
-$border:    #e0e0e0;
-$text:      #1a1a2e;
-$gray:      #6b7f8f;
+$bg: #f0f2f5;
+$surface: #ffffff;
+$border: #e0e0e0;
+$text: #1a1a2e;
+$gray: #6b7f8f;
 $r: 10px;
 $tr: all 0.15s ease;
 
-*, *::before, *::after { box-sizing: border-box; }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
 :host {
   display: block;
@@ -43,7 +47,9 @@ $tr: all 0.15s ease;
     align-items: center;
     gap: 0.6rem;
 
-    .header-icon { font-size: 1.3rem; }
+    .header-icon {
+      font-size: 1.3rem;
+    }
 
     h1 {
       font-size: 1.1rem;
@@ -73,7 +79,10 @@ $tr: all 0.15s ease;
   transition: $tr;
   font-family: inherit;
 
-  &:hover { border-color: #999; background: #f9f9f9; }
+  &:hover {
+    border-color: #999;
+    background: #f9f9f9;
+  }
 }
 
 .form-body {
@@ -94,10 +103,13 @@ $tr: all 0.15s ease;
   border-radius: $r;
   padding: 1rem 1.2rem;
   margin: 0;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   transition: $tr;
 
-  &:hover { box-shadow: 0 3px 12px rgba(0,0,0,0.08); border-color: #ccc; }
+  &:hover {
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+    border-color: #ccc;
+  }
 
   legend {
     font-size: 0.7rem;
@@ -118,7 +130,7 @@ $tr: all 0.15s ease;
   letter-spacing: 0.07em;
   margin: 0.9rem 0 0.6rem;
   padding-bottom: 5px;
-  border-bottom: 1px dashed rgba(158,42,71,0.2);
+  border-bottom: 1px dashed rgba(158, 42, 71, 0.2);
 }
 
 .field-row {
@@ -138,7 +150,8 @@ $tr: all 0.15s ease;
     letter-spacing: 0.06em;
   }
 
-  input, select {
+  input,
+  select {
     height: 32px;
     padding: 0 0.7rem;
     font-size: 0.84rem;
@@ -160,8 +173,16 @@ $tr: all 0.15s ease;
 
 .registrado-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 0.5rem 0.75rem;
+
+  .field-row-wide {
+    grid-column: span 2;
+  }
+
+  .field-row-mid {
+    grid-column: span 2;
+  }
 }
 
 .actions {
@@ -169,7 +190,8 @@ $tr: all 0.15s ease;
   justify-content: flex-end;
   gap: 0.5rem;
 
-  .btn-primary, .btn-secondary {
+  .btn-primary,
+  .btn-secondary {
     height: 34px;
     padding: 0 1.3rem;
     font-size: 0.82rem;
@@ -180,27 +202,53 @@ $tr: all 0.15s ease;
     font-family: inherit;
     transition: $tr;
 
-    &:hover  { transform: translateY(-1px); }
-    &:active { transform: translateY(0); }
+    &:hover {
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
   }
 
   .btn-primary {
     background: $red;
     color: $surface;
     box-shadow: 0 3px 8px rgba(158, 42, 71, 0.22);
-    &:hover { background: $red-dark; }
+
+    &:hover {
+      background: $red-dark;
+    }
   }
 
   .btn-secondary {
     background: $surface;
     border: 1.5px solid $border;
     color: $gray;
-    &:hover { border-color: $red; color: $red; background: $red-light; }
+
+    &:hover {
+      border-color: $red;
+      color: $red;
+      background: $red-light;
+    }
   }
 }
 
 @media (max-width: 860px) {
-  :host { padding: 0.75rem; }
-  .row-top { grid-template-columns: 1fr; }
-  .registrado-grid { grid-template-columns: repeat(2, 1fr); }
+  :host {
+    padding: 0.75rem;
+  }
+
+  .row-top {
+    grid-template-columns: 1fr;
+  }
+
+  .registrado-grid {
+    grid-template-columns: repeat(2, 1fr);
+
+    .field-row-wide,
+    .field-row-mid {
+      grid-column: span 2;
+    }
+  }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, NgZone } from '@angular/core';
+import { Component, OnInit, NgZone, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiService } from '../http';
 import { AuthService } from '../auth';
@@ -85,6 +85,7 @@ export class CertificacionComponent implements OnInit {
     private apiService: ApiService,
     private authService: AuthService,
     private ngZone: NgZone,
+    private cdr: ChangeDetectorRef,
   ) { }
 
   ngOnInit(): void {
@@ -97,6 +98,7 @@ export class CertificacionComponent implements OnInit {
 
   private cargarCatalogos(): void {
     console.log('Cargando catálogos...');
+
     this.apiService.getActosRegistrales().subscribe({
       next: resp => {
         console.log('Actos registrales:', resp.ok ? resp.data : 'sin datos', resp);
@@ -159,14 +161,14 @@ export class CertificacionComponent implements OnInit {
         console.log('Línea de captura:', response?.data?.pago?.referencia_pago ?? 'No recibida');
 
         this.ngZone.run(() => {
-          this.procesando = false;
+          this.procesando  = false;
+          this.cdr.detectChanges();
           this.folioGenerado = response?.data?.solicitud?.folio ?? null;
-          this.lineaCaptura = response?.data?.pago?.referencia_pago ?? null;
+          this.lineaCaptura  = response?.data?.pago?.referencia_pago ?? null;
 
           if (url) {
-            this.urlPdf = url;
+            this.urlPdf     = url;
             this.mostrarPdf = true;
-            console.log('Abriendo PDF en nueva ventana...');
             const ventana = window.open(url, '_blank', `width=${screen.width},height=${screen.height},top=0,left=0`);
             ventana?.addEventListener('load', () => ventana.print());
           } else {
@@ -175,12 +177,15 @@ export class CertificacionComponent implements OnInit {
         });
       },
       error: err => {
-        this.procesando = false;
-        const code = err?.error?.error?.code;
-        const msg = code === 'ERROR_FINANZAS'
-          ? 'Error de conexión'
-          : err?.error?.error?.message ?? 'Error desconocido';
-        alert(msg);
+        this.ngZone.run(() => {     
+          this.procesando = false;
+          this.cdr.detectChanges();
+          const code = err?.error?.error?.code;
+          const msg = code === 'ERROR_FINANZAS'
+            ? 'Error de conexión con Finanzas'
+            : err?.error?.error?.message ?? 'Error desconocido';
+          alert(msg);
+        });
       },
     });
   }

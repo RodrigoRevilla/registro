@@ -16,6 +16,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
 import { AuthService } from '../auth';
+import { CancelacionDialogComponent } from '../cancelaciones/cancelaciones';
+import { ImpresionesComponent } from '../impresiones/impresiones';
 
 interface Usuario {
   id: number;
@@ -67,15 +69,15 @@ export class HomeComponent implements OnInit {
 
   private readonly API = '/api/v1';
 
-  isLoggedIn = false;
-  esAdmin = false;
-  vistaActual: 'home' | 'usuarios' = 'home';
+  isLoggedIn  = false;
+  esAdmin     = false;
   mostrarPassword = false;
+  vistaActual: 'home' | 'usuarios' = 'home';
 
   usuarios: Usuario[] = [];
-  roles: Rol[] = [];
-  areas: Area[] = [];
-  cargando = false;
+  roles:    Rol[]     = [];
+  areas:    Area[]    = [];
+  cargando  = false;
   mostrarFormNuevo = false;
   nuevoUsuario = {
     username: '', password: '', nombre: '',
@@ -87,9 +89,9 @@ export class HomeComponent implements OnInit {
   nuevaPassword = '';
   guardandoPassword = false;
   editandoUsuarioId: number | null = null;
-  usuarioEditando: Usuario | null = null;
+  usuarioEditando:   Usuario | null = null;
   editForm = { rol_id: 1, area_id: 1 };
-  guardandoEdicion = false;
+  guardandoEdicion  = false;
 
   private get headers(): HttpHeaders {
     const token = sessionStorage.getItem('token') ?? '';
@@ -97,12 +99,13 @@ export class HomeComponent implements OnInit {
   }
 
   constructor(
-    private router: Router,
-    private http: HttpClient,
-    public authService: AuthService,
-    private ngZone: NgZone,
-    private cdr: ChangeDetectorRef,
-  ) { }
+    private router:      Router,
+    private http:        HttpClient,
+    public  authService: AuthService,
+    private ngZone:      NgZone,
+    private cdr:         ChangeDetectorRef,
+    private dialog:      MatDialog,
+  ) {}
 
   ngOnInit(): void {
     this.isLoggedIn = this.authService.isLoggedIn();
@@ -112,29 +115,54 @@ export class HomeComponent implements OnInit {
   }
 
   irAGestionUsuarios(): void {
-    this.vistaActual = 'usuarios';
-    this.usuarios = [];
-    this.cargando = true;
+    this.vistaActual      = 'usuarios';
+    this.usuarios         = [];
+    this.cargando         = true;
     this.mostrarFormNuevo = false;
     this.cdr.detectChanges();
     this.cargarDatosUsuarios();
   }
 
   volverAHome(): void {
-    this.vistaActual = 'home';
-    this.mostrarFormNuevo = false;
+    this.vistaActual        = 'home';
+    this.mostrarFormNuevo   = false;
     this.editandoPasswordId = null;
-    this.editandoUsuarioId = null;
-    this.cargando = false;
+    this.editandoUsuarioId  = null;
+    this.cargando           = false;
   }
 
   logout(): void { this.authService.logout(); this.router.navigate(['/login']); }
 
-  irANacimiento(event: MouseEvent) { event?.stopImmediatePropagation(); this.router.navigate(['/nacimiento']); }
-  irATrabajo(event: MouseEvent) { event?.stopImmediatePropagation(); this.router.navigate(['/trabajo']); }
-  irAModificacion(event: Event) { event.stopPropagation(); this.router.navigate(['/modificacion']); }
-  irAActualizarPago(event: Event) { event.preventDefault(); this.router.navigate(['/actualizar']); }
-  irAImpresiones(event: Event) { event.preventDefault(); this.router.navigate(['/impresiones']); }
+  irANacimiento(event: MouseEvent)  { event?.stopImmediatePropagation(); this.router.navigate(['/nacimiento']); }
+  irATrabajo(event: MouseEvent)     { event?.stopImmediatePropagation(); this.router.navigate(['/trabajo']); }
+  irAModificacion(event: Event)     { event.stopPropagation(); this.router.navigate(['/modificacion']); }
+  irAActualizarPago(event: Event)   { event.preventDefault(); this.router.navigate(['/actualizar']); }
+  irAImpresiones(event: Event): void {
+    event.preventDefault();
+    this.dialog.open(ImpresionesComponent, {
+      width: '500px',
+      maxHeight: '90vh',
+      disableClose: false,
+      panelClass: 'impresiones-panel',
+    }).afterClosed().subscribe(result => {
+      if (result?.accion === 'ligar') {
+      }
+    });
+  }
+
+  irACancelaciones(event: Event): void {
+    event.preventDefault();
+    this.dialog.open(CancelacionDialogComponent, {
+      width: '720px',
+      maxHeight: '90vh',
+      disableClose: false,
+      panelClass: 'cancelacion-panel',
+    }).afterClosed().subscribe(result => {
+      if (result?.accion === 'cancelado') {
+        console.log('[home] folio cancelado:', result.folio);
+      }
+    });
+  }
 
   cargarDatosUsuarios(): void {
     this.cargarUsuarios();
@@ -164,9 +192,9 @@ export class HomeComponent implements OnInit {
   cargarRoles(): void {
     this.roles = [
       { id: 1, clave: 'OPERADOR_VENTANILLA', nombre: 'Operador de Ventanilla' },
-      { id: 2, clave: 'JEFE_BUSQUEDAS', nombre: 'Jefe de Búsquedas' },
-      { id: 4, clave: 'VALIDADOR', nombre: 'Validador' },
-      { id: 6, clave: 'ADMINISTRADOR', nombre: 'Administrador' },
+      { id: 2, clave: 'JEFE_BUSQUEDAS',      nombre: 'Jefe de Búsquedas'      },
+      { id: 4, clave: 'VALIDADOR',           nombre: 'Validador'              },
+      { id: 6, clave: 'ADMINISTRADOR',       nombre: 'Administrador'          },
     ];
   }
 
@@ -177,7 +205,7 @@ export class HomeComponent implements OnInit {
           this.areas = resp?.data ?? [];
           this.cdr.detectChanges();
         },
-        error: () => { }
+        error: () => {}
       });
   }
 
@@ -188,7 +216,7 @@ export class HomeComponent implements OnInit {
       username: '', password: '', nombre: '',
       apellido_paterno: '', apellido_materno: '',
       area_id: this.areas[0]?.id ?? 1,
-      rol_id: this.roles[0]?.id ?? 1,
+      rol_id:  this.roles[0]?.id ?? 1,
     };
   }
 
@@ -204,14 +232,13 @@ export class HomeComponent implements OnInit {
     }
 
     this.guardandoNuevo = true;
-
     const body: any = {
-      username: u.username.trim(),
-      password: u.password,
-      nombre: u.nombre.trim(),
+      username:         u.username.trim(),
+      password:         u.password,
+      nombre:           u.nombre.trim(),
       apellido_paterno: u.apellido_paterno.trim(),
-      area_id: Number(u.area_id),
-      rol_id: Number(u.rol_id),
+      area_id:          Number(u.area_id),
+      rol_id:           Number(u.rol_id),
     };
 
     if (u.apellido_materno?.trim()) {
@@ -221,7 +248,7 @@ export class HomeComponent implements OnInit {
     this.http.post<any>(`${this.API}/usuarios`, body, { headers: this.headers })
       .subscribe({
         next: resp => {
-          this.guardandoNuevo = false;
+          this.guardandoNuevo   = false;
           this.mostrarFormNuevo = false;
           if (resp?.ok) { this.cargarUsuarios(); }
           else { alert('Error al crear usuario'); }
@@ -238,15 +265,11 @@ export class HomeComponent implements OnInit {
 
   abrirEditPassword(id: number): void {
     this.editandoPasswordId = id;
-    this.nuevaPassword = '';
-    this.editandoUsuarioId = null;
+    this.nuevaPassword      = '';
+    this.editandoUsuarioId  = null;
   }
 
-  cancelarPassword(): void {
-    this.editandoPasswordId = null;
-    this.nuevaPassword = '';
-    this.mostrarPassword = false; // ← agregar esto
-  }
+  cancelarPassword(): void { this.editandoPasswordId = null; this.nuevaPassword = ''; }
 
   guardarPassword(id: number): void {
     if (!this.nuevaPassword || this.nuevaPassword.length < 8) {
@@ -259,9 +282,9 @@ export class HomeComponent implements OnInit {
       { headers: this.headers }
     ).subscribe({
       next: () => {
-        this.guardandoPassword = false;
+        this.guardandoPassword  = false;
         this.editandoPasswordId = null;
-        this.nuevaPassword = '';
+        this.nuevaPassword      = '';
         alert('Contraseña actualizada');
       },
       error: err => {
@@ -272,18 +295,18 @@ export class HomeComponent implements OnInit {
   }
 
   abrirEditUsuario(usuario: Usuario): void {
-    this.editandoUsuarioId = usuario.id;
-    this.usuarioEditando = usuario;
+    this.editandoUsuarioId  = usuario.id;
+    this.usuarioEditando    = usuario;
     this.editandoPasswordId = null;
     this.editForm = {
-      rol_id: usuario.rol_id,
+      rol_id:  usuario.rol_id,
       area_id: usuario.area_id,
     };
   }
 
   cancelarEditUsuario(): void {
     this.editandoUsuarioId = null;
-    this.usuarioEditando = null;
+    this.usuarioEditando   = null;
   }
 
   guardarEditUsuario(usuario: Usuario): void {
@@ -292,10 +315,10 @@ export class HomeComponent implements OnInit {
     }
     this.guardandoEdicion = true;
     const body: any = {
-      nombre: usuario.nombre,
+      nombre:           usuario.nombre,
       apellido_paterno: usuario.apellido_paterno,
-      area_id: Number(this.editForm.area_id),
-      rol_id: Number(this.editForm.rol_id),
+      area_id:          Number(this.editForm.area_id), 
+      rol_id:           Number(this.editForm.rol_id),  
     };
     if (usuario.apellido_materno?.trim()) {
       body.apellido_materno = usuario.apellido_materno.trim();
@@ -307,7 +330,7 @@ export class HomeComponent implements OnInit {
       { headers: this.headers }
     ).subscribe({
       next: resp => {
-        this.guardandoEdicion = false;
+        this.guardandoEdicion  = false;
         this.editandoUsuarioId = null;
         if (resp?.ok) { this.cargarUsuarios(); }
         else { alert('Error al actualizar usuario'); }

@@ -28,7 +28,8 @@
         <div class="field-row"><label>Año</label><input type="number" formControlName="anioRegistro" /></div>
         <div class="field-row"><label>Foja</label><input formControlName="foja" /></div>
         <div class="field-row"><label>Núm. Acta</label><input formControlName="numeroActa" /></div>
-        <div class="field-row"><label>CURP</label><input formControlName="curp" maxlength="18" style="text-transform:uppercase" /></div>
+        <div class="field-row"><label>CURP</label><input formControlName="curp" maxlength="18"
+            style="text-transform:uppercase" /></div>
         <div class="field-row"><label>CURP Reg.</label><input formControlName="curp_regciv" /></div>
       </fieldset>
 
@@ -54,10 +55,12 @@
     <fieldset class="panel panel-full">
       <legend>Datos del Registrado</legend>
       <div class="registrado-grid">
-        <div class="field-row"><label>Nombre(s)</label><input formControlName="nombre" /></div>
-        <div class="field-row"><label>Ap. Paterno</label><input formControlName="apellidoPaterno" /></div>
-        <div class="field-row"><label>Ap. Materno</label><input formControlName="apellidoMaterno" /></div>
-        <div class="field-row">
+        <div class="field-row field-row-wide"><label>Nombre(s)</label><input formControlName="nombre" /></div>
+        <div class="field-row field-row-wide"><label>Ap. Paterno</label><input formControlName="apellidoPaterno" />
+        </div>
+        <div class="field-row field-row-wide"><label>Ap. Materno</label><input formControlName="apellidoMaterno" />
+        </div>
+        <div class="field-row field-row-mid">
           <label>Sexo</label>
           <select formControlName="sexo">
             <option value="">—</option>
@@ -66,8 +69,8 @@
             <option value="N">No especificado</option>
           </select>
         </div>
-        <div class="field-row"><label>Libro</label><input type="number" formControlName="libro" /></div>
-        <div class="field-row"><label>Status</label><input formControlName="status" /></div>
+        <div class="field-row field-row-mid"><label>Libro</label><input type="number" formControlName="libro" /></div>
+        <div class="field-row field-row-mid"><label>Status</label><input formControlName="status" /></div>
       </div>
     </fieldset>
 

@@ -10,6 +10,7 @@ import { LogoutComponent } from './logout/logout';
 import { ModificacionComponent } from './modificacion/modificacion';
 import { ConsultaPagoComponent } from './act-pag/act-pag';
 import { ImpresionesComponent } from './impresiones/impresiones';
+import { CancelacionDialogComponent } from './cancelaciones/cancelaciones';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -23,5 +24,6 @@ export const routes: Routes = [
   { path: 'actualizar', component: ConsultaPagoComponent, canActivate: [AuthGuard] },
   { path: 'impresiones', component: ImpresionesComponent, canActivate: [AuthGuard] },
   { path: 'logout', component: LogoutComponent, canActivate: [AuthGuard] },
+  { path: 'cancelaciones', component: CancelacionDialogComponent, canActivate: [AuthGuard] },
   { path: '**', redirectTo: '/login' }
 ];

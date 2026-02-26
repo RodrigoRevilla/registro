@@ -68,13 +68,17 @@
 
             <button mat-stroked-button class="action-button primary" [matMenuTriggerFor]="certificacionmenu">
               <mat-icon>print</mat-icon>
-              Impresión de Certificaciones
+              Certificaciones
               <mat-icon>arrow_drop_down</mat-icon>
             </button>
 
             <mat-menu #certificacionmenu="matMenu">
               <button mat-menu-item (click)="irAImpresiones($event)">
                 <mat-icon>print</mat-icon> Imprimir
+              </button>
+
+              <button mat-menu-item (click)="irACancelaciones($event)">
+                <mat-icon>block</mat-icon> Cancelar certificaciones
               </button>
             </mat-menu>
           </div>

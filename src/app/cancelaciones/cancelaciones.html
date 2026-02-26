@@ -1,0 +1,168 @@
+<div class="dialog-wrapper">
+  <div class="dialog-header">
+    <div class="dialog-title-row">
+      <mat-icon>cancel</mat-icon>
+      <div>
+        <h2 class="dialog-title">Cancelación de Certificaciones</h2>
+      </div>
+    </div>
+    <button class="btn-close" (click)="cerrar()">✕</button>
+  </div>
+
+  <div class="dialog-body">
+    <div class="search-card">
+      <div class="search-fields">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Folio</mat-label>
+          <input matInput [(ngModel)]="folio" (keyup.enter)="buscar()" />
+        </mat-form-field>
+        <button class="btn-buscar" (click)="buscar()" [disabled]="buscando">
+          <mat-icon>search</mat-icon>
+          {{ buscando ? 'Buscando...' : 'Buscar' }}
+        </button>
+        <button class="btn-mock" (click)="cargarMock()">🧪 Mock</button>
+      </div>
+
+      <div class="info-chips" *ngIf="solicitud">
+        <div class="info-chip">
+          <span class="chip-label">Status</span>
+          <span class="chip-valor" [class]="'status-' + solicitud.status?.toLowerCase()">
+            {{ solicitud.status || '—' }}
+          </span>
+        </div>
+        <div class="info-chip">
+          <span class="chip-label">Servicio</span>
+          <span class="chip-valor">{{ solicitud.servicio || '—' }}</span>
+        </div>
+        <div class="info-chip">
+          <span class="chip-label">Tipo Certificación</span>
+          <span class="chip-valor">{{ solicitud.tipoCertificacion || '—' }}</span>
+        </div>
+        <div class="info-chip">
+          <span class="chip-label">Copias</span>
+          <span class="chip-valor">{{ solicitud.copias ?? '—' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="seccion-card" *ngIf="solicitud">
+      <div class="seccion-titulo">
+        <mat-icon>person</mat-icon>
+        Registrado
+      </div>
+      <div class="grid-2">
+        <div class="campo">
+          <span class="campo-label">Nombre 1</span>
+          <span class="campo-valor">{{ solicitud.nombre1 || '—' }}</span>
+        </div>
+        <div class="campo">
+          <span class="campo-label">Nombre 2</span>
+          <span class="campo-valor">{{ solicitud.nombre2 || '—' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tablas-row" *ngIf="solicitud">
+
+      <div class="tabla-card">
+        <div class="tabla-titulo">
+          <mat-icon>print</mat-icon>
+          Hojas Valoradas Impresas
+          <span class="tabla-count">{{ hojasImpresas.length }}</span>
+        </div>
+        <table class="hv-table">
+          <thead>
+            <tr>
+              <th>Folio</th>
+              <th>Hoja Valorada</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let h of hojasImpresas" [class.selected]="hojaSeleccionada?.id === h.id"
+              (click)="seleccionarHoja(h)">
+              <td>{{ h.folio }}</td>
+              <td>{{ h.hojaValorada }}</td>
+            </tr>
+            <tr *ngIf="hojasImpresas.length === 0">
+              <td colspan="2" class="empty-row">Sin registros</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="tabla-card">
+        <div class="tabla-titulo canceladas">
+          <mat-icon>cancel</mat-icon>
+          Hojas Valoradas Canceladas
+          <span class="tabla-count">{{ hojasCanceladas.length }}</span>
+        </div>
+        <table class="hv-table">
+          <thead>
+            <tr>
+              <th>Folio</th>
+              <th>Hoja Valorada</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let h of hojasCanceladas">
+              <td>{{ h.folio }}</td>
+              <td>{{ h.hojaValorada }}</td>
+            </tr>
+            <tr *ngIf="hojasCanceladas.length === 0">
+              <td colspan="2" class="empty-row">Sin registros</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <div class="seccion-card" *ngIf="solicitud">
+      <div class="seccion-titulo">
+        <mat-icon>tune</mat-icon>
+        Tipo de Cancelación
+      </div>
+
+      <div class="radio-opciones">
+        <label class="radio-opcion" [class.active]="tipoCancelacion === 'PERDIDA'">
+          <input type="radio" name="tipoCancelacion" value="PERDIDA" [(ngModel)]="tipoCancelacion" />
+          <div class="radio-content">
+            <span class="radio-titulo">Hoja Valorada Perdida — Necesita Reimpresión</span>
+            <span class="radio-desc">La hoja valorada se echó a perder. El folio necesita imprimirse en una hoja valorada
+              nueva (se cancela la hoja valorada).</span>
+          </div>
+        </label>
+
+        <label class="radio-opcion" [class.active]="tipoCancelacion === 'LIBERAR'">
+          <input type="radio" name="tipoCancelacion" value="LIBERAR" [(ngModel)]="tipoCancelacion" />
+          <div class="radio-content">
+            <span class="radio-titulo">Liberar Hoja Valorada y Liberar el Folio de la Solicitud</span>
+            <span class="radio-desc">Se puede reimprimir tanto la Hoja Valorada como el folio.</span>
+          </div>
+        </label>
+
+        <label class="radio-opcion" [class.active]="tipoCancelacion === 'CANCELAR'">
+          <input type="radio" name="tipoCancelacion" value="CANCELAR" [(ngModel)]="tipoCancelacion" />
+          <div class="radio-content">
+            <span class="radio-titulo">Cancelar Hoja Valorada</span>
+            <span class="radio-desc">El folio de solicitud no se puede reimprimir.</span>
+          </div>
+        </label>
+      </div>
+
+    </div>
+
+    <div class="error-msg" *ngIf="error">⚠️ {{ error }}</div>
+
+  </div>
+
+  <div class="dialog-footer">
+    <button class="btn-secundario" (click)="cerrar()">Cancelar</button>
+    <button class="btn-cancelar-folio" (click)="cancelarFolio()"
+      [disabled]="!solicitud || !tipoCancelacion || procesando">
+      <mat-icon>delete_forever</mat-icon>
+      {{ procesando ? 'Procesando...' : 'Cancelar Folio' }}
+    </button>
+  </div>
+
+</div>
