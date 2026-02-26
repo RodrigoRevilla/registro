@@ -146,8 +146,7 @@
       <div class="form-footer">
         <button class="btn-cancel" (click)="cancelarNuevo()">Cancelar</button>
         <button class="btn-save" (click)="guardarNuevo()" [disabled]="guardandoNuevo">
-          <mat-icon>{{ guardandoNuevo ? 'hourglass_empty' : 'check' }}</mat-icon>
-          {{ guardandoNuevo ? 'Guardando...' : 'Guardar usuario' }}
+          {{ guardandoNuevo ? 'Guardando...' : '✓ Guardar usuario' }}
         </button>
       </div>
     </div>
@@ -160,7 +159,6 @@
     <div class="usuarios-grid" *ngIf="!cargando">
 
       <div class="usuario-row" *ngFor="let u of usuarios" [class.inactivo]="!u.activo">
-
         <div class="urow-identity">
           <div class="urow-avatar" [class.inactivo]="!u.activo">
             {{ u.nombre[0] }}{{ u.apellido_paterno[0] }}
@@ -168,6 +166,7 @@
           <div class="urow-info">
             <span class="urow-nombre">{{ nombreCompleto(u) }}</span>
             <span class="urow-username">@{{ u.username }}</span>
+            <span class="urow-area">{{ nombreArea(u.area_id) }}</span>
           </div>
         </div>
 
@@ -182,35 +181,38 @@
         </div>
 
         <div class="urow-actions">
-
           <div *ngIf="editandoPasswordId === u.id" class="inline-edit">
             <input type="password" [(ngModel)]="nuevaPassword"
               placeholder="Nueva contraseña (mín. 8)" class="inline-input" />
             <button class="btn-ok" (click)="guardarPassword(u.id)" [disabled]="guardandoPassword">
-              <mat-icon>{{ guardandoPassword ? 'hourglass_empty' : 'check' }}</mat-icon>
+              {{ guardandoPassword ? '...' : '✓' }}
             </button>
-            <button class="btn-x" (click)="cancelarPassword()">
-              <mat-icon>close</mat-icon>
-            </button>
+            <button class="btn-x" (click)="cancelarPassword()">✕</button>
           </div>
 
-          <div *ngIf="editandoRolId === u.id" class="inline-edit">
-            <select [(ngModel)]="nuevoRolId" class="inline-select">
+          <div *ngIf="editandoUsuarioId === u.id" class="inline-edit inline-edit-doble">
+            <div class="inline-edit-label">Rol</div>
+            <select [(ngModel)]="editForm.rol_id" class="inline-select">
               <option *ngFor="let r of roles" [value]="r.id">{{ r.nombre }}</option>
             </select>
-            <button class="btn-ok" (click)="guardarRol(usuarioEditando!)" [disabled]="guardandoRol">
-              <mat-icon>{{ guardandoRol ? 'hourglass_empty' : 'check' }}</mat-icon>
+            <div class="inline-edit-label">Área</div>
+            <select [(ngModel)]="editForm.area_id" class="inline-select">
+              <option *ngFor="let a of areas" [value]="a.id">{{ a.nombre }}</option>
+            </select>
+            <button class="btn-ok" (click)="guardarEditUsuario(usuarioEditando!)" [disabled]="guardandoEdicion">
+              {{ guardandoEdicion ? '...' : '✓' }}
             </button>
-            <button class="btn-x" (click)="cancelarRol()">
-              <mat-icon>close</mat-icon>
-            </button>
+            <button class="btn-x" (click)="cancelarEditUsuario()">✕</button>
           </div>
 
-          <div class="icon-btns" *ngIf="editandoPasswordId !== u.id && editandoRolId !== u.id">
-            <button class="icon-btn" (click)="abrirEditPassword(u.id)" matTooltip="Cambiar contraseña">
+          <div class="icon-btns"
+            *ngIf="editandoPasswordId !== u.id && editandoUsuarioId !== u.id">
+            <button class="icon-btn" (click)="abrirEditPassword(u.id)"
+              matTooltip="Cambiar contraseña">
               <mat-icon>lock_reset</mat-icon>
             </button>
-            <button class="icon-btn" (click)="abrirEditRol(u)" matTooltip="Cambiar rol">
+            <button class="icon-btn" (click)="abrirEditUsuario(u)"
+              matTooltip="Editar rol y área">
               <mat-icon>admin_panel_settings</mat-icon>
             </button>
             <button class="icon-btn toggle-btn" [class.is-active]="u.activo"

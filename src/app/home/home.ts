@@ -70,26 +70,25 @@ export class HomeComponent implements OnInit {
   isLoggedIn  = false;
   esAdmin     = false;
   vistaActual: 'home' | 'usuarios' = 'home';
-  usuarios:   Usuario[] = [];
-  roles:      Rol[]     = [];
-  areas:      Area[]    = [];
-  cargando    = false;  
 
+  usuarios: Usuario[] = [];
+  roles:    Rol[]     = [];
+  areas:    Area[]    = [];
+  cargando  = false;
   mostrarFormNuevo = false;
   nuevoUsuario = {
     username: '', password: '', nombre: '',
     apellido_paterno: '', apellido_materno: '',
     area_id: 1, rol_id: 1,
   };
-
   guardandoNuevo = false;
   editandoPasswordId: number | null = null;
   nuevaPassword = '';
   guardandoPassword = false;
-  editandoRolId: number | null = null;
-  nuevoRolId: number | null = null;
-  guardandoRol = false;
-  usuarioEditando: Usuario | null = null;
+  editandoUsuarioId: number | null = null;
+  usuarioEditando:   Usuario | null = null;
+  editForm = { rol_id: 1, area_id: 1 };
+  guardandoEdicion  = false;
 
   private get headers(): HttpHeaders {
     const token = sessionStorage.getItem('token') ?? '';
@@ -116,7 +115,7 @@ export class HomeComponent implements OnInit {
     this.usuarios         = [];
     this.cargando         = true;
     this.mostrarFormNuevo = false;
-    this.cdr.detectChanges();  
+    this.cdr.detectChanges();
     this.cargarDatosUsuarios();
   }
 
@@ -124,8 +123,8 @@ export class HomeComponent implements OnInit {
     this.vistaActual        = 'home';
     this.mostrarFormNuevo   = false;
     this.editandoPasswordId = null;
-    this.editandoRolId      = null;
-    this.cargando           = false;  
+    this.editandoUsuarioId  = null;
+    this.cargando           = false;
   }
 
   logout(): void { this.authService.logout(); this.router.navigate(['/login']); }
@@ -143,15 +142,15 @@ export class HomeComponent implements OnInit {
 
   cargarUsuarios(): void {
     this.cargando = true;
-    this.cdr.detectChanges();  
+    this.cdr.detectChanges();
 
     this.http.get<any>(`${this.API}/usuarios?limit=100`, { headers: this.headers })
       .subscribe({
         next: resp => {
           this.usuarios = resp?.data ?? [];
-          this.cargarRoles();
+          this.cargarRoles();  
           this.cargando = false;
-          this.cdr.detectChanges();   
+          this.cdr.detectChanges();
         },
         error: (err) => {
           console.error('[home] cargarUsuarios ERROR:', err?.status, err?.error);
@@ -184,6 +183,7 @@ export class HomeComponent implements OnInit {
 
   abrirFormNuevo(): void {
     this.mostrarFormNuevo = true;
+    this.editandoUsuarioId = null; 
     this.nuevoUsuario = {
       username: '', password: '', nombre: '',
       apellido_paterno: '', apellido_materno: '',
@@ -223,7 +223,7 @@ export class HomeComponent implements OnInit {
   abrirEditPassword(id: number): void {
     this.editandoPasswordId = id;
     this.nuevaPassword      = '';
-    this.editandoRolId      = null;
+    this.editandoUsuarioId  = null; 
   }
 
   cancelarPassword(): void { this.editandoPasswordId = null; this.nuevaPassword = ''; }
@@ -251,24 +251,32 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  abrirEditRol(usuario: Usuario): void {
-    this.editandoRolId      = usuario.id;
-    this.nuevoRolId         = usuario.rol_id;
-    this.editandoPasswordId = null;
+  abrirEditUsuario(usuario: Usuario): void {
+    this.editandoUsuarioId  = usuario.id;
     this.usuarioEditando    = usuario;
+    this.editandoPasswordId = null; 
+    this.editForm = {
+      rol_id:  usuario.rol_id,
+      area_id: usuario.area_id,
+    };
   }
 
-  cancelarRol(): void { this.editandoRolId = null; this.nuevoRolId = null; }
+  cancelarEditUsuario(): void {
+    this.editandoUsuarioId = null;
+    this.usuarioEditando   = null;
+  }
 
-  guardarRol(usuario: Usuario): void {
-    if (!this.nuevoRolId) { alert('Selecciona un rol'); return; }
-    this.guardandoRol = true;
+  guardarEditUsuario(usuario: Usuario): void {
+    if (!this.editForm.rol_id || !this.editForm.area_id) {
+      alert('Selecciona rol y área'); return;
+    }
+    this.guardandoEdicion = true;
     const body = {
       nombre:           usuario.nombre,
       apellido_paterno: usuario.apellido_paterno,
       apellido_materno: usuario.apellido_materno ?? undefined,
-      area_id:          usuario.area_id,
-      rol_id:           this.nuevoRolId,
+      area_id:          this.editForm.area_id,
+      rol_id:           this.editForm.rol_id,
     };
     this.http.put<any>(
       `${this.API}/usuarios/${usuario.id}`,
@@ -276,14 +284,14 @@ export class HomeComponent implements OnInit {
       { headers: this.headers }
     ).subscribe({
       next: resp => {
-        this.guardandoRol  = false;
-        this.editandoRolId = null;
+        this.guardandoEdicion  = false;
+        this.editandoUsuarioId = null;
         if (resp?.ok) { this.cargarUsuarios(); }
-        else { alert('Error al actualizar rol'); }
+        else { alert('Error al actualizar usuario'); }
       },
       error: err => {
-        this.guardandoRol = false;
-        alert(err?.error?.error?.message ?? 'Error al cambiar rol');
+        this.guardandoEdicion = false;
+        alert(err?.error?.error?.message ?? 'Error al editar usuario');
       }
     });
   }
@@ -304,5 +312,9 @@ export class HomeComponent implements OnInit {
 
   nombreCompleto(u: Usuario): string {
     return [u.nombre, u.apellido_paterno, u.apellido_materno].filter(Boolean).join(' ');
+  }
+
+  nombreArea(area_id: number): string {
+    return this.areas.find(a => a.id === area_id)?.nombre ?? '—';
   }
 }

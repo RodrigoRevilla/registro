@@ -415,8 +415,8 @@
   background: #fdf2f8;
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 $wine:         #8b1538;
 $wine-deep:    #6b0f2a;
 $wine-soft:    #fdf2f5;
@@ -731,6 +731,18 @@ $slate-900:    #0f172a;
   margin-top: .08rem;
 }
 
+.urow-area {
+  font-size: .72rem;
+  font-weight: 500;
+  color: $slate-500;
+  margin-top: .1rem;
+
+  &::before {
+    content: '📍 ';
+    font-size: .65rem;
+  }
+}
+
 .urow-meta {
   display: flex;
   align-items: center;
@@ -852,20 +864,24 @@ $slate-900:    #0f172a;
   &:hover { filter: brightness(.92); }
 }
 
-.btn-ok, .btn-x {
-  mat-icon {
-    font-size: 18px !important;
-    width: 18px !important;
-    height: 18px !important;
-    line-height: 18px !important;
-    color: inherit;
-  }
-}
-
 .inline-edit {
   display: flex;
   align-items: center;
   gap: .38rem;
+}
+
+.inline-edit-doble {
+  flex-wrap: wrap;
+  gap: .35rem .5rem;
+  max-width: 420px;
+}
+
+.inline-edit-label {
+  font-size: .7rem;
+  font-weight: 600;
+  color: $slate-500;
+  letter-spacing: .02em;
+  text-transform: uppercase;
 }
 
 .inline-input, .inline-select {
@@ -895,8 +911,10 @@ $slate-900:    #0f172a;
   justify-content: center;
   cursor: pointer;
   transition: all .14s ease;
-
-  mat-icon { font-size: .95rem; width: .95rem; height: .95rem; }
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+  flex-shrink: 0;
 }
 
 .btn-ok {
