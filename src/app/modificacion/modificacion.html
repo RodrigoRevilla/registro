@@ -1,201 +1,167 @@
-<div class="modificacion-container fade-in">
+<div class="page-container">
+  <div class="page-header">
+    <div class="page-title-row">
+      <mat-icon>edit</mat-icon>
+      <h2 class="page-title">Modificación de Solicitudes</h2>
+    </div>
+    <div class="header-actions">
+      <button class="btn-limpiar" (click)="limpiarRegistro()" matTooltip="Limpiar registro">
+        <mat-icon>cleaning_services</mat-icon>
+        Limpiar
+      </button>
+      <button class="btn-volver" (click)="goHome()">
+        <mat-icon>arrow_back</mat-icon>
+        Volver
+      </button>
+    </div>
+  </div>
 
-    <mat-card class="mod-card" [formGroup]="formulario">
+  <div [formGroup]="formulario">
+    <div class="search-card">
+      <div class="search-fields">
 
-        <mat-card-header>
-            <mat-card-title>
-                <div class="custom-title">
-                    <span class="icon">✏️</span>
-                    <h1>Modificación de Solicitudes</h1>
-                </div>
-            </mat-card-title>
-        </mat-card-header>
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Folio</mat-label>
+          <input matInput formControlName="folio" />
+        </mat-form-field>
 
-        <mat-card-actions>
-            <button mat-stroked-button color="primary" (click)="goHome()" class="btn-home">
-                🏠 Home
-            </button>
-        </mat-card-actions>
-
-        <button mat-icon-button color="warn" matTooltip="Limpiar registro"
-            (click)="limpiarRegistro()" class="clean-btn">
-            <mat-icon>cleaning_services</mat-icon>
+        <button class="btn-buscar" (click)="buscarSolicitud()">
+          <mat-icon>search</mat-icon>
+          Buscar
         </button>
 
-        <mat-card-content>
+        <mat-form-field appearance="outline" class="search-field select-field">
+          <mat-label>Seleccione una opción</mat-label>
+          <mat-select formControlName="estadoSeleccionado">
+            <mat-option *ngFor="let op of opcionesEstado" [value]="op.value">
+              {{ op.label }}
+            </mat-option>
+          </mat-select>
+          <mat-hint *ngIf="opcionesEstado.length === 0" style="color:#c62828">
+            Sin opciones para tu rol
+          </mat-hint>
+        </mat-form-field>
 
-            <div class="section search-section">
-                <div class="form-row">
+        <button class="btn-reimprimir" (click)="reImprimir()">
+          <mat-icon>print</mat-icon>
+          Re-imprimir
+        </button>
 
-                    <mat-form-field appearance="outline">
-                        <mat-label>Folio</mat-label>
-                        <input matInput formControlName="folio" />
-                    </mat-form-field>
+      </div>
+    </div>
 
-                    <button mat-raised-button color="primary" (click)="buscarSolicitud()">
-                        <mat-icon>search</mat-icon>
-                        Buscar
-                    </button>
+    <div class="seccion-card">
+      <div class="seccion-titulo">
+        <mat-icon>description</mat-icon>
+        Datos del Acta
+      </div>
+      <div class="form-grid-4">
+        <div class="form-campo">
+          <label>Servicio</label>
+          <input formControlName="servicio" readonly class="campo-input readonly" />
+        </div>
+        <div class="form-campo">
+          <label>Tipo de Acta</label>
+          <input formControlName="tipoActa" readonly class="campo-input readonly" />
+        </div>
+        <div class="form-campo">
+          <label>Año</label>
+          <input formControlName="anio" class="campo-input" />
+        </div>
+        <div class="form-campo">
+          <label>Años de Búsqueda</label>
+          <input formControlName="aniosBusqueda" readonly class="campo-input readonly" />
+        </div>
+        <div class="form-campo">
+          <label>Rango de Búsqueda</label>
+          <input formControlName="rangoBusqueda" readonly class="campo-input readonly" />
+        </div>
+        <div class="form-campo">
+          <label>Fecha de Registro</label>
+          <input type="date" formControlName="fechaRegistro" class="campo-input" />
+        </div>
+      </div>
+      <div class="form-grid-3" style="margin-top: 0.75rem">
+        <div class="form-campo">
+          <label>Oficialía</label>
+          <input formControlName="oficialia" class="campo-input" />
+        </div>
+        <div class="form-campo">
+          <label>No. de Acta</label>
+          <input formControlName="noActa" class="campo-input" />
+        </div>
+        <div class="form-campo">
+          <label>No. de Foja</label>
+          <input formControlName="noFoja" class="campo-input" />
+        </div>
+      </div>
+    </div>
 
-                    <mat-form-field appearance="outline">
-                        <mat-label>Seleccione una opción</mat-label>
-                        <mat-select formControlName="estadoSeleccionado">
-                            <mat-option *ngFor="let op of opcionesEstado" [value]="op.value">
-                                {{ op.label }}
-                            </mat-option>
-                        </mat-select>
-                        <mat-hint *ngIf="opcionesEstado.length === 0" style="color: #f44336">
-                            Sin opciones para tu rol
-                        </mat-hint>
-                    </mat-form-field>
+    <div class="seccion-card">
+      <div class="seccion-titulo">
+        <mat-icon>place</mat-icon>
+        Registro
+      </div>
+      <div class="form-grid-4">
+        <div class="form-campo">
+          <label>Localidad</label>
+          <input formControlName="localidad" class="campo-input" />
+        </div>
+        <div class="form-campo">
+          <label>Estado</label>
+          <input formControlName="estadoRegistro" class="campo-input" />
+        </div>
+        <div class="form-campo">
+          <label>Distrito</label>
+          <input formControlName="distrito" class="campo-input" />
+        </div>
+        <div class="form-campo">
+          <label>Municipio</label>
+          <input formControlName="municipio" class="campo-input" />
+        </div>
+      </div>
+      <div class="form-campo full-width" style="margin-top: 0.75rem">
+        <label>Nombre(s)</label>
+        <input formControlName="nombres" class="campo-input" />
+      </div>
+    </div>
 
-                    <button mat-stroked-button color="accent" (click)="reImprimir()">
-                        Re-imprimir
-                    </button>
+    <div class="seccion-card">
+      <div class="seccion-titulo">
+        <mat-icon>calendar_today</mat-icon>
+        Fechas
+      </div>
+      <div class="form-grid-3">
+        <div class="form-campo">
+          <label>Fecha Solicitud</label>
+          <input type="date" formControlName="fechaSolicitud" class="campo-input" />
+        </div>
+        <div class="form-campo">
+          <label>Fecha Entrega</label>
+          <input type="date" formControlName="fechaEntrega" class="campo-input" />
+        </div>
+        <div class="form-campo">
+          <label>Fecha Pago</label>
+          <input type="date" formControlName="fechaPago" class="campo-input" />
+        </div>
+      </div>
+    </div>
 
-                </div>
-            </div>
+    <div class="seccion-card">
+      <div class="seccion-titulo">
+        <mat-icon>notes</mat-icon>
+        Observaciones
+      </div>
+      <textarea formControlName="observaciones" class="campo-input textarea" rows="4"></textarea>
+    </div>
 
-            <div class="section">
-                <h3 class="section-title">Datos del Acta</h3>
+    <div class="acciones-footer">
+      <button class="btn-cancelar" (click)="cancelar()">Cancelar</button>
+      <button class="btn-guardar" (click)="guardarCambios()">
+        <mat-icon>save</mat-icon>
+        Guardar Cambios
+      </button>
+    </div>
 
-                <div class="form-grid-4">
-
-                    <mat-form-field appearance="outline" class="readonly-field">
-                        <mat-label>Servicio</mat-label>
-                        <input matInput formControlName="servicio" readonly />
-                    </mat-form-field>
-
-                    <mat-form-field appearance="outline" class="readonly-field">
-                        <mat-label>Tipo de Acta</mat-label>
-                        <input matInput formControlName="tipoActa" readonly />
-                    </mat-form-field>
-
-                    <mat-form-field appearance="outline">
-                        <mat-label>Año</mat-label>
-                        <input matInput formControlName="anio" />
-                    </mat-form-field>
-
-                    <mat-form-field appearance="outline" class="readonly-field">
-                        <mat-label>Años de Búsqueda</mat-label>
-                        <input matInput formControlName="aniosBusqueda" readonly />
-                    </mat-form-field>
-
-                    <mat-form-field appearance="outline" class="readonly-field">
-                        <mat-label>Rango de Búsqueda</mat-label>
-                        <input matInput formControlName="rangoBusqueda" readonly />
-                    </mat-form-field>
-
-                    <mat-form-field appearance="outline">
-                        <mat-label>Fecha de Registro</mat-label>
-                        <input matInput type="date" formControlName="fechaRegistro" />
-                    </mat-form-field>
-
-                </div>
-
-                <div class="form-grid-3">
-
-                    <mat-form-field appearance="outline">
-                        <mat-label>Oficialía</mat-label>
-                        <input matInput formControlName="oficialia" />
-                    </mat-form-field>
-
-                    <mat-form-field appearance="outline">
-                        <mat-label>No. de Acta</mat-label>
-                        <input matInput formControlName="noActa" />
-                    </mat-form-field>
-
-                    <mat-form-field appearance="outline">
-                        <mat-label>No. de Foja</mat-label>
-                        <input matInput formControlName="noFoja" />
-                    </mat-form-field>
-
-                </div>
-            </div>
-
-            <div class="section">
-                <h3 class="section-title">Registro</h3>
-
-                <div class="form-grid-4">
-
-                    <mat-form-field appearance="outline">
-                        <mat-label>Localidad</mat-label>
-                        <input matInput formControlName="localidad" />
-                    </mat-form-field>
-
-                    <mat-form-field appearance="outline">
-                        <mat-label>Estado</mat-label>
-                        <input matInput formControlName="estadoRegistro" />
-                    </mat-form-field>
-
-                    <mat-form-field appearance="outline">
-                        <mat-label>Distrito</mat-label>
-                        <input matInput formControlName="distrito" />
-                    </mat-form-field>
-
-                    <mat-form-field appearance="outline">
-                        <mat-label>Municipio</mat-label>
-                        <input matInput formControlName="municipio" />
-                    </mat-form-field>
-
-                    <button mat-icon-button color="warn" matTooltip="Limpiar campos de registro"
-                        (click)="limpiarRegistro()">
-                        <mat-icon>cleaning_services</mat-icon>
-                    </button>
-
-                </div>
-
-                <mat-form-field appearance="outline" class="full-width">
-                    <mat-label>Nombre(s)</mat-label>
-                    <input matInput formControlName="nombres" />
-                </mat-form-field>
-
-            </div>
-
-            <div class="section">
-                <h3 class="section-title">Otro</h3>
-
-                <div class="form-grid-3">
-
-                    <mat-form-field appearance="outline">
-                        <mat-label>Fecha Solicitud</mat-label>
-                        <input matInput type="date" formControlName="fechaSolicitud" />
-                    </mat-form-field>
-
-                    <mat-form-field appearance="outline">
-                        <mat-label>Fecha Entrega</mat-label>
-                        <input matInput type="date" formControlName="fechaEntrega" />
-                    </mat-form-field>
-
-                    <mat-form-field appearance="outline">
-                        <mat-label>Fecha Pago</mat-label>
-                        <input matInput type="date" formControlName="fechaPago" />
-                    </mat-form-field>
-
-                </div>
-            </div>
-
-            <div class="section">
-                <h3 class="section-title">Observaciones</h3>
-
-                <mat-form-field appearance="outline" class="full-width">
-                    <textarea matInput rows="4" formControlName="observaciones"></textarea>
-                </mat-form-field>
-            </div>
-
-        </mat-card-content>
-
-        <mat-card-actions align="end">
-            <button mat-stroked-button color="warn" (click)="cancelar()">
-                Cancelar
-            </button>
-
-            <button mat-raised-button color="primary" (click)="guardarCambios()">
-                <mat-icon>save</mat-icon>
-                Guardar Cambios
-            </button>
-        </mat-card-actions>
-
-    </mat-card>
-
+  </div>
 </div>

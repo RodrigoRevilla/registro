@@ -1,51 +1,41 @@
-<div class="cert-container">
+<div class="page-container">
+  <div class="page-header">
+    <div class="page-title-row">
+      <mat-icon>print</mat-icon>
+      <h2 class="page-title">Impresión de Certificaciones</h2>
+    </div>
+    <button class="btn-volver" (click)="goHome()">
+      <mat-icon>arrow_back</mat-icon>
+      Volver
+    </button>
+  </div>
 
-  <mat-card class="cert-card">
+  <div class="search-card">
+    <div class="seccion-titulo">
+      <mat-icon>confirmation_number</mat-icon>
+      Ingresa el folio para generar la certificación
+    </div>
+    <div class="search-fields">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Folio</mat-label>
+        <input matInput [(ngModel)]="folio" placeholder="Ej. RC-20260224-0009"
+          autocomplete="off" (keyup.enter)="buscar()" />
+        <mat-icon matSuffix>confirmation_number</mat-icon>
+      </mat-form-field>
+      <button class="btn-buscar" (click)="buscar()" [disabled]="buscando">
+        <mat-icon>search</mat-icon>
+        {{ buscando ? 'Buscando...' : 'Buscar' }}
+      </button>
+    </div>
 
-    <mat-card-header>
-      <mat-icon class="header-icon">print</mat-icon>
-      <div>
-        <mat-card-title>Impresión de Certificaciones</mat-card-title>
-        <mat-card-subtitle>
-          Ingrese el folio correspondiente para generar la certificación
-        </mat-card-subtitle>
-      </div>
-    </mat-card-header>
+    <div class="buscando-msg" *ngIf="buscando">
+      <mat-spinner diameter="18"></mat-spinner>
+      <span>Buscando...</span>
+    </div>
 
-    <mat-divider></mat-divider>
-
-    <mat-card-content>
-
-      <form class="folio-form" (ngSubmit)="buscar()">
-
-        <mat-form-field appearance="outline" class="folio-field">
-          <mat-label>Folio</mat-label>
-          <input matInput
-            [(ngModel)]="folio"
-            name="folio"
-            placeholder="Ej. RC-20260224-0009"
-            autocomplete="off">
-          <mat-icon matSuffix>confirmation_number</mat-icon>
-        </mat-form-field>
-
-        <button mat-raised-button color="primary" type="submit" [disabled]="buscando">
-          <mat-icon>search</mat-icon>
-          Buscar
-        </button>
-
-      </form>
-
-      <div class="buscando-msg" *ngIf="buscando">
-        <mat-spinner diameter="20"></mat-spinner>
-        <span>Buscando...</span>
-      </div>
-
-      <div class="error-msg" *ngIf="error">
-        ⚠️ {{ error }}
-      </div>
-
-    </mat-card-content>
-
-  </mat-card>
+    <div class="error-msg" *ngIf="error">
+      ⚠️ {{ error }}
+    </div>
+  </div>
 
 </div>

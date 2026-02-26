@@ -1,162 +1,134 @@
-<div class="modificacion-container fade-in">
-  <mat-card class="mod-card">
+<div class="page-container">
+  <div class="page-header">
+    <div class="page-title-row">
+      <mat-icon>payments</mat-icon>
+      <h2 class="page-title">Consulta de Pago</h2>
+    </div>
+    <button class="btn-volver" (click)="goHome()">
+      <mat-icon>arrow_back</mat-icon>
+      Volver
+    </button>
+  </div>
 
-    <mat-card-header>
-      <mat-card-title>
-        <div class="custom-title">
-          <span class="icon">💳</span>
-          <h1>Consulta de Pago</h1>
-        </div>
-      </mat-card-title>
-    </mat-card-header>
-
-    <mat-card-actions>
-      <button mat-stroked-button color="primary" (click)="goHome()" class="btn-home">
-        🏠 Home
+  <div class="search-card">
+    <div class="search-fields">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Folio</mat-label>
+        <input matInput [(ngModel)]="folioBuscar" (keyup.enter)="buscarFolio()" />
+      </mat-form-field>
+      <button class="btn-buscar" (click)="buscarFolio()" [disabled]="procesando$ | async">
+        <mat-icon>search</mat-icon>
+        {{ (procesando$ | async) ? 'Buscando...' : 'Buscar' }}
       </button>
-    </mat-card-actions>
+    </div>
+  </div>
 
-    <mat-card-content>
-      <div class="section search-section">
-        <div class="form-row">
-          <mat-form-field appearance="outline">
-            <mat-label>Folio</mat-label>
-            <input matInput [(ngModel)]="folioBuscar" (keyup.enter)="buscarFolio()" />
-          </mat-form-field>
-          <button mat-raised-button color="primary"
-            (click)="buscarFolio()"
-            [disabled]="procesando$ | async">
-            <mat-icon>search</mat-icon>
-            {{ (procesando$ | async) ? 'Buscando...' : 'Buscar' }}
-          </button>
-        </div>
+  <ng-container *ngIf="solicitud$ | async as sol">
+
+    <div class="seccion-card">
+      <div class="seccion-titulo">
+        <mat-icon>description</mat-icon>
+        Detalles de la Solicitud
       </div>
 
-      <!-- ✅ async pipe se suscribe al BehaviorSubject y actualiza la vista automáticamente -->
-      <ng-container *ngIf="solicitud$ | async as sol">
-        <div class="section">
-          <h3 class="section-title">Detalles de la Solicitud</h3>
-          <div class="form-grid-3">
+      <div class="form-grid-3">
 
-            <mat-form-field appearance="outline">
-              <mat-label>Años de Búsqueda</mat-label>
-              <input matInput [value]="sol.aniosBusqueda" readonly />
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Solicitud</mat-label>
-              <input matInput [value]="sol.solicitud" readonly />
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Oficialía</mat-label>
-              <input matInput [value]="sol.oficialia" readonly />
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Número de Acta</mat-label>
-              <input matInput [value]="sol.numeroActa" readonly />
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Número de Foja</mat-label>
-              <input matInput [value]="sol.numeroFoja" readonly />
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Fecha de Registro</mat-label>
-              <input matInput type="date" [value]="sol.fechaRegistro | date:'yyyy-MM-dd'" readonly />
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Lugar de Registro</mat-label>
-              <input matInput [value]="sol.lugarRegistro" readonly />
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Rango de Búsqueda</mat-label>
-              <input matInput [value]="sol.rangoBusqueda" readonly />
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Estado Biológico</mat-label>
-              <input matInput [value]="sol.estadoBiologico" readonly />
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Estado del Acta</mat-label>
-              <input matInput [value]="sol.estadoActa" readonly />
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Documento Presentado</mat-label>
-              <input matInput [value]="sol.documentoPresentado" readonly />
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Nombres</mat-label>
-              <input matInput [value]="sol.nombres" readonly />
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>CRIP</mat-label>
-              <input matInput [value]="sol.crip" readonly />
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Sexo</mat-label>
-              <input matInput [value]="sol.sexo" readonly />
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Copias Solicitadas</mat-label>
-              <input matInput [value]="sol.copiasSolicitadas" readonly />
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Fecha de Entrega (día/hora)</mat-label>
-              <input matInput type="datetime-local"
-                [value]="sol.fechaEntregaHora ? (sol.fechaEntregaHora | date:'yyyy-MM-ddTHH:mm') : ''"
-                readonly />
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Fecha de Solicitud (día/hora)</mat-label>
-              <input matInput type="datetime-local"
-                [value]="sol.fechaSolicitudHora ? (sol.fechaSolicitudHora | date:'yyyy-MM-ddTHH:mm') : ''"
-                readonly />
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Status</mat-label>
-              <input matInput [value]="sol.status" readonly />
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Línea de Captura</mat-label>
-              <input matInput [value]="sol.lineaCaptura" readonly />
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Tipo de Acta</mat-label>
-              <input matInput [value]="sol.tipoActa" readonly />
-            </mat-form-field>
-
-          </div>
+        <div class="form-campo">
+          <label>Años de Búsqueda</label>
+          <input class="campo-input readonly" [value]="sol.aniosBusqueda" readonly />
+        </div>
+        <div class="form-campo">
+          <label>Solicitud</label>
+          <input class="campo-input readonly" [value]="sol.solicitud" readonly />
+        </div>
+        <div class="form-campo">
+          <label>Oficialía</label>
+          <input class="campo-input readonly" [value]="sol.oficialia" readonly />
+        </div>
+        <div class="form-campo">
+          <label>Número de Acta</label>
+          <input class="campo-input readonly" [value]="sol.numeroActa" readonly />
+        </div>
+        <div class="form-campo">
+          <label>Número de Foja</label>
+          <input class="campo-input readonly" [value]="sol.numeroFoja" readonly />
+        </div>
+        <div class="form-campo">
+          <label>Fecha de Registro</label>
+          <input class="campo-input readonly" type="date"
+            [value]="sol.fechaRegistro | date:'yyyy-MM-dd'" readonly />
+        </div>
+        <div class="form-campo">
+          <label>Lugar de Registro</label>
+          <input class="campo-input readonly" [value]="sol.lugarRegistro" readonly />
+        </div>
+        <div class="form-campo">
+          <label>Rango de Búsqueda</label>
+          <input class="campo-input readonly" [value]="sol.rangoBusqueda" readonly />
+        </div>
+        <div class="form-campo">
+          <label>Estado Biológico</label>
+          <input class="campo-input readonly" [value]="sol.estadoBiologico" readonly />
+        </div>
+        <div class="form-campo">
+          <label>Estado del Acta</label>
+          <input class="campo-input readonly" [value]="sol.estadoActa" readonly />
+        </div>
+        <div class="form-campo">
+          <label>Documento Presentado</label>
+          <input class="campo-input readonly" [value]="sol.documentoPresentado" readonly />
+        </div>
+        <div class="form-campo">
+          <label>Nombres</label>
+          <input class="campo-input readonly" [value]="sol.nombres" readonly />
+        </div>
+        <div class="form-campo">
+          <label>CRIP</label>
+          <input class="campo-input readonly" [value]="sol.crip" readonly />
+        </div>
+        <div class="form-campo">
+          <label>Sexo</label>
+          <input class="campo-input readonly" [value]="sol.sexo" readonly />
+        </div>
+        <div class="form-campo">
+          <label>Copias Solicitadas</label>
+          <input class="campo-input readonly" [value]="sol.copiasSolicitadas" readonly />
+        </div>
+        <div class="form-campo">
+          <label>Fecha de Entrega</label>
+          <input class="campo-input readonly" type="datetime-local"
+            [value]="sol.fechaEntregaHora ? (sol.fechaEntregaHora | date:'yyyy-MM-ddTHH:mm') : ''"
+            readonly />
+        </div>
+        <div class="form-campo">
+          <label>Fecha de Solicitud</label>
+          <input class="campo-input readonly" type="datetime-local"
+            [value]="sol.fechaSolicitudHora ? (sol.fechaSolicitudHora | date:'yyyy-MM-ddTHH:mm') : ''"
+            readonly />
+        </div>
+        <div class="form-campo">
+          <label>Status</label>
+          <input class="campo-input readonly" [value]="sol.status" readonly />
+        </div>
+        <div class="form-campo">
+          <label>Línea de Captura</label>
+          <input class="campo-input readonly" [value]="sol.lineaCaptura" readonly />
+        </div>
+        <div class="form-campo">
+          <label>Tipo de Acta</label>
+          <input class="campo-input readonly" [value]="sol.tipoActa" readonly />
         </div>
 
-        <mat-card-actions align="end">
-          <button *ngIf="sol.status === 'PENDIENTE_PAGO'" class="btn-confirmar"
-            [disabled]="procesando$ | async"
-            (click)="confirmarPagoManual()">
-            <mat-icon>payments</mat-icon>
-            {{ (procesando$ | async) ? 'Procesando...' : 'Confirmar Pago' }}
-          </button>
-        </mat-card-actions>
+      </div>
+    </div>
 
-      </ng-container>
+    <div class="acciones-footer" *ngIf="sol.status === 'PENDIENTE_PAGO'">
+      <button class="btn-confirmar" [disabled]="procesando$ | async" (click)="confirmarPagoManual()">
+        <mat-icon>payments</mat-icon>
+        {{ (procesando$ | async) ? 'Procesando...' : 'Confirmar Pago' }}
+      </button>
+    </div>
 
-    </mat-card-content>
+  </ng-container>
 
-  </mat-card>
 </div>

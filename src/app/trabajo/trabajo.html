@@ -1,149 +1,130 @@
-<mat-card class="container">
-  <div class="header-section">
-    <mat-card-title class="title">🔍 Búsqueda de Pagos</mat-card-title>
-    <p class="subtitle">Consulta tus pagos realizados por fecha y categoría</p>
-    <button mat-stroked-button color="primary" (click)="goHome()" class="btn-home">
-      🏠 Home
+<div class="page-container">
+  <div class="page-header">
+    <div class="page-title-row">
+      <mat-icon>manage_search</mat-icon>
+      <h2 class="page-title">Búsqueda de Solicitudes</h2>
+      <span class="count-badge">{{ resultsCount }}</span>
+    </div>
+    <button class="btn-volver" (click)="goHome()">
+      <mat-icon>arrow_back</mat-icon>
+      Volver
     </button>
   </div>
 
-  <mat-divider></mat-divider>
+  <div class="filtros-row">
+    <button *ngFor="let filter of filters"
+      class="filter-chip"
+      [class.active]="currentFilter === filter.value"
+      (click)="setFilter(filter.value)">
+      {{ filter.label }}
+    </button>
+  </div>
 
-  <div class="search-section">
-    <div class="filter-tabs">
-      <button *ngFor="let filter of filters" mat-button class="filter-tab"
-        [class.active]="currentFilter === filter.value"
-        (click)="setFilter(filter.value)">
-        {{ filter.label }}
-      </button>
-    </div>
+  <div class="search-card">
+    <div class="search-fields">
 
-    <div class="search-controls">
-
-      <mat-form-field appearance="outline" class="input-group" floatLabel="always">
-        <mat-label>Fecha de Pago</mat-label>
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Fecha de recepción</mat-label>
         <input matInput [matDatepicker]="picker" [(ngModel)]="fechaPago" placeholder="dd/mm/aaaa">
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
       </mat-form-field>
 
       <ng-container *ngIf="!folioHojaBloqueado">
-        <mat-form-field appearance="outline" class="input-group" floatLabel="always">
+        <mat-form-field appearance="outline" class="search-field">
           <mat-label>Folio inicial hoja valorada</mat-label>
-          <input matInput type="number" min="1"
-            [(ngModel)]="folioInput"
-            placeholder="Ej. 1042">
-          <mat-hint>Se bloqueará al presionar <strong>Establecer</strong></mat-hint>
+          <input matInput type="number" min="1" [(ngModel)]="folioInput" placeholder="Ej. 1042">
+          <mat-hint>Se bloqueará al presionar Establecer</mat-hint>
         </mat-form-field>
-        <button mat-stroked-button color="warn"
-          class="btn-establecer"
-          (click)="establecerFolioInicial()"
+        <button class="btn-establecer" (click)="establecerFolioInicial()"
           matTooltip="Establece el folio inicial. No podrá editarse en esta sesión.">
-          <mat-icon>lock</mat-icon> Establecer folio
+          <mat-icon>lock</mat-icon>
+          Establecer
         </button>
       </ng-container>
 
-      <div *ngIf="folioHojaBloqueado" class="folio-bloqueado-box">
+      <div *ngIf="folioHojaBloqueado" class="folio-bloqueado">
         <mat-icon>lock</mat-icon>
-        <span>Siguiente hoja valorada: <strong>{{ folioHojaValorada }}</strong></span>
+        <div>
+          <span class="folio-lbl">Siguiente hoja valorada</span>
+          <strong class="folio-num">{{ folioHojaValorada }}</strong>
+        </div>
       </div>
 
-      <button mat-raised-button (click)="buscarPagos()" class="btn-buscar">
-        <mat-icon>search</mat-icon> Buscar
+      <button class="btn-buscar" (click)="buscarPagos()">
+        <mat-icon>search</mat-icon>
+        Buscar
       </button>
 
     </div>
 
-    <div class="year-groups">
-      <div *ngFor="let yearRange of yearRanges" class="year-group"
-        [class.selected]="isYearRangeSelected(yearRange.range)"
-        (click)="selectYearRange(yearRange.range)">
-        <div class="year-range">{{ yearRange.range }}</div>
-        <div class="year-count">{{ yearRange.count }} registros</div>
-      </div>
+    <div class="year-strip">
+      <button *ngFor="let yr of yearRanges"
+        class="year-chip"
+        [class.active]="isYearRangeSelected(yr.range)"
+        (click)="selectYearRange(yr.range)">
+        <span class="yr-range">{{ yr.range }}</span>
+        <span class="yr-count">{{ yr.count }}</span>
+      </button>
     </div>
-
   </div>
 
-  <mat-divider></mat-divider>
-
-  <div class="results-section">
-    <div class="results-header">
-      <div class="results-info">
-        <h2>Resultados</h2>
-        <span class="results-count">{{ resultsCount }}</span>
-      </div>
-
-      <div class="bulk-actions" *ngIf="payments.length > 0">
-        <button mat-raised-button style="background:#2e7d32;color:white"
-          (click)="generarReporteSeleccionados()"
-          [disabled]="selectedCount === 0"
-          matTooltip="Genera PDF con órdenes de búsqueda de los seleccionados">
-          <mat-icon>picture_as_pdf</mat-icon>
-          Reporte seleccionados ({{ selectedCount }})
-        </button>
-
-        <button mat-raised-button style="background:#1b5e20;color:white"
-          (click)="generarReporte()"
-          matTooltip="Genera PDF con órdenes de búsqueda de todos los resultados">
-          <mat-icon>picture_as_pdf</mat-icon>
-          Reporte todos ({{ payments.length }})
-        </button>
-      </div>
-    </div>
-
-    <div *ngIf="isLoading" class="loading">
-      <mat-spinner diameter="40"></mat-spinner>
-      <p>Buscando registros...</p>
-    </div>
-
-    <div *ngIf="!isLoading && payments.length === 0" class="empty-state">
-      <mat-icon>description</mat-icon>
-      <p>
-        {{ selectedYearRange || currentFilter !== 'todos' || fechaPago
-          ? 'No se encontraron registros con los criterios seleccionados'
-          : 'Selecciona un filtro o rango de años y presiona Buscar' }}
-      </p>
-    </div>
-
-    <div *ngIf="!isLoading && payments.length > 0">
-      <mat-card *ngFor="let payment of payments"
-        class="payment-card"
-        [class.selected]="payment.selected"
-        [class.impreso]="payment.impreso"
-        [id]="'payment-' + payment.id">
-
-        <div class="payment-header">
-          <div class="payment-id">{{ payment.id }}</div>
-          <div class="payment-status" [class]="'status-' + payment.estadoClave">
-            {{ payment.estadoNombre }}
-          </div>
-        </div>
-
-        <mat-divider></mat-divider>
-
-        <div class="payment-details">
-          <div class="detail-item"><strong>Fecha:</strong> {{ payment.fecha }}</div>
-          <div class="detail-item"><strong>Monto:</strong> {{ payment.monto }}</div>
-          <div class="detail-item"><strong>Concepto:</strong> {{ payment.concepto }}</div>
-          <div class="detail-item"><strong>Referencia:</strong> {{ payment.referencia }}</div>
-          <div class="detail-item"><strong>Método:</strong> {{ payment.metodo }}</div>
-          <div class="detail-item" *ngIf="payment.folioHojaUsado">
-            <strong>Hoja valorada:</strong>
-            <span class="folio-badge">{{ payment.folioHojaUsado }}</span>
-          </div>
-        </div>
-
-        <mat-divider></mat-divider>
-
-        <div class="payment-actions">
-          <mat-checkbox [(ngModel)]="payment.selected" color="primary">
-            Seleccionar
-          </mat-checkbox>
-        </div>
-
-      </mat-card>
-    </div>
-
+  <div class="acciones-row" *ngIf="payments.length > 0">
+    <button class="btn-pdf btn-sel" (click)="generarReporteSeleccionados()"
+      [disabled]="selectedCount === 0"
+      matTooltip="PDF de seleccionados">
+      <mat-icon>picture_as_pdf</mat-icon>
+      Seleccionados ({{ selectedCount }})
+    </button>
+    <button class="btn-pdf btn-all" (click)="generarReporte()"
+      matTooltip="PDF de todos">
+      <mat-icon>picture_as_pdf</mat-icon>
+      Todos ({{ payments.length }})
+    </button>
   </div>
-</mat-card>
+
+  <div class="loading" *ngIf="isLoading">
+    <mat-spinner diameter="32"></mat-spinner>
+    <span>Buscando registros...</span>
+  </div>
+
+  <div class="empty" *ngIf="!isLoading && payments.length === 0">
+    {{ selectedYearRange || currentFilter !== 'todos' || fechaPago
+      ? 'Sin resultados para los criterios seleccionados'
+      : 'Selecciona un filtro y presiona Buscar' }}
+  </div>
+
+  <div class="lista" *ngIf="!isLoading && payments.length > 0">
+    <div class="solicitud-card"
+      *ngFor="let payment of payments"
+      [class.is-selected]="payment.selected"
+      [class.is-impreso]="payment.impreso"
+      [id]="'payment-' + payment.id">
+
+      <div class="s-avatar">{{ payment.id[0] }}</div>
+      <div class="s-info">
+        <span class="s-folio">{{ payment.id }}</span>
+        <span class="s-concepto">{{ payment.concepto }}</span>
+        <span class="s-fecha">
+          <mat-icon>calendar_today</mat-icon>
+          {{ payment.fecha }}
+        </span>
+      </div>
+
+      <div class="s-chips">
+        <span class="estado-chip" [class]="'estado-' + payment.estadoClave">
+          {{ payment.estadoNombre }}
+        </span>
+        <span class="hoja-chip" *ngIf="payment.folioHojaUsado">
+          HV: {{ payment.folioHojaUsado }}
+        </span>
+      </div>
+
+      <div class="s-acciones">
+        <mat-checkbox [(ngModel)]="payment.selected" color="primary"></mat-checkbox>
+      </div>
+
+    </div>
+  </div>
+
+</div>

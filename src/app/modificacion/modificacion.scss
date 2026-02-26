@@ -1,485 +1,302 @@
 @use 'sass:color';
 
-// ─────────────────────────────────────────────
-// PALETA — misma que busqueda-pagos-rojo.scss
-// ─────────────────────────────────────────────
+$red:        #9e2a47;
+$red-light:  #fdf2f6;
+$red-border: #f5c2d0;
+$navy:       #1a3a5c;
+$navy-light: #e8f0f7;
+$green:      #2e7d32;
+$amber:      #7a4500;
+$amber-light:#fefce8;
 
-$gov-red:        #9e2a47;
-$gov-red-dark:   #7d1f38;
-$gov-red-mid:    #b83558;
-$gov-red-light:  #fdf2f6;
-$gov-red-subtle: #fef7f9;
+$text:       #1a1a2e;
+$text-sub:   #555;
+$gray:       #6b7f8f;
+$border:     #e0e0e0;
+$surface:    #ffffff;
+$bg:         #f0f2f5;
 
-$navy:           #1a3a5c;
-$navy-light:     #e8f0f7;
-$navy-subtle:    #f0f5fb;
+$r:  10px;
+$tr: all 0.15s ease;
 
-$gold:           #b8890a;
-$gold-light:     #fdf8ed;
+:host { display: block; background: $bg; min-height: 100vh; padding: 2rem 3rem; }
 
-$text-heading:   #0d1f2d;
-$text-body:      #2d3f50;
-$text-muted:     #6b7f8f;
-$text-inverse:   #ffffff;
-
-$border:         #ddd0d5;
-$border-strong:  #c4a8b2;
-$surface:        #ffffff;
-$bg:             #f7f2f4;
-
-$radius-sm:  6px;
-$radius-md:  10px;
-$radius-lg:  14px;
-$radius-pill:999px;
-
-$shadow-sm:      0 1px 3px rgba(158, 42, 71, 0.07), 0 1px 2px rgba(0,0,0,0.04);
-$shadow-md:      0 4px 14px rgba(158, 42, 71, 0.10), 0 2px 4px rgba(0,0,0,0.05);
-$shadow-lg:      0 12px 36px rgba(158, 42, 71, 0.10), 0 4px 8px rgba(0,0,0,0.05);
-$shadow-primary: 0 6px 18px rgba(158, 42, 71, 0.28);
-
-$transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
-
-// ─────────────────────────────────────────────
-// CONTENEDOR PRINCIPAL
-// ─────────────────────────────────────────────
-
-.modificacion-container {
-  padding: 2rem;
-  display: flex;
-  justify-content: center;
-  min-height: 100vh;
-  background: $bg;
-  font-family: 'Lato', 'Segoe UI', system-ui, sans-serif;
-  color: $text-body;
+.page-container {
+  max-width: 1100px;
+  margin: 0 auto;
 }
 
-// ─────────────────────────────────────────────
-// TARJETA PRINCIPAL
-// ─────────────────────────────────────────────
-
-.mod-card {
-  width: 100%;
-  max-width: 1180px;
-  border-radius: $radius-lg;
-  background: $surface;
-  box-shadow: $shadow-lg;
-  overflow: hidden;
-  border: 1px solid $border;
-  height: fit-content;
-}
-
-// ─────────────────────────────────────────────
-// CABECERA — rojo institucional + franja dorada
-// ─────────────────────────────────────────────
-
-mat-card-header {
+.page-header {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  padding: 2rem 2.5rem 1.8rem;
-  margin-bottom: 0;
-  background: $gov-red;
-  border-bottom: 4px solid $gold;
-  position: relative;
-
-  // Textura diagonal — papel oficial
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: repeating-linear-gradient(
-      135deg,
-      transparent,
-      transparent 20px,
-      rgba(0,0,0,0.018) 20px,
-      rgba(0,0,0,0.018) 40px
-    );
-    pointer-events: none;
-  }
-
-  .custom-title {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.6rem;
-    position: relative; // sobre la textura
-
-    .icon {
-      font-size: 1.4rem;
-      line-height: 1;
-      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2));
-    }
-
-    h1 {
-      font-size: 1.4rem;
-      font-weight: 800;
-      color: $text-inverse;
-      margin: 0;
-      letter-spacing: 0.01em;
-      text-shadow: 0 1px 4px rgba(0,0,0,0.25);
-      text-align: center;
-    }
-  }
-}
-
-// ─── BOTÓN HOME ──────────────────────────────
-
-mat-card-header + mat-card-actions {
-  display: flex;
-  justify-content: flex-start;
-  padding: 0.8rem 1.5rem 0.4rem;
-  background: $surface;
-  border-bottom: 1px solid $border;
-}
-
-.btn-home {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.5rem 1.3rem;
-  border-radius: $radius-sm;
-  border: 1.5px solid $gov-red;
-  background: $surface;
-  color: $gov-red;
-  font-weight: 700;
-  font-size: 0.78rem;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  transition: $transition;
-
-  &:hover {
-    background: $gov-red-light;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(158, 42, 71, 0.15);
-  }
-}
-
-// ─── BOTÓN LIMPIAR (flotante) ─────────────────
-
-.clean-btn {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  color: $text-muted !important;
-  transition: $transition;
-
-  &:hover {
-    color: $gov-red !important;
-    transform: rotate(-15deg);
-  }
-}
-
-// ─────────────────────────────────────────────
-// CONTENIDO
-// ─────────────────────────────────────────────
-
-mat-card-content {
-  padding: 1.5rem 2rem 1rem !important;
-  background: $bg;
-}
-
-// ─────────────────────────────────────────────
-// SECCIONES
-// ─────────────────────────────────────────────
-
-.section {
+  justify-content: space-between;
   margin-bottom: 1.2rem;
-  padding: 1.4rem 1.6rem 1rem;
-  border: 1px solid $border;
-  border-left: 4px solid transparent;
-  border-radius: $radius-md;
-  background: $surface;
-  box-shadow: $shadow-sm;
-  transition: $transition;
-
-  &:hover {
-    box-shadow: $shadow-md;
-    border-left-color: $gov-red-mid;
-    border-color: $border-strong;
-    transform: translateY(-1px);
-  }
+  flex-wrap: wrap;
+  gap: 0.75rem;
 }
 
-.section-title {
-  margin-bottom: 1.1rem;
-  font-weight: 800;
-  font-size: 0.72rem;
-  color: $gov-red;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+.page-title-row {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 
-  &::before {
-    content: '';
-    display: inline-block;
-    width: 4px;
-    height: 14px;
-    background: $gov-red;
-    border-radius: 2px;
-    flex-shrink: 0;
-  }
+  mat-icon { color: $red; font-size: 1.4rem; width: 1.4rem; height: 1.4rem; }
 }
 
-// ─── SECCIÓN BÚSQUEDA ────────────────────────
+.page-title {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: $text;
+}
 
-.search-section {
-  background: $navy-subtle;
-  border-color: color.adjust($navy-light, $lightness: -4%);
-  border-left-color: $navy !important;
+.header-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.btn-volver {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.45rem 1.1rem;
+  border: 1.5px solid $border;
+  background: $surface;
+  border-radius: 99px;
+  color: $text;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: $tr;
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+  &:hover { border-color: #999; background: #f9f9f9; }
+}
+
+.btn-limpiar {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.45rem 1rem;
+  border: 1.5px solid $border;
+  background: $surface;
+  border-radius: 99px;
+  color: $gray;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: $tr;
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+  &:hover { border-color: $red; color: $red; background: $red-light; }
+}
+
+.search-card {
+  background: $surface;
+  border: 1px solid $border;
+  border-left: 4px solid $navy;
+  border-radius: $r;
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.search-fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.8rem;
+}
+
+.search-field { flex: 1; min-width: 180px; max-width: 240px; }
+.select-field { max-width: 260px; }
+
+.btn-buscar {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: 40px;
+  margin-bottom: 22px;
+  padding: 0 1.3rem;
+  background: $red;
+  color: #fff;
+  border: none;
+  border-radius: 99px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: $tr;
+  box-shadow: 0 3px 10px rgba(158,42,71,0.25);
+
+  mat-icon { font-size: 17px; width: 17px; height: 17px; }
+  &:hover { background: color.adjust($red, $lightness: -8%); }
+}
+
+.btn-reimprimir {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: 40px;
+  margin-bottom: 22px;
+  padding: 0 1.1rem;
+  border: 1.5px solid $navy;
+  background: $surface;
+  border-radius: 99px;
+  color: $navy;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: $tr;
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+  &:hover { background: $navy-light; }
+}
+
+.seccion-card {
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: $r;
+  padding: 1.1rem 1.5rem;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  transition: $tr;
 
   &:hover {
-    border-left-color: $navy !important;
-    border-color: color.adjust($navy-light, $lightness: -10%);
+    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+    border-color: #ccc;
   }
 }
 
-.form-row {
+.seccion-titulo {
   display: flex;
-  gap: 1rem;
   align-items: center;
-  flex-wrap: wrap;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: $red;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 1rem;
 
-  mat-form-field {
-    width: 220px;
-    margin-bottom: -1.25em;
-  }
-
-  button {
-    margin-bottom: 4px;
-    border-radius: $radius-sm;
-    font-size: 0.76rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    transition: $transition;
-
-    // Botón Buscar
-    &[color="primary"] {
-      background: $gov-red;
-      color: $text-inverse;
-      border: none;
-      box-shadow: $shadow-primary;
-      padding: 0 1.2rem;
-
-      &:hover {
-        background: $gov-red-dark;
-        transform: translateY(-1px);
-        box-shadow: 0 8px 22px rgba(158, 42, 71, 0.35);
-      }
-    }
-
-    // Botón Re-imprimir
-    &[color="accent"] {
-      border: 1.5px solid $navy;
-      color: $navy;
-      background: $surface;
-
-      &:hover {
-        background: $navy-light;
-        transform: translateY(-1px);
-      }
-    }
-  }
+  mat-icon { font-size: 14px; width: 14px; height: 14px; }
 }
-
-// ─────────────────────────────────────────────
-// GRIDS DE FORMULARIO
-// ─────────────────────────────────────────────
 
 .form-grid-4 {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
-  align-items: start;
+  gap: 0.75rem;
 }
 
 .form-grid-3 {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
-.full-width {
-  width: 100%;
-}
+.full-width { width: 100%; }
 
-// ─── CAMPOS READONLY ─────────────────────────
+.form-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 
-.readonly-field input {
-  background-color: color.adjust($bg, $lightness: 2%);
-  font-weight: 500;
-  color: $text-muted;
-  cursor: default;
-}
-
-// ─── BOTÓN LIMPIAR EN GRID ───────────────────
-
-.form-grid-4 mat-icon-button,
-.form-grid-4 button[mat-icon-button] {
-  margin-top: 0.5rem;
-  color: $text-muted;
-  transition: $transition;
-
-  &:hover {
-    color: $gov-red;
-    transform: rotate(-15deg);
+  label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: $gray;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
   }
 }
 
-// ─────────────────────────────────────────────
-// ACCIONES FINALES
-// ─────────────────────────────────────────────
-
-mat-card-actions {
-  padding: 1rem 1.5rem !important;
-  border-top: 1px solid $border;
+.campo-input {
+  padding: 0.5rem 0.75rem;
+  border: 1.5px solid $border;
+  border-radius: 7px;
+  font-size: 0.85rem;
+  color: $text;
   background: $surface;
+  transition: $tr;
+  font-family: inherit;
+  width: 100%;
+  box-sizing: border-box;
 
-  &[align="end"] {
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.75rem;
+  &:focus {
+    outline: none;
+    border-color: $red;
+    box-shadow: 0 0 0 3px rgba(158,42,71,0.08);
+  }
 
-    // Cancelar
-    button[color="warn"] {
-      border-radius: $radius-sm;
-      border: 1.5px solid $border-strong;
-      color: $text-muted;
-      font-weight: 700;
-      font-size: 0.76rem;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      transition: $transition;
+  &.readonly {
+    background: #f7f7f7;
+    color: $gray;
+    cursor: default;
+    &:focus { border-color: $border; box-shadow: none; }
+  }
 
-      &:hover {
-        border-color: $gov-red;
-        color: $gov-red;
-        background: $gov-red-light;
-      }
-    }
-
-    // Guardar Cambios
-    button[color="primary"] {
-      border-radius: $radius-sm;
-      background: $gov-red;
-      color: $text-inverse;
-      font-weight: 800;
-      font-size: 0.78rem;
-      letter-spacing: 0.07em;
-      text-transform: uppercase;
-      border: none;
-      box-shadow: $shadow-primary;
-      transition: $transition;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-
-      mat-icon {
-        font-size: 16px;
-        width: 16px;
-        height: 16px;
-      }
-
-      &:hover {
-        background: $gov-red-dark;
-        transform: translateY(-1px);
-        box-shadow: 0 8px 22px rgba(158, 42, 71, 0.38);
-      }
-
-      &:active {
-        transform: translateY(0);
-        box-shadow: $shadow-sm;
-      }
-    }
+  &.textarea {
+    resize: vertical;
+    min-height: 90px;
+    line-height: 1.5;
   }
 }
 
-// ─────────────────────────────────────────────
-// ANIMACIÓN DE ENTRADA
-// ─────────────────────────────────────────────
-
-.fade-in {
-  animation: fadeInUp 0.35s cubic-bezier(0.4, 0, 0.2, 1) both;
+.acciones-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  padding: 0.5rem 0 0;
 }
 
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.btn-cancelar {
+  padding: 0.5rem 1.4rem;
+  border: 1.5px solid $border;
+  background: $surface;
+  border-radius: 8px;
+  color: $gray;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: $tr;
+
+  &:hover { border-color: $red; color: $red; background: $red-light; }
 }
 
-// ─────────────────────────────────────────────
-// RESPONSIVE
-// ─────────────────────────────────────────────
+.btn-guardar {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 1.5rem;
+  background: $red;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: $tr;
+  box-shadow: 0 3px 10px rgba(158,42,71,0.25);
+
+  mat-icon { font-size: 17px; width: 17px; height: 17px; }
+  &:hover { background: color.adjust($red, $lightness: -8%); }
+}
 
 @media (max-width: 900px) {
-  .form-grid-4 {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  .form-grid-4 { grid-template-columns: repeat(2, 1fr); }
 }
 
-@media (max-width: 768px) {
-  .modificacion-container {
-    padding: 0.6rem;
-  }
-
-  mat-card-header {
-    padding: 1.4rem 1.2rem 1.6rem;
-  }
-
-  mat-card-content {
-    padding: 1rem 1rem 0.8rem !important;
-  }
-
-  mat-card-header + mat-card-actions {
-    padding: 0.7rem 1rem 0.4rem;
-  }
-
-  .section {
-    padding: 1.1rem 1rem 0.8rem;
-  }
-
-  .form-row {
-    flex-direction: column;
-    align-items: stretch;
-
-    mat-form-field {
-      width: 100%;
-    }
-
-    button {
-      width: 100%;
-      justify-content: center;
-    }
-  }
-
-  .form-grid-4 {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .form-grid-3 {
-    grid-template-columns: 1fr;
-  }
-
-  mat-card-actions[align="end"] {
-    flex-direction: column;
-
-    button {
-      width: 100%;
-      justify-content: center;
-    }
-  }
+@media (max-width: 640px) {
+  :host { padding: 0.75rem; }
+  .search-fields { flex-direction: column; }
+  .search-field, .select-field { max-width: 100%; }
+  .btn-buscar, .btn-reimprimir { width: 100%; justify-content: center; margin-bottom: 0; }
+  .form-grid-4 { grid-template-columns: 1fr 1fr; }
+  .form-grid-3 { grid-template-columns: 1fr; }
+  .acciones-footer { flex-direction: column; }
+  .btn-cancelar, .btn-guardar { width: 100%; justify-content: center; }
 }
 
 @media (max-width: 480px) {
-  .form-grid-4 {
-    grid-template-columns: 1fr;
-  }
+  .form-grid-4 { grid-template-columns: 1fr; }
 }
