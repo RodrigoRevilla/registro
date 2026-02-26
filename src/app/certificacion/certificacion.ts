@@ -64,6 +64,7 @@ export class CertificacionComponent implements OnInit {
   copiasSOlicitadas = 1;
   aniosBusqueda = '';
   rangoBusqueda = '';
+  today: string = new Date().toISOString().split('T')[0];
   fechaEntrega = '';
   horaEntrega = '';
   nombreContribuyente = '';
@@ -96,7 +97,6 @@ export class CertificacionComponent implements OnInit {
 
   private cargarCatalogos(): void {
     console.log('Cargando catálogos...');
-
     this.apiService.getActosRegistrales().subscribe({
       next: resp => {
         console.log('Actos registrales:', resp.ok ? resp.data : 'sin datos', resp);
@@ -161,7 +161,7 @@ export class CertificacionComponent implements OnInit {
         this.ngZone.run(() => {
           this.procesando = false;
           this.folioGenerado = response?.data?.solicitud?.folio ?? null;
-          this.lineaCaptura  = response?.data?.pago?.referencia_pago ?? null;
+          this.lineaCaptura = response?.data?.pago?.referencia_pago ?? null;
 
           if (url) {
             this.urlPdf = url;
@@ -183,6 +183,21 @@ export class CertificacionComponent implements OnInit {
         alert(msg);
       },
     });
+  }
+
+  autoFechaEntrega(): void {
+    if (!this.fechaEntrega) {
+      this.fechaEntrega = this.today;
+    }
+  }
+
+  autoHoraEntrega(): void {
+    if (!this.horaEntrega) return;
+    const [horas, minutos] = this.horaEntrega.split(':').map(Number);
+    if (horas < 12) {
+      const horasPm = horas + 12;
+      this.horaEntrega = `${horasPm.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}`;
+    }
   }
 
   copiarFolio(): void {

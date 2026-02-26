@@ -42,17 +42,6 @@ export class ModificacionComponent {
   respuestaBackend: any = null;
 
   readonly opcionesPorRol: Record<string, { value: string; label: string }[]> = {
-    BUSQUEDA: [
-      { value: 'NO_HAY_LIBRO', label: 'No hay libro' },
-      { value: 'NO_HAY_FORMATO', label: 'No hay formato' },
-      { value: 'NO_HAY_CUADERNO', label: 'No hay cuaderno' },
-      { value: 'NO_HAY_REGISTRO', label: 'No hay registro' },
-      { value: 'ENCONTRADA', label: 'Encontrada' },
-    ],
-    VALIDACION: [
-      { value: 'COTEJADA', label: 'Cotejada' },
-      { value: 'ACLARACION', label: 'Para aclaración' },
-    ],
     ADMINISTRADOR: [
       { value: 'NO_HAY_LIBRO', label: 'No hay libro' },
       { value: 'NO_HAY_FORMATO', label: 'No hay formato' },
@@ -62,14 +51,36 @@ export class ModificacionComponent {
       { value: 'COTEJADA', label: 'Cotejada' },
       { value: 'ACLARACION', label: 'Para aclaración' },
     ],
+    JEFE_BUSQUEDAS: [
+      { value: 'NO_HAY_LIBRO', label: 'No hay libro' },
+      { value: 'NO_HAY_FORMATO', label: 'No hay formato' },
+      { value: 'NO_HAY_CUADERNO', label: 'No hay cuaderno' },
+      { value: 'NO_HAY_REGISTRO', label: 'No hay registro' },
+      { value: 'ENCONTRADA', label: 'Encontrada' },
+    ],
+    BUSCADOR: [
+      { value: 'NO_HAY_LIBRO', label: 'No hay libro' },
+      { value: 'NO_HAY_FORMATO', label: 'No hay formato' },
+      { value: 'NO_HAY_CUADERNO', label: 'No hay cuaderno' },
+      { value: 'NO_HAY_REGISTRO', label: 'No hay registro' },
+      { value: 'ENCONTRADA', label: 'Encontrada' },
+    ],
+    VALIDADOR: [
+      { value: 'COTEJADA', label: 'Cotejada' },
+      { value: 'ACLARACION', label: 'Para aclaración' },
+    ],
+    CERTIFICACION: [
+      { value: 'COTEJADA', label: 'Cotejada' },
+      { value: 'ACLARACION', label: 'Para aclaración' },
+    ],
   };
 
   get opcionesEstado(): { value: string; label: string }[] {
-    const rol = this.authService.getRol().toUpperCase();
-    const key = Object.keys(this.opcionesPorRol).find(k => rol.includes(k));
+    const clave = this.authService.getRolClave().toUpperCase();
+    const key = Object.keys(this.opcionesPorRol).find(k => clave === k);
     return key ? this.opcionesPorRol[key] : [];
   }
-
+  
   constructor(
     private router: Router,
     private fb: FormBuilder,
@@ -77,7 +88,6 @@ export class ModificacionComponent {
     private apiService: ApiService,
     private authService: AuthService
   ) {
-
     this.loginForm = this.fb.group({
       username: ['operador1'],
       password: ['mi_password']
@@ -115,38 +125,29 @@ export class ModificacionComponent {
 
   login(): void {
     const { username, password } = this.loginForm.value;
-
     this.http.post(`${this.baseUrl}/auth/login`, { username, password }).subscribe({
       next: (resp: any) => {
-        console.log('Login response:', resp);
         if (resp.ok) {
           this.authService.login(resp.data.token, resp.data.usuario);
           alert('Login correcto');
         }
       },
-      error: (err) => {
-        console.error('Error login:', err);
-        alert('Error en login');
-      }
+      error: (err) => { console.error('Error login:', err); alert('Error en login'); }
     });
   }
 
   buscarSolicitud(): void {
     const folio = this.formulario.get('folio')?.value?.trim();
-    console.log('[buscarSolicitud] folio:', folio);
     if (!folio) { alert('Ingresa un folio'); return; }
-
     const headers = this.getHeaders();
     if (!headers) return;
 
     this.http.get(`${this.baseUrl}/solicitudes/folio/${folio}`, { headers })
       .subscribe({
         next: (resp: any) => {
-          console.log('[buscarSolicitud] respuesta:', resp);
           this.respuestaBackend = resp;
           if (resp.ok && resp.data) {
             const d = resp.data;
-            console.log('[buscarSolicitud] data:', d);
             this.formulario.patchValue({
               anio: d.fecha_recepcion ? new Date(d.fecha_recepcion).getFullYear() : '',
               fechaRegistro: d.fecha_recepcion?.split('T')[0] ?? '',
@@ -155,7 +156,6 @@ export class ModificacionComponent {
             this.http.get(`${this.baseUrl}/solicitudes/${d.id}/comentarios`, { headers })
               .subscribe({
                 next: (respComentarios: any) => {
-                  console.log('[buscarSolicitud] comentarios:', respComentarios);
                   if (respComentarios.ok && respComentarios.data?.length) {
                     const ultimo = respComentarios.data.at(-1);
                     this.formulario.patchValue({ observaciones: ultimo.comentario });
@@ -167,7 +167,6 @@ export class ModificacionComponent {
         },
         error: (err) => {
           console.error('[buscarSolicitud] error:', err);
-          console.error('[buscarSolicitud] error.error:', err.error);
           this.respuestaBackend = err.error;
         }
       });
@@ -176,43 +175,30 @@ export class ModificacionComponent {
   reImprimir(): void {
     const id = this.respuestaBackend?.data?.id;
     if (!id) { alert('Primero busca una solicitud'); return; }
-
     const folioHoja = this.formulario.get('folio')?.value?.trim();
     if (!folioHoja) { alert('No hay folio para reimprimir'); return; }
-
     const headers = this.getHeaders();
     if (!headers) return;
 
-    this.http.post(
-      `${this.baseUrl}/solicitudes/${id}/impresion`,
-      { folio_hoja_valorada: folioHoja },
-      { headers }
-    ).subscribe({
-      next: (resp: any) => {
-        console.log('[reImprimir] impresión registrada:', resp);
-        this.http.get(`${this.baseUrl}/solicitudes/${id}/pago`, { headers })
-          .subscribe({
-            next: (respPago: any) => {
-              console.log('[reImprimir] pago:', respPago);
-              const url = respPago?.data?.url_pdf;
-              if (url) {
-                const ventana = window.open(url, '_blank', `width=${screen.width},height=${screen.height},top=0,left=0`);
-                ventana?.addEventListener('load', () => ventana.print());
-              } else {
-                alert('No se encontró URL del PDF');
-              }
-            },
-            error: (err) => {
-              console.error('[reImprimir] error pago:', err);
-              alert('Error al obtener el PDF: ' + (err.error?.error?.message ?? 'Error desconocido'));
-            }
-          });
-      },
-      error: (err) => {
-        console.error('[reImprimir] error impresión:', err);
-        alert('Error al registrar impresión: ' + (err.error?.error?.message ?? 'Error desconocido'));
-      }
-    });
+    this.http.post(`${this.baseUrl}/solicitudes/${id}/impresion`, { folio_hoja_valorada: folioHoja }, { headers })
+      .subscribe({
+        next: () => {
+          this.http.get(`${this.baseUrl}/solicitudes/${id}/pago`, { headers })
+            .subscribe({
+              next: (respPago: any) => {
+                const url = respPago?.data?.url_pdf;
+                if (url) {
+                  const ventana = window.open(url, '_blank', `width=${screen.width},height=${screen.height},top=0,left=0`);
+                  ventana?.addEventListener('load', () => ventana.print());
+                } else {
+                  alert('No se encontró URL del PDF');
+                }
+              },
+              error: (err) => alert('Error al obtener el PDF: ' + (err.error?.error?.message ?? 'Error desconocido'))
+            });
+        },
+        error: (err) => alert('Error al registrar impresión: ' + (err.error?.error?.message ?? 'Error desconocido'))
+      });
   }
 
   cancelar(): void {
@@ -226,18 +212,12 @@ export class ModificacionComponent {
   }
 
   limpiarRegistroSection(): void {
-    this.formulario.patchValue({
-      localidad: '',
-      estadoRegistro: '',
-      distrito: '',
-      municipio: ''
-    });
+    this.formulario.patchValue({ localidad: '', estadoRegistro: '', distrito: '', municipio: '' });
   }
 
   guardarCambios(): void {
     const headers = this.getHeaders();
     if (!headers) return;
-
     const id = this.respuestaBackend?.data?.id;
     if (!id) { alert('Primero busca una solicitud'); return; }
 
@@ -245,11 +225,6 @@ export class ModificacionComponent {
     const comentario = this.formulario.get('observaciones')?.value ?? '';
     const usuario = this.authService.getUsuario();
     const areaId = usuario?.area_id ?? null;
-
-    console.log('[guardarCambios] id:', id);
-    console.log('[guardarCambios] estadoClave:', estadoClave);
-    console.log('[guardarCambios] comentario:', comentario);
-    console.log('[guardarCambios] area_id:', areaId);
 
     if (!estadoClave && !comentario) {
       alert('Selecciona un estado o escribe un comentario');
@@ -261,26 +236,17 @@ export class ModificacionComponent {
       : null;
     const textoFinal = [opcionLabel, comentario].filter(Boolean).join(' — ');
 
-    console.log('[guardarCambios] textoFinal comentario:', textoFinal);
-
     const bodyComentario: any = { comentario: textoFinal };
     if (areaId) bodyComentario.area_id = areaId;
 
-    this.http.post(
-      `${this.baseUrl}/solicitudes/${id}/comentarios`,
-      bodyComentario,
-      { headers }
-    ).subscribe({
-      next: (resp: any) => {
-        console.log('[guardarCambios] comentario guardado:', resp);
-        this.respuestaBackend = resp;
-        alert('Cambios guardados correctamente');
-      },
-      error: (err) => {
-        console.error('[guardarCambios] error comentario:', err);
-        alert('Error al guardar: ' + (err.error?.error?.message ?? 'Error desconocido'));
-      }
-    });
+    this.http.post(`${this.baseUrl}/solicitudes/${id}/comentarios`, bodyComentario, { headers })
+      .subscribe({
+        next: (resp: any) => {
+          this.respuestaBackend = resp;
+          alert('Cambios guardados correctamente');
+        },
+        error: (err) => alert('Error al guardar: ' + (err.error?.error?.message ?? 'Error desconocido'))
+      });
   }
 
   goHome(): void {

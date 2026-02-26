@@ -166,11 +166,11 @@
         </div>
         <div class="campo">
           <label>Fecha Entrega</label>
-          <input type="date" [(ngModel)]="fechaEntrega" name="fechaEntrega" />
+          <input type="date" [(ngModel)]="fechaEntrega" name="fechaEntrega" (blur)="autoFechaEntrega()" />
         </div>
         <div class="campo">
           <label>Hora Entrega</label>
-          <input type="time" [(ngModel)]="horaEntrega" name="horaEntrega" />
+          <input type="time" [(ngModel)]="horaEntrega" name="horaEntrega" (change)="autoHoraEntrega()" />
         </div>
       </div>
     </div>

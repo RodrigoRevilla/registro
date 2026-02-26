@@ -5,15 +5,12 @@
       Sistema de Trámites y Consultas
     </h2>
     <div class="header-actions">
-      <button *ngIf="esAdmin && vistaActual === 'home'"
-        mat-stroked-button class="action-button accent"
+      <button *ngIf="esAdmin && vistaActual === 'home'" mat-stroked-button class="action-button accent"
         (click)="irAGestionUsuarios()">
         <mat-icon>manage_accounts</mat-icon>
         Gestión de Usuarios
       </button>
-      <button *ngIf="vistaActual === 'usuarios'"
-        mat-stroked-button class="action-button"
-        (click)="volverAHome()">
+      <button *ngIf="vistaActual === 'usuarios'" mat-stroked-button class="action-button" (click)="volverAHome()">
         <mat-icon>arrow_back</mat-icon>
         Volver
       </button>
@@ -182,8 +179,12 @@
 
         <div class="urow-actions">
           <div *ngIf="editandoPasswordId === u.id" class="inline-edit">
-            <input type="password" [(ngModel)]="nuevaPassword"
+            <input [type]="mostrarPassword ? 'text' : 'password'" [(ngModel)]="nuevaPassword"
               placeholder="Nueva contraseña (mín. 8)" class="inline-input" />
+            <button class="icon-btn" (click)="mostrarPassword = !mostrarPassword"
+              [matTooltip]="mostrarPassword ? 'Ocultar contraseña' : 'Ver contraseña'">
+              <mat-icon>{{ mostrarPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
             <button class="btn-ok" (click)="guardarPassword(u.id)" [disabled]="guardandoPassword">
               {{ guardandoPassword ? '...' : '✓' }}
             </button>
@@ -205,18 +206,14 @@
             <button class="btn-x" (click)="cancelarEditUsuario()">✕</button>
           </div>
 
-          <div class="icon-btns"
-            *ngIf="editandoPasswordId !== u.id && editandoUsuarioId !== u.id">
-            <button class="icon-btn" (click)="abrirEditPassword(u.id)"
-              matTooltip="Cambiar contraseña">
+          <div class="icon-btns" *ngIf="editandoPasswordId !== u.id && editandoUsuarioId !== u.id">
+            <button class="icon-btn" (click)="abrirEditPassword(u.id)" matTooltip="Cambiar contraseña">
               <mat-icon>lock_reset</mat-icon>
             </button>
-            <button class="icon-btn" (click)="abrirEditUsuario(u)"
-              matTooltip="Editar rol y área">
+            <button class="icon-btn" (click)="abrirEditUsuario(u)" matTooltip="Editar rol y área">
               <mat-icon>admin_panel_settings</mat-icon>
             </button>
-            <button class="icon-btn toggle-btn" [class.is-active]="u.activo"
-              (click)="toggleActivo(u)"
+            <button class="icon-btn toggle-btn" [class.is-active]="u.activo" (click)="toggleActivo(u)"
               [matTooltip]="u.activo ? 'Desactivar usuario' : 'Activar usuario'">
               <mat-icon>{{ u.activo ? 'person_off' : 'person' }}</mat-icon>
             </button>

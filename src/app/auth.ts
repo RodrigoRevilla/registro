@@ -53,7 +53,12 @@ export class AuthService {
 
   getRol(): string {
     const usuario = this.getUsuario();
-    return usuario?.rol?.nombre || '';
+    return usuario?.rol?.nombre ?? '';
+  }
+
+  getRolClave(): string {
+    const usuario = this.getUsuario();
+    return usuario?.rol?.clave ?? '';
   }
 
   hasPermiso(clave: string): boolean {

@@ -67,14 +67,15 @@ export class HomeComponent implements OnInit {
 
   private readonly API = '/api/v1';
 
-  isLoggedIn  = false;
-  esAdmin     = false;
+  isLoggedIn = false;
+  esAdmin = false;
   vistaActual: 'home' | 'usuarios' = 'home';
+  mostrarPassword = false;
 
   usuarios: Usuario[] = [];
-  roles:    Rol[]     = [];
-  areas:    Area[]    = [];
-  cargando  = false;
+  roles: Rol[] = [];
+  areas: Area[] = [];
+  cargando = false;
   mostrarFormNuevo = false;
   nuevoUsuario = {
     username: '', password: '', nombre: '',
@@ -86,9 +87,9 @@ export class HomeComponent implements OnInit {
   nuevaPassword = '';
   guardandoPassword = false;
   editandoUsuarioId: number | null = null;
-  usuarioEditando:   Usuario | null = null;
+  usuarioEditando: Usuario | null = null;
   editForm = { rol_id: 1, area_id: 1 };
-  guardandoEdicion  = false;
+  guardandoEdicion = false;
 
   private get headers(): HttpHeaders {
     const token = sessionStorage.getItem('token') ?? '';
@@ -96,44 +97,44 @@ export class HomeComponent implements OnInit {
   }
 
   constructor(
-    private router:      Router,
-    private http:        HttpClient,
-    public  authService: AuthService,
-    private ngZone:      NgZone,
-    private cdr:         ChangeDetectorRef,
-  ) {}
+    private router: Router,
+    private http: HttpClient,
+    public authService: AuthService,
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef,
+  ) { }
 
   ngOnInit(): void {
     this.isLoggedIn = this.authService.isLoggedIn();
     if (!this.isLoggedIn) { this.router.navigate(['/login']); return; }
-    const rol = this.authService.getRol()?.toUpperCase() ?? '';
+    const rol = this.authService.getRolClave().toUpperCase();
     this.esAdmin = rol.includes('ADMIN');
   }
 
   irAGestionUsuarios(): void {
-    this.vistaActual      = 'usuarios';
-    this.usuarios         = [];
-    this.cargando         = true;
+    this.vistaActual = 'usuarios';
+    this.usuarios = [];
+    this.cargando = true;
     this.mostrarFormNuevo = false;
     this.cdr.detectChanges();
     this.cargarDatosUsuarios();
   }
 
   volverAHome(): void {
-    this.vistaActual        = 'home';
-    this.mostrarFormNuevo   = false;
+    this.vistaActual = 'home';
+    this.mostrarFormNuevo = false;
     this.editandoPasswordId = null;
-    this.editandoUsuarioId  = null;
-    this.cargando           = false;
+    this.editandoUsuarioId = null;
+    this.cargando = false;
   }
 
   logout(): void { this.authService.logout(); this.router.navigate(['/login']); }
 
-  irANacimiento(event: MouseEvent)  { event?.stopImmediatePropagation(); this.router.navigate(['/nacimiento']); }
-  irATrabajo(event: MouseEvent)     { event?.stopImmediatePropagation(); this.router.navigate(['/trabajo']); }
-  irAModificacion(event: Event)     { event.stopPropagation(); this.router.navigate(['/modificacion']); }
-  irAActualizarPago(event: Event)   { event.preventDefault(); this.router.navigate(['/actualizar']); }
-  irAImpresiones(event: Event)      { event.preventDefault(); this.router.navigate(['/impresiones']); }
+  irANacimiento(event: MouseEvent) { event?.stopImmediatePropagation(); this.router.navigate(['/nacimiento']); }
+  irATrabajo(event: MouseEvent) { event?.stopImmediatePropagation(); this.router.navigate(['/trabajo']); }
+  irAModificacion(event: Event) { event.stopPropagation(); this.router.navigate(['/modificacion']); }
+  irAActualizarPago(event: Event) { event.preventDefault(); this.router.navigate(['/actualizar']); }
+  irAImpresiones(event: Event) { event.preventDefault(); this.router.navigate(['/impresiones']); }
 
   cargarDatosUsuarios(): void {
     this.cargarUsuarios();
@@ -148,7 +149,7 @@ export class HomeComponent implements OnInit {
       .subscribe({
         next: resp => {
           this.usuarios = resp?.data ?? [];
-          this.cargarRoles();  
+          this.cargarRoles();
           this.cargando = false;
           this.cdr.detectChanges();
         },
@@ -161,13 +162,12 @@ export class HomeComponent implements OnInit {
   }
 
   cargarRoles(): void {
-    const rolesMap = new Map<number, Rol>();
-    this.usuarios.forEach(u => {
-      if (u.rol && !rolesMap.has(u.rol.id)) {
-        rolesMap.set(u.rol.id, { id: u.rol.id, clave: u.rol.clave, nombre: u.rol.nombre });
-      }
-    });
-    this.roles = Array.from(rolesMap.values());
+    this.roles = [
+      { id: 1, clave: 'OPERADOR_VENTANILLA', nombre: 'Operador de Ventanilla' },
+      { id: 2, clave: 'JEFE_BUSQUEDAS', nombre: 'Jefe de Búsquedas' },
+      { id: 4, clave: 'VALIDADOR', nombre: 'Validador' },
+      { id: 6, clave: 'ADMINISTRADOR', nombre: 'Administrador' },
+    ];
   }
 
   cargarAreas(): void {
@@ -177,18 +177,18 @@ export class HomeComponent implements OnInit {
           this.areas = resp?.data ?? [];
           this.cdr.detectChanges();
         },
-        error: () => {}
+        error: () => { }
       });
   }
 
   abrirFormNuevo(): void {
     this.mostrarFormNuevo = true;
-    this.editandoUsuarioId = null; 
+    this.editandoUsuarioId = null;
     this.nuevoUsuario = {
       username: '', password: '', nombre: '',
       apellido_paterno: '', apellido_materno: '',
       area_id: this.areas[0]?.id ?? 1,
-      rol_id:  this.roles[0]?.id ?? 1,
+      rol_id: this.roles[0]?.id ?? 1,
     };
   }
 
@@ -199,13 +199,29 @@ export class HomeComponent implements OnInit {
     if (!u.username || !u.password || !u.nombre || !u.apellido_paterno) {
       alert('Completa los campos obligatorios'); return;
     }
-    if (u.password.length < 8) { alert('La contraseña debe tener al menos 8 caracteres'); return; }
+    if (u.password.length < 8) {
+      alert('La contraseña debe tener al menos 8 caracteres'); return;
+    }
 
     this.guardandoNuevo = true;
-    this.http.post<any>(`${this.API}/usuarios`, u, { headers: this.headers })
+
+    const body: any = {
+      username: u.username.trim(),
+      password: u.password,
+      nombre: u.nombre.trim(),
+      apellido_paterno: u.apellido_paterno.trim(),
+      area_id: Number(u.area_id),
+      rol_id: Number(u.rol_id),
+    };
+
+    if (u.apellido_materno?.trim()) {
+      body.apellido_materno = u.apellido_materno.trim();
+    }
+
+    this.http.post<any>(`${this.API}/usuarios`, body, { headers: this.headers })
       .subscribe({
         next: resp => {
-          this.guardandoNuevo   = false;
+          this.guardandoNuevo = false;
           this.mostrarFormNuevo = false;
           if (resp?.ok) { this.cargarUsuarios(); }
           else { alert('Error al crear usuario'); }
@@ -222,11 +238,15 @@ export class HomeComponent implements OnInit {
 
   abrirEditPassword(id: number): void {
     this.editandoPasswordId = id;
-    this.nuevaPassword      = '';
-    this.editandoUsuarioId  = null; 
+    this.nuevaPassword = '';
+    this.editandoUsuarioId = null;
   }
 
-  cancelarPassword(): void { this.editandoPasswordId = null; this.nuevaPassword = ''; }
+  cancelarPassword(): void {
+    this.editandoPasswordId = null;
+    this.nuevaPassword = '';
+    this.mostrarPassword = false; // ← agregar esto
+  }
 
   guardarPassword(id: number): void {
     if (!this.nuevaPassword || this.nuevaPassword.length < 8) {
@@ -239,9 +259,9 @@ export class HomeComponent implements OnInit {
       { headers: this.headers }
     ).subscribe({
       next: () => {
-        this.guardandoPassword  = false;
+        this.guardandoPassword = false;
         this.editandoPasswordId = null;
-        this.nuevaPassword      = '';
+        this.nuevaPassword = '';
         alert('Contraseña actualizada');
       },
       error: err => {
@@ -252,18 +272,18 @@ export class HomeComponent implements OnInit {
   }
 
   abrirEditUsuario(usuario: Usuario): void {
-    this.editandoUsuarioId  = usuario.id;
-    this.usuarioEditando    = usuario;
-    this.editandoPasswordId = null; 
+    this.editandoUsuarioId = usuario.id;
+    this.usuarioEditando = usuario;
+    this.editandoPasswordId = null;
     this.editForm = {
-      rol_id:  usuario.rol_id,
+      rol_id: usuario.rol_id,
       area_id: usuario.area_id,
     };
   }
 
   cancelarEditUsuario(): void {
     this.editandoUsuarioId = null;
-    this.usuarioEditando   = null;
+    this.usuarioEditando = null;
   }
 
   guardarEditUsuario(usuario: Usuario): void {
@@ -271,20 +291,23 @@ export class HomeComponent implements OnInit {
       alert('Selecciona rol y área'); return;
     }
     this.guardandoEdicion = true;
-    const body = {
-      nombre:           usuario.nombre,
+    const body: any = {
+      nombre: usuario.nombre,
       apellido_paterno: usuario.apellido_paterno,
-      apellido_materno: usuario.apellido_materno ?? undefined,
-      area_id:          this.editForm.area_id,
-      rol_id:           this.editForm.rol_id,
+      area_id: Number(this.editForm.area_id),
+      rol_id: Number(this.editForm.rol_id),
     };
+    if (usuario.apellido_materno?.trim()) {
+      body.apellido_materno = usuario.apellido_materno.trim();
+    }
+
     this.http.put<any>(
       `${this.API}/usuarios/${usuario.id}`,
       body,
       { headers: this.headers }
     ).subscribe({
       next: resp => {
-        this.guardandoEdicion  = false;
+        this.guardandoEdicion = false;
         this.editandoUsuarioId = null;
         if (resp?.ok) { this.cargarUsuarios(); }
         else { alert('Error al actualizar usuario'); }
