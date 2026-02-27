@@ -69,8 +69,8 @@ export class HomeComponent implements OnInit {
 
   private readonly API = '/api/v1';
 
-  isLoggedIn  = false;
-  esAdmin     = false;
+  isLoggedIn      = false;
+  esAdmin         = false;
   mostrarPassword = false;
   vistaActual: 'home' | 'usuarios' = 'home';
 
@@ -84,9 +84,9 @@ export class HomeComponent implements OnInit {
     apellido_paterno: '', apellido_materno: '',
     area_id: 1, rol_id: 1,
   };
-  guardandoNuevo = false;
+  guardandoNuevo    = false;
   editandoPasswordId: number | null = null;
-  nuevaPassword = '';
+  nuevaPassword     = '';
   guardandoPassword = false;
   editandoUsuarioId: number | null = null;
   usuarioEditando:   Usuario | null = null;
@@ -112,6 +112,7 @@ export class HomeComponent implements OnInit {
     if (!this.isLoggedIn) { this.router.navigate(['/login']); return; }
     const rol = this.authService.getRolClave().toUpperCase();
     this.esAdmin = rol.includes('ADMIN');
+    this.cargarRoles(); 
   }
 
   irAGestionUsuarios(): void {
@@ -137,6 +138,7 @@ export class HomeComponent implements OnInit {
   irATrabajo(event: MouseEvent)     { event?.stopImmediatePropagation(); this.router.navigate(['/trabajo']); }
   irAModificacion(event: Event)     { event.stopPropagation(); this.router.navigate(['/modificacion']); }
   irAActualizarPago(event: Event)   { event.preventDefault(); this.router.navigate(['/actualizar']); }
+
   irAImpresiones(event: Event): void {
     event.preventDefault();
     this.dialog.open(ImpresionesComponent, {
@@ -145,8 +147,7 @@ export class HomeComponent implements OnInit {
       disableClose: false,
       panelClass: 'impresiones-panel',
     }).afterClosed().subscribe(result => {
-      if (result?.accion === 'ligar') {
-      }
+      if (result?.accion === 'ligar') {}
     });
   }
 
@@ -159,29 +160,33 @@ export class HomeComponent implements OnInit {
       panelClass: 'cancelacion-panel',
     }).afterClosed().subscribe(result => {
       if (result?.accion === 'cancelado') {
-        console.log('[home] folio cancelado:', result.folio);
+        const mensajes: Record<string, string> = {
+          PERDIDA:  `Hoja valorada anulada correctamente`,
+          LIBERAR:  `Hoja valorada liberada correctamente`,
+          CANCELAR: `Hoja valorada cancelada correctamente`,
+        };
+        alert(mensajes[result.tipo] ?? 'Operación completada');
       }
     });
   }
 
   cargarDatosUsuarios(): void {
     this.cargarUsuarios();
+    this.cargarRoles();
     this.cargarAreas();
   }
 
   cargarUsuarios(): void {
     this.cargando = true;
     this.cdr.detectChanges();
-
     this.http.get<any>(`${this.API}/usuarios?limit=100`, { headers: this.headers })
       .subscribe({
         next: resp => {
           this.usuarios = resp?.data ?? [];
-          this.cargarRoles();
           this.cargando = false;
           this.cdr.detectChanges();
         },
-        error: (err) => {
+        error: err => {
           console.error('[home] cargarUsuarios ERROR:', err?.status, err?.error);
           this.cargando = false;
           this.cdr.detectChanges();
@@ -190,12 +195,14 @@ export class HomeComponent implements OnInit {
   }
 
   cargarRoles(): void {
-    this.roles = [
-      { id: 1, clave: 'OPERADOR_VENTANILLA', nombre: 'Operador de Ventanilla' },
-      { id: 2, clave: 'JEFE_BUSQUEDAS',      nombre: 'Jefe de Búsquedas'      },
-      { id: 4, clave: 'VALIDADOR',           nombre: 'Validador'              },
-      { id: 6, clave: 'ADMINISTRADOR',       nombre: 'Administrador'          },
-    ];
+    this.http.get<any>(`${this.API}/catalogos/roles`, { headers: this.headers })
+      .subscribe({
+        next: resp => {
+          this.roles = resp?.data ?? [];
+          this.cdr.detectChanges();
+        },
+        error: () => {}
+      });
   }
 
   cargarAreas(): void {
@@ -210,7 +217,7 @@ export class HomeComponent implements OnInit {
   }
 
   abrirFormNuevo(): void {
-    this.mostrarFormNuevo = true;
+    this.mostrarFormNuevo  = true;
     this.editandoUsuarioId = null;
     this.nuevoUsuario = {
       username: '', password: '', nombre: '',
@@ -240,7 +247,6 @@ export class HomeComponent implements OnInit {
       area_id:          Number(u.area_id),
       rol_id:           Number(u.rol_id),
     };
-
     if (u.apellido_materno?.trim()) {
       body.apellido_materno = u.apellido_materno.trim();
     }
@@ -269,7 +275,11 @@ export class HomeComponent implements OnInit {
     this.editandoUsuarioId  = null;
   }
 
-  cancelarPassword(): void { this.editandoPasswordId = null; this.nuevaPassword = ''; }
+  cancelarPassword(): void {
+    this.editandoPasswordId = null;
+    this.nuevaPassword      = '';
+    this.mostrarPassword    = false;
+  }
 
   guardarPassword(id: number): void {
     if (!this.nuevaPassword || this.nuevaPassword.length < 8) {
@@ -317,8 +327,8 @@ export class HomeComponent implements OnInit {
     const body: any = {
       nombre:           usuario.nombre,
       apellido_paterno: usuario.apellido_paterno,
-      area_id:          Number(this.editForm.area_id), 
-      rol_id:           Number(this.editForm.rol_id),  
+      area_id:          Number(this.editForm.area_id),
+      rol_id:           Number(this.editForm.rol_id),
     };
     if (usuario.apellido_materno?.trim()) {
       body.apellido_materno = usuario.apellido_materno.trim();
@@ -345,7 +355,6 @@ export class HomeComponent implements OnInit {
   toggleActivo(usuario: Usuario): void {
     const accion = usuario.activo ? 'desactivar' : 'activar';
     if (!confirm(`¿Seguro que deseas ${accion} a ${usuario.nombre}?`)) return;
-
     this.http.patch<any>(
       `${this.API}/usuarios/${usuario.id}/toggle-activo`,
       {},

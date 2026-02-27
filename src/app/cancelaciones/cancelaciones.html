@@ -20,7 +20,6 @@
           <mat-icon>search</mat-icon>
           {{ buscando ? 'Buscando...' : 'Buscar' }}
         </button>
-        <button class="btn-mock" (click)="cargarMock()">🧪 Mock</button>
       </div>
 
       <div class="info-chips" *ngIf="solicitud">
@@ -128,7 +127,7 @@
           <input type="radio" name="tipoCancelacion" value="PERDIDA" [(ngModel)]="tipoCancelacion" />
           <div class="radio-content">
             <span class="radio-titulo">Hoja Valorada Perdida — Necesita Reimpresión</span>
-            <span class="radio-desc">La hoja valorada se echó a perder. El folio necesita imprimirse en una hoja valorada
+            <span class="radio-desc">La hoja valorada se hizo perder. El folio necesita imprimirse en una hoja valorada
               nueva (se cancela la hoja valorada).</span>
           </div>
         </label>

@@ -1,6 +1,6 @@
 {
   "/api": {
-    "target": "https://uncarolled-kaylene-unplentiful.ngrok-free.dev/",
+    "target": "https://uncarolled-kaylene-unplentiful.ngrok-free.dev",
     "secure": false,
     "changeOrigin": true,
     "logLevel": "debug",
