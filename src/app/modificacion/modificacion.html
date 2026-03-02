@@ -1,167 +1,163 @@
-<div class="page-container">
-  <div class="page-header">
-    <div class="page-title-row">
-      <mat-icon>edit</mat-icon>
-      <h2 class="page-title">Modificación de Solicitudes</h2>
+<div class="page">
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="page-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Modificación de Solicitudes</h1>
+        <p>Busca un folio y modifica los datos de la solicitud</p>
+      </div>
     </div>
     <div class="header-actions">
-      <button class="btn-limpiar" (click)="limpiarRegistro()" matTooltip="Limpiar registro">
-        <mat-icon>cleaning_services</mat-icon>
+      <button class="btn-clear" (click)="limpiarRegistro()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+        </svg>
         Limpiar
       </button>
-      <button class="btn-volver" (click)="goHome()">
-        <mat-icon>arrow_back</mat-icon>
+      <button class="back-btn" (click)="goHome()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 12H5M12 5l-7 7 7 7"/>
+        </svg>
         Volver
       </button>
     </div>
-  </div>
+  </header>
 
   <div [formGroup]="formulario">
-    <div class="search-card">
-      <div class="search-fields">
+    <div class="card search-card">
+      <div class="card-header">
+        <div class="card-icon search-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+          </svg>
+        </div>
+        <span>Búsqueda</span>
+      </div>
+      <div class="card-body search-body">
 
-        <mat-form-field appearance="outline" class="search-field">
-          <mat-label>Folio</mat-label>
-          <input matInput formControlName="folio" />
-        </mat-form-field>
+        <div class="field">
+          <label>Folio</label>
+          <input formControlName="folio" placeholder="RC-YYYYMMDD-0000" />
+        </div>
 
-        <button class="btn-buscar" (click)="buscarSolicitud()">
-          <mat-icon>search</mat-icon>
+        <button class="btn-search" (click)="buscarSolicitud()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+          </svg>
           Buscar
         </button>
 
-        <mat-form-field appearance="outline" class="search-field select-field">
-          <mat-label>Seleccione una opción</mat-label>
-          <mat-select formControlName="estadoSeleccionado">
-            <mat-option *ngFor="let op of opcionesEstado" [value]="op.value">
-              {{ op.label }}
-            </mat-option>
-          </mat-select>
-          <mat-hint *ngIf="opcionesEstado.length === 0" style="color:#c62828">
-            Sin opciones para tu rol
-          </mat-hint>
-        </mat-form-field>
+        <div class="field field--grow">
+          <label>Cambiar Estado</label>
+          <select formControlName="estadoSeleccionado">
+            <option value="">Seleccione una opción</option>
+            <option *ngFor="let op of opcionesEstado" [value]="op.value">{{ op.label }}</option>
+          </select>
+          <span class="hint-error" *ngIf="opcionesEstado.length === 0">Sin opciones para tu rol</span>
+        </div>
 
-        <button class="btn-reimprimir" (click)="reImprimir()">
-          <mat-icon>print</mat-icon>
+        <button class="btn-reprint" (click)="reImprimir()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6v-8z"/>
+          </svg>
           Re-imprimir
         </button>
 
       </div>
     </div>
 
-    <div class="seccion-card">
-      <div class="seccion-titulo">
-        <mat-icon>description</mat-icon>
-        Datos del Acta
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon acta-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+          </svg>
+        </div>
+        <span>Datos del Acta</span>
       </div>
-      <div class="form-grid-4">
-        <div class="form-campo">
-          <label>Servicio</label>
-          <input formControlName="servicio" readonly class="campo-input readonly" />
-        </div>
-        <div class="form-campo">
-          <label>Tipo de Acta</label>
-          <input formControlName="tipoActa" readonly class="campo-input readonly" />
-        </div>
-        <div class="form-campo">
-          <label>Año</label>
-          <input formControlName="anio" class="campo-input" />
-        </div>
-        <div class="form-campo">
-          <label>Años de Búsqueda</label>
-          <input formControlName="aniosBusqueda" readonly class="campo-input readonly" />
-        </div>
-        <div class="form-campo">
-          <label>Rango de Búsqueda</label>
-          <input formControlName="rangoBusqueda" readonly class="campo-input readonly" />
-        </div>
-        <div class="form-campo">
-          <label>Fecha de Registro</label>
-          <input type="date" formControlName="fechaRegistro" class="campo-input" />
-        </div>
-      </div>
-      <div class="form-grid-3" style="margin-top: 0.75rem">
-        <div class="form-campo">
-          <label>Oficialía</label>
-          <input formControlName="oficialia" class="campo-input" />
-        </div>
-        <div class="form-campo">
-          <label>No. de Acta</label>
-          <input formControlName="noActa" class="campo-input" />
-        </div>
-        <div class="form-campo">
-          <label>No. de Foja</label>
-          <input formControlName="noFoja" class="campo-input" />
+      <div class="card-body">
+        <div class="fields fields--4">
+          <div class="field"><label>Servicio</label><input formControlName="servicio" readonly class="readonly" /></div>
+          <div class="field"><label>Tipo de Acta</label><input formControlName="tipoActa" readonly class="readonly" /></div>
+          <div class="field"><label>Año</label><input formControlName="anio" /></div>
+          <div class="field"><label>Años de Búsqueda</label><input formControlName="aniosBusqueda" readonly class="readonly" /></div>
+          <div class="field"><label>Rango de Búsqueda</label><input formControlName="rangoBusqueda" readonly class="readonly" /></div>
+          <div class="field"><label>Fecha de Registro</label><input type="date" formControlName="fechaRegistro" /></div>
+          <div class="field"><label>Oficialía</label><input formControlName="oficialia" /></div>
+          <div class="field"><label>No. de Acta</label><input formControlName="noActa" /></div>
+          <div class="field fields--span2"><label>No. de Foja</label><input formControlName="noFoja" /></div>
         </div>
       </div>
     </div>
 
-    <div class="seccion-card">
-      <div class="seccion-titulo">
-        <mat-icon>place</mat-icon>
-        Registro
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon reg-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><circle cx="12" cy="11" r="3"/>
+          </svg>
+        </div>
+        <span>Registro</span>
       </div>
-      <div class="form-grid-4">
-        <div class="form-campo">
-          <label>Localidad</label>
-          <input formControlName="localidad" class="campo-input" />
+      <div class="card-body">
+        <div class="fields fields--4">
+          <div class="field"><label>Localidad</label><input formControlName="localidad" /></div>
+          <div class="field"><label>Estado</label><input formControlName="estadoRegistro" /></div>
+          <div class="field"><label>Distrito</label><input formControlName="distrito" /></div>
+          <div class="field"><label>Municipio</label><input formControlName="municipio" /></div>
         </div>
-        <div class="form-campo">
-          <label>Estado</label>
-          <input formControlName="estadoRegistro" class="campo-input" />
-        </div>
-        <div class="form-campo">
-          <label>Distrito</label>
-          <input formControlName="distrito" class="campo-input" />
-        </div>
-        <div class="form-campo">
-          <label>Municipio</label>
-          <input formControlName="municipio" class="campo-input" />
-        </div>
-      </div>
-      <div class="form-campo full-width" style="margin-top: 0.75rem">
-        <label>Nombre(s)</label>
-        <input formControlName="nombres" class="campo-input" />
-      </div>
-    </div>
-
-    <div class="seccion-card">
-      <div class="seccion-titulo">
-        <mat-icon>calendar_today</mat-icon>
-        Fechas
-      </div>
-      <div class="form-grid-3">
-        <div class="form-campo">
-          <label>Fecha Solicitud</label>
-          <input type="date" formControlName="fechaSolicitud" class="campo-input" />
-        </div>
-        <div class="form-campo">
-          <label>Fecha Entrega</label>
-          <input type="date" formControlName="fechaEntrega" class="campo-input" />
-        </div>
-        <div class="form-campo">
-          <label>Fecha Pago</label>
-          <input type="date" formControlName="fechaPago" class="campo-input" />
+        <div class="field field--full" style="margin-top: 0.5rem">
+          <label>Nombre(s)</label>
+          <input formControlName="nombres" />
         </div>
       </div>
     </div>
 
-    <div class="seccion-card">
-      <div class="seccion-titulo">
-        <mat-icon>notes</mat-icon>
-        Observaciones
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon date-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+        </div>
+        <span>Fechas</span>
       </div>
-      <textarea formControlName="observaciones" class="campo-input textarea" rows="4"></textarea>
+      <div class="card-body">
+        <div class="fields fields--3">
+          <div class="field"><label>Fecha Solicitud</label><input type="date" formControlName="fechaSolicitud" /></div>
+          <div class="field"><label>Fecha Entrega</label><input type="date" formControlName="fechaEntrega" /></div>
+          <div class="field"><label>Fecha Pago</label><input type="date" formControlName="fechaPago" /></div>
+        </div>
+      </div>
     </div>
 
-    <div class="acciones-footer">
-      <button class="btn-cancelar" (click)="cancelar()">Cancelar</button>
-      <button class="btn-guardar" (click)="guardarCambios()">
-        <mat-icon>save</mat-icon>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon obs-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+          </svg>
+        </div>
+        <span>Observaciones</span>
+      </div>
+      <div class="card-body">
+        <textarea formControlName="observaciones" rows="4" placeholder="Escriba sus observaciones aquí..."></textarea>
+      </div>
+    </div>
+
+    <footer class="form-footer">
+      <button class="btn-cancel" (click)="cancelar()">Cancelar</button>
+      <button class="btn-save" (click)="guardarCambios()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
+        </svg>
         Guardar Cambios
       </button>
-    </div>
+    </footer>
 
   </div>
 </div>

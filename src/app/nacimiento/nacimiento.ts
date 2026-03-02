@@ -40,41 +40,42 @@ export class NacimientoComponent implements OnInit {
   nacimientoForm: FormGroup;
 
   constructor(
-    private fb:     FormBuilder,
+    private fb: FormBuilder,
     private router: Router,
     private dialog: MatDialog,
-    private http:   HttpClient,
+    private http: HttpClient,
   ) {
     this.nacimientoForm = this.fb.group({
-      entidad:             [''],
-      municipio:           [''],
-      oficialia:           [''],
-      distrito:            [''],
-      fechaRegistro:       [null],
-      anioRegistro:        [''],
-      foja:                [''],
-      numeroActa:          [''],
-      curp:                [''],
-      curp_regciv:         [''],
-      entidadNacimiento:   [''],
+      entidad: [''],
+      municipio: [''],
+      oficialia: [''],
+      distrito: [''],
+      fechaRegistro: [null],
+      anioRegistro: [''],
+      foja: [''],
+      numeroActa: [''],
+      curp: [''],
+      crip: [''],
+      curp_regciv: [''],
+      entidadNacimiento: [''],
       municipioNacimiento: [''],
-      distritoNacimiento:  [''],
-      localidad:           [''],
+      distritoNacimiento: [''],
+      localidad: [''],
       localidadNacimiento: [''],
-      fechaNacimiento:     [''],
-      horaNacimiento:      [''],
-      nombre:              [''],
-      apellidoPaterno:     [''],
-      apellidoMaterno:     [''],
-      sexo:                [''],
-      libro:               [''],
-      status:              [''],
-      nombrePadre:         [''],
-      edadPadre:           [''],
-      nacionalidadPadre:   [''],
-      nombreMadre:         [''],
-      edadMadre:           [''],
-      nacionalidadMadre:   [''],
+      fechaNacimiento: [''],
+      horaNacimiento: [''],
+      nombre: [''],
+      apellidoPaterno: [''],
+      apellidoMaterno: [''],
+      sexo: [''],
+      libro: [''],
+      status: [''],
+      nombrePadre: [''],
+      edadPadre: [''],
+      nacionalidadPadre: [''],
+      nombreMadre: [''],
+      edadMadre: [''],
+      nacionalidadMadre: [''],
     });
 
     this.nacimientoForm.get('fechaRegistro')?.valueChanges.subscribe((fecha: Date) => {
@@ -87,11 +88,19 @@ export class NacimientoComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   mostrarNombre(m: any): string {
     return m ? (typeof m === 'string' ? m : m.nombre) : '';
   }
+
+  errores: { campo: string; mensaje: string }[] = [];
+  anotaciones: { tipo: string; descripcion: string }[] = [{ tipo: 'Nacimiento', descripcion: 'Por resolución administrativa de fecha 15 de marzo de 2026, se rectifica el apellido materno donde dice “Gonzáles” para quedar como “González”.Se expide la presente para constancia legal.' },];
+  erroresExpanded = false;
+  anotacionesExpanded = false;
+
+  toggleErrores(): void { this.erroresExpanded = !this.erroresExpanded; }
+  toggleAnotaciones(): void { this.anotacionesExpanded = !this.anotacionesExpanded; }
 
   goHome(): void {
     this.router.navigate(['/home']);
@@ -103,12 +112,12 @@ export class NacimientoComponent implements OnInit {
 
   buscarActa(): void {
     const dialogRef = this.dialog.open(ActaDetalleComponent, {
-      width:        '95vw',
-      height:       '90vh',
-      maxWidth:     '1400px',
-      panelClass:   'acta-detalle-dialog',
+      width: '95vw',
+      height: '90vh',
+      maxWidth: '1400px',
+      panelClass: 'acta-detalle-dialog',
       disableClose: false,
-      autoFocus:    true,
+      autoFocus: true,
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -118,31 +127,39 @@ export class NacimientoComponent implements OnInit {
 
   rellenarFormulario(datos: any): void {
     this.nacimientoForm.patchValue({
-      entidad:             datos.entidad,
-      municipio:           datos.municipio,
-      oficialia:           datos.oficialia,
-      distrito:            datos.distrito,
-      fechaRegistro:       datos.fechaRegistro ? new Date(datos.fechaRegistro) : null,
-      anioRegistro:        datos.anioRegistro,
-      foja:                datos.foja,
-      numeroActa:          datos.numeroActa,
-      curp:                datos.curp,
-      entidadNacimiento:   datos.entidadNacimiento,
+      entidad: datos.entidad,
+      municipio: datos.municipio,
+      oficialia: datos.oficialia,
+      distrito: datos.distrito,
+      fechaRegistro: datos.fechaRegistro ? new Date(datos.fechaRegistro) : null,
+      anioRegistro: datos.anioRegistro,
+      foja: datos.foja,
+      numeroActa: datos.numeroActa,
+      curp: datos.curp,
+      curp_regciv: datos.curp_regciv,
+      crip: datos.crip,
+      entidadNacimiento: datos.entidadNacimiento,
       municipioNacimiento: datos.municipioNacimiento,
-      distritoNacimiento:  datos.distritoNacimiento,
-      localidad:           datos.localidad,
-      fechaNacimiento:     datos.fechaNacimiento,
-      horaNacimiento:      datos.horaNacimiento,
-      nombre:              datos.nombre,
-      apellidoPaterno:     datos.apellidoPaterno,
-      apellidoMaterno:     datos.apellidoMaterno,
-      sexo:                datos.sexo,
-      libro:               datos.libro,
-      status:              datos.status,
-      nombrePadre:         datos.nombrePadre,
-      edadPadre:           datos.edadPadre,
-      nombreMadre:         datos.nombreMadre,
-      edadMadre:           datos.edadMadre,
+      distritoNacimiento: datos.distritoNacimiento,
+      localidad: datos.localidad,
+      fechaNacimiento: datos.fechaNacimiento,
+      horaNacimiento: datos.horaNacimiento,
+      nombre: datos.nombre,
+      apellidoPaterno: datos.apellidoPaterno,
+      apellidoMaterno: datos.apellidoMaterno,
+      sexo: datos.sexo,
+      libro: datos.libro,
+      status: datos.status,
+      nombrePadre: datos.nombrePadre,
+      nacionalidadPadre: datos.nacionalidadPadre,
+      edadPadre: datos.edadPadre,
+      nombreMadre: datos.nombreMadre,
+      nacionalidadMadre: datos.nacionalidadMadre,
+      edadMadre: datos.edadMadre,
     });
+    this.errores = datos.errores ?? [];
+    this.anotaciones = datos.anotaciones ?? [];
+    this.erroresExpanded = this.errores.length > 0;
+    this.anotacionesExpanded = this.anotaciones.length > 0;
   }
 }

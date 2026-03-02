@@ -1,133 +1,117 @@
-<div class="page-container">
-  <div class="page-header">
-    <div class="page-title-row">
-      <mat-icon>payments</mat-icon>
-      <h2 class="page-title">Consulta de Pago</h2>
+<div class="page">
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="page-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Consulta de Pago</h1>
+        <p>Busca un folio para ver el estado del pago</p>
+      </div>
     </div>
-    <button class="btn-volver" (click)="goHome()">
-      <mat-icon>arrow_back</mat-icon>
+    <button class="back-btn" (click)="goHome()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 5l-7 7 7 7"/>
+      </svg>
       Volver
     </button>
-  </div>
+  </header>
 
-  <div class="search-card">
-    <div class="search-fields">
-      <mat-form-field appearance="outline" class="search-field">
-        <mat-label>Folio</mat-label>
-        <input matInput [(ngModel)]="folioBuscar" (keyup.enter)="buscarFolio()" />
-      </mat-form-field>
-      <button class="btn-buscar" (click)="buscarFolio()" [disabled]="procesando$ | async">
-        <mat-icon>search</mat-icon>
+  <div class="card search-card">
+    <div class="card-header">
+      <div class="card-icon search-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+        </svg>
+      </div>
+      <span>Búsqueda</span>
+    </div>
+    <div class="card-body search-body">
+      <div class="field field--folio">
+        <label>Folio</label>
+        <input [(ngModel)]="folioBuscar" (keyup.enter)="buscarFolio()" placeholder="RC-YYYYMMDD-0000" />
+      </div>
+      <button class="btn-search" (click)="buscarFolio()" [disabled]="procesando$ | async">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+        </svg>
         {{ (procesando$ | async) ? 'Buscando...' : 'Buscar' }}
       </button>
     </div>
   </div>
 
   <ng-container *ngIf="solicitud$ | async as sol">
-
-    <div class="seccion-card">
-      <div class="seccion-titulo">
-        <mat-icon>description</mat-icon>
-        Detalles de la Solicitud
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon det-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+          </svg>
+        </div>
+        <span>Detalles de la Solicitud</span>
       </div>
+      <div class="card-body">
+        <div class="fields fields--3">
 
-      <div class="form-grid-3">
+          <div class="field"><label>Años de Búsqueda</label>
+            <input [value]="sol.aniosBusqueda" readonly class="readonly" /></div>
+          <div class="field"><label>Solicitud</label>
+            <input [value]="sol.solicitud" readonly class="readonly" /></div>
+          <div class="field"><label>Oficialía</label>
+            <input [value]="sol.oficialia" readonly class="readonly" /></div>
+          <div class="field"><label>Número de Acta</label>
+            <input [value]="sol.numeroActa" readonly class="readonly" /></div>
+          <div class="field"><label>Número de Foja</label>
+            <input [value]="sol.numeroFoja" readonly class="readonly" /></div>
+          <div class="field"><label>Fecha de Registro</label>
+            <input type="date" [value]="sol.fechaRegistro | date:'yyyy-MM-dd'" readonly class="readonly" /></div>
+          <div class="field"><label>Lugar de Registro</label>
+            <input [value]="sol.lugarRegistro" readonly class="readonly" /></div>
+          <div class="field"><label>Rango de Búsqueda</label>
+            <input [value]="sol.rangoBusqueda" readonly class="readonly" /></div>
+          <div class="field"><label>Estado Biológico</label>
+            <input [value]="sol.estadoBiologico" readonly class="readonly" /></div>
+          <div class="field"><label>Estado del Acta</label>
+            <input [value]="sol.estadoActa" readonly class="readonly" /></div>
+          <div class="field"><label>Documento Presentado</label>
+            <input [value]="sol.documentoPresentado" readonly class="readonly" /></div>
+          <div class="field"><label>Nombres</label>
+            <input [value]="sol.nombres" readonly class="readonly" /></div>
+          <div class="field"><label>CRIP</label>
+            <input [value]="sol.crip" readonly class="readonly" /></div>
+          <div class="field"><label>Sexo</label>
+            <input [value]="sol.sexo" readonly class="readonly" /></div>
+          <div class="field"><label>Copias Solicitadas</label>
+            <input [value]="sol.copiasSolicitadas" readonly class="readonly" /></div>
+          <div class="field"><label>Fecha de Entrega</label>
+            <input type="datetime-local"
+              [value]="sol.fechaEntregaHora ? (sol.fechaEntregaHora | date:'yyyy-MM-ddTHH:mm') : ''"
+              readonly class="readonly" /></div>
+          <div class="field"><label>Fecha de Solicitud</label>
+            <input type="datetime-local"
+              [value]="sol.fechaSolicitudHora ? (sol.fechaSolicitudHora | date:'yyyy-MM-ddTHH:mm') : ''"
+              readonly class="readonly" /></div>
+          <div class="field"><label>Status</label>
+            <input [value]="sol.status" readonly class="readonly status-input" /></div>
+          <div class="field"><label>Línea de Captura</label>
+            <input [value]="sol.lineaCaptura" readonly class="readonly monospace" /></div>
+          <div class="field"><label>Tipo de Acta</label>
+            <input [value]="sol.tipoActa" readonly class="readonly" /></div>
 
-        <div class="form-campo">
-          <label>Años de Búsqueda</label>
-          <input class="campo-input readonly" [value]="sol.aniosBusqueda" readonly />
         </div>
-        <div class="form-campo">
-          <label>Solicitud</label>
-          <input class="campo-input readonly" [value]="sol.solicitud" readonly />
-        </div>
-        <div class="form-campo">
-          <label>Oficialía</label>
-          <input class="campo-input readonly" [value]="sol.oficialia" readonly />
-        </div>
-        <div class="form-campo">
-          <label>Número de Acta</label>
-          <input class="campo-input readonly" [value]="sol.numeroActa" readonly />
-        </div>
-        <div class="form-campo">
-          <label>Número de Foja</label>
-          <input class="campo-input readonly" [value]="sol.numeroFoja" readonly />
-        </div>
-        <div class="form-campo">
-          <label>Fecha de Registro</label>
-          <input class="campo-input readonly" type="date"
-            [value]="sol.fechaRegistro | date:'yyyy-MM-dd'" readonly />
-        </div>
-        <div class="form-campo">
-          <label>Lugar de Registro</label>
-          <input class="campo-input readonly" [value]="sol.lugarRegistro" readonly />
-        </div>
-        <div class="form-campo">
-          <label>Rango de Búsqueda</label>
-          <input class="campo-input readonly" [value]="sol.rangoBusqueda" readonly />
-        </div>
-        <div class="form-campo">
-          <label>Estado Biológico</label>
-          <input class="campo-input readonly" [value]="sol.estadoBiologico" readonly />
-        </div>
-        <div class="form-campo">
-          <label>Estado del Acta</label>
-          <input class="campo-input readonly" [value]="sol.estadoActa" readonly />
-        </div>
-        <div class="form-campo">
-          <label>Documento Presentado</label>
-          <input class="campo-input readonly" [value]="sol.documentoPresentado" readonly />
-        </div>
-        <div class="form-campo">
-          <label>Nombres</label>
-          <input class="campo-input readonly" [value]="sol.nombres" readonly />
-        </div>
-        <div class="form-campo">
-          <label>CRIP</label>
-          <input class="campo-input readonly" [value]="sol.crip" readonly />
-        </div>
-        <div class="form-campo">
-          <label>Sexo</label>
-          <input class="campo-input readonly" [value]="sol.sexo" readonly />
-        </div>
-        <div class="form-campo">
-          <label>Copias Solicitadas</label>
-          <input class="campo-input readonly" [value]="sol.copiasSolicitadas" readonly />
-        </div>
-        <div class="form-campo">
-          <label>Fecha de Entrega</label>
-          <input class="campo-input readonly" type="datetime-local"
-            [value]="sol.fechaEntregaHora ? (sol.fechaEntregaHora | date:'yyyy-MM-ddTHH:mm') : ''"
-            readonly />
-        </div>
-        <div class="form-campo">
-          <label>Fecha de Solicitud</label>
-          <input class="campo-input readonly" type="datetime-local"
-            [value]="sol.fechaSolicitudHora ? (sol.fechaSolicitudHora | date:'yyyy-MM-ddTHH:mm') : ''"
-            readonly />
-        </div>
-        <div class="form-campo">
-          <label>Status</label>
-          <input class="campo-input readonly" [value]="sol.status" readonly />
-        </div>
-        <div class="form-campo">
-          <label>Línea de Captura</label>
-          <input class="campo-input readonly" [value]="sol.lineaCaptura" readonly />
-        </div>
-        <div class="form-campo">
-          <label>Tipo de Acta</label>
-          <input class="campo-input readonly" [value]="sol.tipoActa" readonly />
-        </div>
-
       </div>
     </div>
 
-    <div class="acciones-footer" *ngIf="sol.status === 'PENDIENTE_PAGO'">
-      <button class="btn-confirmar" [disabled]="procesando$ | async" (click)="confirmarPagoManual()">
-        <mat-icon>payments</mat-icon>
+    <footer class="form-footer" *ngIf="sol.status === 'PENDIENTE_PAGO'">
+      <button class="btn-confirm" [disabled]="procesando$ | async" (click)="confirmarPagoManual()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+        </svg>
         {{ (procesando$ | async) ? 'Procesando...' : 'Confirmar Pago' }}
       </button>
-    </div>
+    </footer>
 
   </ng-container>
 

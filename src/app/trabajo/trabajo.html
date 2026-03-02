@@ -1,112 +1,145 @@
-<div class="page-container">
-  <div class="page-header">
-    <div class="page-title-row">
-      <mat-icon>manage_search</mat-icon>
-      <h2 class="page-title">Búsqueda de Solicitudes</h2>
+<div class="page">
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="page-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      </div>
+      <div>
+        <h1>Búsqueda de Solicitudes</h1>
+        <p>Filtra y localiza solicitudes por estado, fecha o folio</p>
+      </div>
       <span class="count-badge">{{ resultsCount }}</span>
     </div>
-    <button class="btn-volver" (click)="goHome()">
-      <mat-icon>arrow_back</mat-icon>
+    <button class="back-btn" (click)="goHome()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 5l-7 7 7 7" />
+      </svg>
       Volver
     </button>
-  </div>
+  </header>
 
-  <div class="filtros-row">
-    <button *ngFor="let filter of filters"
-      class="filter-chip"
-      [class.active]="currentFilter === filter.value"
+  <div class="filter-row">
+    <button *ngFor="let filter of filters" class="filter-chip" [class.active]="currentFilter === filter.value"
       (click)="setFilter(filter.value)">
       {{ filter.label }}
     </button>
   </div>
 
-  <div class="search-card">
-    <div class="search-fields">
+  <div class="card search-card">
+    <div class="card-header">
+      <div class="card-icon search-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path
+            d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z" />
+        </svg>
+      </div>
+      <span>Criterios de Búsqueda</span>
+    </div>
+    <div class="card-body">
 
-      <mat-form-field appearance="outline" class="search-field">
-        <mat-label>Fecha de recepción</mat-label>
-        <input matInput [matDatepicker]="picker" [(ngModel)]="fechaPago" placeholder="dd/mm/aaaa">
-        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-datepicker #picker></mat-datepicker>
-      </mat-form-field>
+      <div class="search-fields">
 
-      <ng-container *ngIf="!folioHojaBloqueado">
-        <mat-form-field appearance="outline" class="search-field">
-          <mat-label>Folio inicial hoja valorada</mat-label>
-          <input matInput type="number" min="1" [(ngModel)]="folioInput" placeholder="Ej. 1042">
-          <mat-hint>Se bloqueará al presionar Establecer</mat-hint>
-        </mat-form-field>
-        <button class="btn-establecer" (click)="establecerFolioInicial()"
-          matTooltip="Establece el folio inicial. No podrá editarse en esta sesión.">
-          <mat-icon>lock</mat-icon>
-          Establecer
-        </button>
-      </ng-container>
-
-      <div *ngIf="folioHojaBloqueado" class="folio-bloqueado">
-        <mat-icon>lock</mat-icon>
-        <div>
-          <span class="folio-lbl">Siguiente hoja valorada</span>
-          <strong class="folio-num">{{ folioHojaValorada }}</strong>
+        <div class="field">
+          <label>Fecha de Recepción</label>
+          <input type="date" [(ngModel)]="fechaPago" name="fechaPago" />
         </div>
+
+        <ng-container *ngIf="!folioHojaBloqueado">
+          <div class="field">
+            <label>Folio Inicial Hoja Valorada</label>
+            <input type="number" min="1" [(ngModel)]="folioInput" placeholder="Ej. 1042" />
+          </div>
+          <button class="btn-establecer" (click)="establecerFolioInicial()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path
+                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            Establecer
+          </button>
+        </ng-container>
+
+        <div *ngIf="folioHojaBloqueado" class="folio-bloqueado">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path
+              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+          <div>
+            <span class="folio-lbl">Siguiente hoja valorada</span>
+            <strong class="folio-num">{{ folioHojaValorada }}</strong>
+          </div>
+        </div>
+
+        <button class="btn-search" (click)="buscarPagos()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <circle cx="11" cy="11" r="8" />
+            <path d="M21 21l-4.35-4.35" />
+          </svg>
+          Buscar
+        </button>
+
       </div>
 
-      <button class="btn-buscar" (click)="buscarPagos()">
-        <mat-icon>search</mat-icon>
-        Buscar
-      </button>
+      <div class="year-strip">
+        <button *ngFor="let yr of yearRanges" class="year-chip" [class.active]="isYearRangeSelected(yr.range)"
+          (click)="selectYearRange(yr.range)">
+          <span class="yr-range">{{ yr.range }}</span>
+          <span class="yr-count">{{ yr.count }}</span>
+        </button>
+      </div>
 
-    </div>
-
-    <div class="year-strip">
-      <button *ngFor="let yr of yearRanges"
-        class="year-chip"
-        [class.active]="isYearRangeSelected(yr.range)"
-        (click)="selectYearRange(yr.range)">
-        <span class="yr-range">{{ yr.range }}</span>
-        <span class="yr-count">{{ yr.count }}</span>
-      </button>
     </div>
   </div>
 
   <div class="acciones-row" *ngIf="payments.length > 0">
-    <button class="btn-pdf btn-sel" (click)="generarReporteSeleccionados()"
-      [disabled]="selectedCount === 0"
-      matTooltip="PDF de seleccionados">
-      <mat-icon>picture_as_pdf</mat-icon>
+    <button class="btn-pdf btn-sel" (click)="generarReporteSeleccionados()" [disabled]="selectedCount === 0">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path
+          d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+      </svg>
       Seleccionados ({{ selectedCount }})
     </button>
-    <button class="btn-pdf btn-all" (click)="generarReporte()"
-      matTooltip="PDF de todos">
-      <mat-icon>picture_as_pdf</mat-icon>
+    <button class="btn-pdf btn-all" (click)="generarReporte()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path
+          d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+      </svg>
       Todos ({{ payments.length }})
     </button>
   </div>
 
+
   <div class="loading" *ngIf="isLoading">
-    <mat-spinner diameter="32"></mat-spinner>
+    <div class="spinner"></div>
     <span>Buscando registros...</span>
   </div>
 
   <div class="empty" *ngIf="!isLoading && payments.length === 0">
-    {{ selectedYearRange || currentFilter !== 'todos' || fechaPago
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path
+        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+    </svg>
+    <p>{{ selectedYearRange || currentFilter !== 'todos' || fechaPago
       ? 'Sin resultados para los criterios seleccionados'
-      : 'Selecciona un filtro y presiona Buscar' }}
+      : 'Selecciona un filtro y presiona Buscar' }}</p>
   </div>
-
   <div class="lista" *ngIf="!isLoading && payments.length > 0">
-    <div class="solicitud-card"
-      *ngFor="let payment of payments"
-      [class.is-selected]="payment.selected"
-      [class.is-impreso]="payment.impreso"
-      [id]="'payment-' + payment.id">
+    <div class="solicitud-card" *ngFor="let payment of payments" [class.is-selected]="payment.selected"
+      [class.is-impreso]="payment.impreso" [id]="'payment-' + payment.id">
 
       <div class="s-avatar">{{ payment.id[0] }}</div>
+
       <div class="s-info">
         <span class="s-folio">{{ payment.id }}</span>
         <span class="s-concepto">{{ payment.concepto }}</span>
         <span class="s-fecha">
-          <mat-icon>calendar_today</mat-icon>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" />
+            <line x1="16" y1="2" x2="16" y2="6" />
+            <line x1="8" y1="2" x2="8" y2="6" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+          </svg>
           {{ payment.fecha }}
         </span>
       </div>

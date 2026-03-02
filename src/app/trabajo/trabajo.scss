@@ -1,52 +1,80 @@
 @use 'sass:color';
-$red:        #9e2a47;
-$red-light:  #fdf2f6;
-$red-border: #f5c2d0;
-$green:      #2e7d32;
-$green-light:#e8f5e9;
-$amber:      #7a4500;
-$amber-light:#fefce8;
-$blue:       #1565c0;
+
+$red: #9e2a47;
+$red-dark: color.adjust(#9e2a47, $lightness: -8%);
+$red-light: rgba(158, 42, 71, 0.06);
+$navy: #1a3a5c;
+$green: #2e7d32;
+$green-light: #e8f5e9;
+$amber: #7a4500;
+$amber-light: #fefce8;
+$blue: #1565c0;
 $blue-light: #e3f2fd;
-$gray:       #6b7f8f;
-$border:     #e0e0e0;
-$surface:    #ffffff;
-$bg:         #f0f2f5;
-$text:       #1a1a2e;
-$text-sub:   #555;
+$bg: #f0f2f5;
+$surface: #ffffff;
+$border: #e8eaed;
+$text: #1a1a2e;
+$gray: #6b7f8f;
+$tr: all 0.18s ease;
 
-$r: 10px;
-$tr: all 0.15s ease;
-
-:host { display: block; background: $bg; min-height: 100vh; padding: 1.5rem 3rem; }
-
-.page-container {
-  max-width: 1100px;
-  margin: 0 auto;
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
-.page-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1.2rem;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-}
-
-.page-title-row {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-
-  mat-icon { color: $red; font-size: 1.4rem; width: 1.4rem; height: 1.4rem; }
-}
-
-.page-title {
-  margin: 0;
-  font-size: 1.3rem;
-  font-weight: 700;
+:host {
+  display: block;
+  font-family: 'DM Sans', 'Segoe UI', sans-serif;
+  font-size: 14px;
+  background: $bg;
   color: $text;
+  min-height: 100vh;
+  padding: 1.5rem 2.5rem 2rem;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+
+  .topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  h1 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0;
+    color: $text;
+  }
+
+  p {
+    font-size: 0.72rem;
+    color: $gray;
+    margin: 2px 0 0;
+  }
+}
+
+.page-badge {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, $red, color.adjust($red, $lightness: 10%));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 3px 10px rgba(158, 42, 71, 0.28);
+
+  svg {
+    width: 20px;
+    height: 20px;
+    stroke: white;
+  }
 }
 
 .count-badge {
@@ -55,28 +83,38 @@ $tr: all 0.15s ease;
   padding: 0.15rem 0.7rem;
   border-radius: 99px;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
 }
 
-.btn-volver {
+.back-btn {
   display: flex;
   align-items: center;
-  gap: 0.3rem;
-  padding: 0.45rem 1.1rem;
+  gap: 0.4rem;
+  height: 34px;
+  padding: 0 1rem;
   border: 1.5px solid $border;
-  background: $surface;
   border-radius: 99px;
-  color: $text;
-  font-size: 0.82rem;
+  background: $surface;
+  color: $gray;
+  font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
   transition: $tr;
+  font-family: inherit;
 
-  mat-icon { font-size: 16px; width: 16px; height: 16px; }
-  &:hover { border-color: #999; background: #f9f9f9; }
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  &:hover {
+    border-color: $navy;
+    color: $navy;
+    background: rgba(26, 58, 92, 0.05);
+  }
 }
 
-.filtros-row {
+.filter-row {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
@@ -84,104 +122,261 @@ $tr: all 0.15s ease;
 }
 
 .filter-chip {
-  padding: 0.32rem 0.9rem;
+  padding: 0.3rem 0.85rem;
   border-radius: 99px;
   border: 1.5px solid $border;
   background: $surface;
   color: $gray;
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   cursor: pointer;
   transition: $tr;
+  font-family: inherit;
 
-  &:hover { border-color: $red; color: $red; background: $red-light; }
-  &.active { background: $red; color: #fff; border-color: $red; }
+  &:hover {
+    border-color: $red;
+    color: $red;
+    background: $red-light;
+  }
+
+  &.active {
+    background: $red;
+    color: #fff;
+    border-color: $red;
+  }
 }
 
-.search-card {
+.card {
   background: $surface;
   border: 1px solid $border;
-  border-radius: $r;
-  padding: 1.2rem 1.5rem;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
   margin-bottom: 1rem;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  transition: box-shadow 0.2s;
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.09);
+  }
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid $border;
+  background: #fafbfc;
+
+  span {
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: $text;
+  }
+}
+
+.card-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  &.search-icon {
+    background: rgba(26, 58, 92, 0.1);
+
+    svg {
+      stroke: $navy;
+    }
+  }
+}
+
+.card-body {
+  padding: 0.85rem 1rem;
 }
 
 .search-fields {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
-  gap: 0.8rem;
+  gap: 0.75rem;
   margin-bottom: 1rem;
 }
 
-.search-field { flex: 1; min-width: 190px; max-width: 260px; }
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 0 1 220px;
+
+  label {
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: $gray;
+    padding-left: 2px;
+  }
+
+  mat-form-field {
+    width: 100%;
+
+    .mat-mdc-form-field-flex {
+      height: 33px;
+    }
+
+    .mat-mdc-text-field-wrapper {
+      padding: 0 0.65rem;
+    }
+
+    .mat-mdc-form-field-infix {
+      padding: 0;
+      min-height: 33px;
+      display: flex;
+      align-items: center;
+    }
+
+    input {
+      font-size: 0.84rem;
+      font-family: inherit;
+    }
+
+    .mat-mdc-form-field-subscript-wrapper {
+      display: none;
+    }
+  }
+
+  input {
+    height: 33px;
+    padding: 0 0.65rem;
+    font-size: 0.84rem;
+    border: 1.5px solid $border;
+    border-radius: 7px;
+    background: $bg;
+    color: $text;
+    outline: none;
+    width: 100%;
+    font-family: inherit;
+    transition: $tr;
+
+    &::placeholder {
+      color: #b0bec5;
+    }
+
+    &:focus {
+      border-color: $red;
+      background: $surface;
+      box-shadow: 0 0 0 3px rgba(158, 42, 71, 0.08);
+    }
+
+    &:hover:not(:focus) {
+      border-color: #ccc;
+      background: $surface;
+    }
+  }
+}
 
 .btn-establecer {
+  align-self: flex-end;
   display: flex;
   align-items: center;
-  gap: 0.3rem;
-  height: 40px;
-  margin-bottom: 22px;
+  gap: 0.35rem;
+  height: 33px;
   padding: 0 1rem;
   border: 1.5px solid $border;
+  border-radius: 7px;
   background: $surface;
-  border-radius: 8px;
-  color: $text-sub;
+  color: $gray;
   font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
   transition: $tr;
+  font-family: inherit;
+  flex-shrink: 0;
 
-  mat-icon { font-size: 15px; width: 15px; height: 15px; }
-  &:hover { border-color: $red; color: $red; background: $red-light; }
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  &:hover {
+    border-color: $red;
+    color: $red;
+    background: $red-light;
+  }
 }
 
 .folio-bloqueado {
+  align-self: flex-end;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.45rem 0.9rem;
+  height: 33px;
+  padding: 0 0.85rem;
   background: $amber-light;
   border: 1.5px solid #fde68a;
-  border-radius: 8px;
-  margin-bottom: 22px;
+  border-radius: 7px;
+  flex-shrink: 0;
 
-  mat-icon { font-size: 15px; width: 15px; height: 15px; color: $amber; }
-  div { display: flex; flex-direction: column; }
+  svg {
+    width: 14px;
+    height: 14px;
+    stroke: $amber;
+    flex-shrink: 0;
+  }
+
+  div {
+    display: flex;
+    flex-direction: column;
+  }
 }
 
-.folio-lbl  { font-size: 0.63rem; color: $gray; text-transform: uppercase; letter-spacing: 0.05em; }
-.folio-num  { font-size: 0.92rem; font-weight: 800; font-family: monospace; color: color.adjust($amber, $lightness: -5%); }
-
-.btn-buscar {
+.btn-search {
+  align-self: flex-end;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 0.35rem;
-  height: 40px;
-  margin-bottom: 22px;
-  padding: 0 1.3rem;
+  gap: 0.4rem;
+  height: 33px;
+  padding: 0 1.25rem;
   background: $red;
-  color: #fff;
+  color: white;
   border: none;
   border-radius: 99px;
   font-size: 0.82rem;
   font-weight: 700;
   cursor: pointer;
   transition: $tr;
-  box-shadow: 0 3px 10px rgba(158,42,71,0.25);
+  font-family: inherit;
+  box-shadow: 0 3px 10px rgba(158, 42, 71, 0.25);
 
-  mat-icon { font-size: 17px; width: 17px; height: 17px; }
-  &:hover { background: color.adjust($red, $lightness: -8%); }
+  svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  &:hover {
+    background: $red-dark;
+  }
 }
 
 .year-strip {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
-  margin-top: 2.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid $border;
 }
 
 .year-chip {
@@ -195,17 +390,41 @@ $tr: all 0.15s ease;
   cursor: pointer;
   transition: $tr;
   flex: 1;
-  min-width: 90px;
+  min-width: 80px;
+  font-family: inherit;
 
-  &:hover { border-color: $red; background: $red-light; }
-  &.active { background: $red; border-color: $red;
-    .yr-range, .yr-count { color: #fff; }
-    .yr-count { color: rgba(255,255,255,0.6); }
+  &:hover {
+    border-color: $red;
+    background: $red-light;
+  }
+
+  &.active {
+    background: $red;
+    border-color: $red;
+
+    .yr-range,
+    .yr-count {
+      color: #fff;
+    }
+
+    .yr-count {
+      color: rgba(255, 255, 255, 0.65);
+    }
   }
 }
 
-.yr-range { font-size: 0.68rem; font-weight: 800; color: $text; }
-.yr-count { font-size: 0.6rem; font-weight: 600; color: $gray; margin-top: 1px; }
+.yr-range {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: $text;
+}
+
+.yr-count {
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: $gray;
+  margin-top: 1px;
+}
 
 .acciones-row {
   display: flex;
@@ -218,43 +437,95 @@ $tr: all 0.15s ease;
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.4rem 1rem;
+  height: 32px;
+  padding: 0 1rem;
   border: none;
   border-radius: 8px;
   font-size: 0.75rem;
   font-weight: 700;
   cursor: pointer;
   transition: $tr;
+  font-family: inherit;
   color: #fff;
 
-  mat-icon { font-size: 15px; width: 15px; height: 15px; }
-  &:disabled { opacity: 0.4; cursor: not-allowed; }
-  &:not(:disabled):hover { filter: brightness(1.1); }
+  svg {
+    width: 14px;
+    height: 14px;
+    stroke: white;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  &:not(:disabled):hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+  }
 }
 
-.btn-sel { background: $green; }
-.btn-all { background: color.adjust($green, $lightness: -8%); }
+.btn-sel {
+  background: $green;
+}
+
+.btn-all {
+  background: color.adjust($green, $lightness: -8%);
+}
 
 .loading {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 2rem;
+  padding: 2.5rem;
   color: $gray;
   font-size: 0.88rem;
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 2.5px solid $border;
+  border-top-color: $red;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .empty {
   background: $surface;
   border: 1px solid $border;
-  border-radius: $r;
+  border-radius: 14px;
   padding: 3rem;
   text-align: center;
   color: $gray;
-  font-size: 0.88rem;
+
+  svg {
+    width: 36px;
+    height: 36px;
+    stroke: #ccc;
+    margin-bottom: 0.75rem;
+    display: block;
+    margin-inline: auto;
+  }
+
+  p {
+    font-size: 0.88rem;
+    margin: 0;
+  }
 }
 
-.lista { display: flex; flex-direction: column; gap: 0.6rem; }
+.lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
 
 .solicitud-card {
   display: flex;
@@ -262,17 +533,20 @@ $tr: all 0.15s ease;
   gap: 1rem;
   background: $surface;
   border: 1px solid $border;
-  border-radius: $r;
-  padding: 0.9rem 1.2rem;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  border-radius: 12px;
+  padding: 0.85rem 1.1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   transition: $tr;
 
-  &:hover { box-shadow: 0 3px 12px rgba(0,0,0,0.09); transform: translateY(-1px); }
+  &:hover {
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.09);
+    transform: translateY(-1px);
+  }
 
   &.is-selected {
     border-color: $red;
     background: $red-light;
-    box-shadow: 0 0 0 3px rgba(158,42,71,0.08);
+    box-shadow: 0 0 0 3px rgba(158, 42, 71, 0.08);
   }
 
   &.is-impreso {
@@ -282,10 +556,10 @@ $tr: all 0.15s ease;
 }
 
 .s-avatar {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: $red;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, $red, color.adjust($red, $lightness: 12%));
   color: #fff;
   display: flex;
   align-items: center;
@@ -293,6 +567,7 @@ $tr: all 0.15s ease;
   font-weight: 800;
   font-size: 1rem;
   flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(158, 42, 71, 0.25);
 }
 
 .s-info {
@@ -305,7 +580,7 @@ $tr: all 0.15s ease;
 
 .s-folio {
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   color: $text;
   font-family: monospace;
   letter-spacing: 0.03em;
@@ -313,7 +588,7 @@ $tr: all 0.15s ease;
 
 .s-concepto {
   font-size: 0.78rem;
-  color: $text-sub;
+  color: $gray;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -322,11 +597,15 @@ $tr: all 0.15s ease;
 .s-fecha {
   display: flex;
   align-items: center;
-  gap: 3px;
-  font-size: 0.72rem;
+  gap: 4px;
+  font-size: 0.7rem;
   color: $gray;
 
-  mat-icon { font-size: 12px; width: 12px; height: 12px; }
+  svg {
+    width: 11px;
+    height: 11px;
+    flex-shrink: 0;
+  }
 }
 
 .s-chips {
@@ -338,43 +617,94 @@ $tr: all 0.15s ease;
 }
 
 .estado-chip {
-  font-size: 0.65rem;
+  font-size: 0.62rem;
   font-weight: 800;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  padding: 0.22rem 0.75rem;
+  padding: 0.2rem 0.7rem;
   border-radius: 99px;
   border: 1px solid $border;
   background: $bg;
   color: $gray;
 
-  &.estado-ENTREGADA            { background: $green-light; color: $green;  border-color: #a5d6a7; }
-  &.estado-PENDIENTE_ASIGNACION { background: $amber-light; color: $amber;  border-color: #fde68a; }
-  &.estado-EN_BUSQUEDA          { background: $blue-light;  color: $blue;   border-color: #90caf9; }
-  &.estado-ASIGNADA             { background: $blue-light;  color: $blue;   border-color: #90caf9; }
-  &.estado-NO_ENCONTRADA        { background: $red-light;   color: $red;    border-color: $red-border; }
+  &.estado-ENTREGADA {
+    background: $green-light;
+    color: $green;
+    border-color: #a5d6a7;
+  }
+
+  &.estado-PENDIENTE_ASIGNACION {
+    background: $amber-light;
+    color: $amber;
+    border-color: #fde68a;
+  }
+
+  &.estado-EN_BUSQUEDA {
+    background: $blue-light;
+    color: $blue;
+    border-color: #90caf9;
+  }
+
+  &.estado-ASIGNADA {
+    background: $blue-light;
+    color: $blue;
+    border-color: #90caf9;
+  }
+
+  &.estado-NO_ENCONTRADA {
+    background: $red-light;
+    color: $red;
+    border-color: rgba(158, 42, 71, 0.3);
+  }
+
   &.estado-CANCELADA,
-  &.estado-RECHAZADA            { background: $bg; color: $gray; border-color: $border; }
+  &.estado-RECHAZADA {
+    background: $bg;
+    color: $gray;
+    border-color: $border;
+  }
 }
 
 .hoja-chip {
-  font-size: 0.63rem;
+  font-size: 0.62rem;
   font-weight: 700;
   font-family: monospace;
-  padding: 0.15rem 0.6rem;
+  padding: 0.15rem 0.55rem;
   border-radius: 99px;
   background: $amber-light;
   color: color.adjust($amber, $lightness: -5%);
   border: 1px solid #fde68a;
 }
 
-.s-acciones { flex-shrink: 0; }
+.s-acciones {
+  flex-shrink: 0;
+}
 
 @media (max-width: 640px) {
-  :host { padding: 0.75rem; }
-  .search-fields { flex-direction: column; }
-  .search-field { max-width: 100%; }
-  .btn-establecer, .btn-buscar { width: 100%; justify-content: center; margin-bottom: 0; }
-  .solicitud-card { flex-wrap: wrap; }
-  .s-chips { flex-direction: row; align-items: center; }
+  :host {
+    padding: 0.75rem;
+  }
+
+  .field {
+    max-width: 100%;
+  }
+
+  .search-fields {
+    flex-direction: column;
+  }
+
+  .btn-establecer,
+  .btn-search {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .solicitud-card {
+    flex-wrap: wrap;
+  }
+
+  .s-chips {
+    flex-direction: row;
+    align-items: center;
+  }
 }
