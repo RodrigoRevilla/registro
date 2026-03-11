@@ -1,94 +1,182 @@
 <div class="dashboard-container fade-in">
-  <div class="header">
-    <h2>
-      <mat-icon>account_balance</mat-icon>
-      Sistema de Trámites y Consultas
-    </h2>
-    <div class="header-actions">
-      <button *ngIf="esAdmin && vistaActual === 'home'" mat-stroked-button class="action-button accent"
-        (click)="irAGestionUsuarios()">
-        <mat-icon>manage_accounts</mat-icon>
-        Gestión de Usuarios
-      </button>
-      <button *ngIf="vistaActual === 'usuarios'" mat-stroked-button class="action-button" (click)="volverAHome()">
-        <mat-icon>arrow_back</mat-icon>
-        Volver
-      </button>
+  <header class="header">
+    <div class="header-inner">
+
+      <div class="header-brand">
+        <div class="header-escudo">
+          <img src="/oaxaca.png" alt="Escudo Estado de Oaxaca" />
+        </div>
+        <div class="header-text">
+          <span class="header-supratitle">Gobierno del Estado de Oaxaca</span>
+          <h1>Registro Civil</h1>
+          <span class="header-sub">Sistema de Trámites y Consultas · Uso Interno</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button *ngIf="esAdmin && vistaActual === 'home'" class="header-action-btn" mat-stroked-button
+          (click)="irAGestionUsuarios()">
+          <mat-icon>manage_accounts</mat-icon>
+          Gestión de Usuarios
+        </button>
+        <button *ngIf="vistaActual === 'usuarios'" class="header-action-btn" mat-stroked-button (click)="volverAHome()">
+          <mat-icon>arrow_back</mat-icon>
+          Volver al inicio
+        </button>
+      </div>
+
     </div>
-  </div>
+    <div class="header-rule"></div>
+  </header>
 
   <div class="dashboard-content slide-up" *ngIf="vistaActual === 'home'">
-    <p class="dashboard-subtitle">¿Qué deseas hacer hoy?</p>
+
+    <div class="dashboard-header-row">
+      <p class="dashboard-subtitle">¿Qué deseas hacer hoy?</p>
+      <div class="session-pill">
+        <span class="session-pill__dot"></span>
+        <span>Sesión activa</span>
+      </div>
+    </div>
 
     <div class="cards-grid">
       <mat-card class="service-card">
-        <div class="card-icon">🔍</div>
-        <mat-card-content>
-          <h3>SOFTWARE DE APOYO PARA TRÁMITES Y SERVICIOS</h3>
-          <p>Accede a sistemas especializados para localizar información oficial de manera rápida y segura.</p>
 
-          <div class="action-buttons">
-            <button mat-stroked-button class="action-button primary" [matMenuTriggerFor]="atencionMenu">
-              <mat-icon>groups</mat-icon>
-              Atención al Público
-              <mat-icon>arrow_drop_down</mat-icon>
-            </button>
-
-            <mat-menu #atencionMenu="matMenu">
-              <button mat-menu-item (click)="irANacimiento($event)">
-                <mat-icon>child_care</mat-icon> Nacimientos
-              </button>
-              <button mat-menu-item disabled><mat-icon>favorite</mat-icon> Matrimonio</button>
-              <button mat-menu-item disabled><mat-icon>sentiment_very_dissatisfied</mat-icon> Defunciones</button>
-              <button mat-menu-item disabled><mat-icon>how_to_reg</mat-icon> Reconocimientos</button>
-              <button mat-menu-item disabled><mat-icon>gavel</mat-icon> Divorcios</button>
-              <button mat-menu-item disabled><mat-icon>child_friendly</mat-icon> Adopciones</button>
-              <button mat-menu-item disabled><mat-icon>assignment</mat-icon> Inscripción de</button>
-            </mat-menu>
-
-            <button mat-stroked-button class="action-button accent" [matMenuTriggerFor]="buscadoresMenu">
-              <mat-icon>search</mat-icon>
-              Buscadores
-              <mat-icon>arrow_drop_down</mat-icon>
-            </button>
-
-            <mat-menu #buscadoresMenu="matMenu">
-              <button mat-menu-item (click)="irATrabajo($event)">
-                <mat-icon>work</mat-icon> Trabajo
-              </button>
-              <button mat-menu-item (click)="irAModificacion($event)">
-                <mat-icon>edit</mat-icon> Modificación
-              </button>
-            </mat-menu>
-
-            <button mat-stroked-button class="action-button warn" (click)="irAActualizarPago($event)">
-              <mat-icon>attach_money</mat-icon>
-              Actualizar pago de solicitud
-            </button>
-
-            <button mat-stroked-button class="action-button primary" [matMenuTriggerFor]="certificacionmenu">
-              <mat-icon>print</mat-icon>
-              Certificaciones
-              <mat-icon>arrow_drop_down</mat-icon>
-            </button>
-
-            <mat-menu #certificacionmenu="matMenu">
-              <button mat-menu-item (click)="irAImpresiones($event)">
-                <mat-icon>link</mat-icon> Imprimir
-              </button>
-
-              <button mat-menu-item (click)="irACancelaciones($event)">
-                <mat-icon>block</mat-icon> Cancelar certificaciones
-              </button>
-            </mat-menu>
+        <div class="card-header-strip">
+          <span class="card-header-icon">
+            <mat-icon>terminal</mat-icon>
+          </span>
+          <div class="card-header-text">
+            <h3>Software de Apoyo para Trámites y Servicios</h3>
           </div>
+        </div>
+
+        <mat-card-content>
+
+          <p class="card-desc">Selecciona el módulo correspondiente al trámite que vas a atender.</p>
+
+          <div class="modules-grid">
+            <div class="module-block">
+              <div class="module-label">
+                <mat-icon>groups</mat-icon>
+                Atención al Público
+              </div>
+              <p class="module-desc">Registro de actos del estado civil</p>
+              <button mat-stroked-button class="action-button primary" [matMenuTriggerFor]="atencionMenu">
+                <mat-icon>expand_circle_down</mat-icon>
+                Seleccionar acto
+              </button>
+              <mat-menu #atencionMenu="matMenu" class="rc-menu">
+                <button mat-menu-item (click)="irANacimiento($event)">
+                  <mat-icon>child_care</mat-icon> Nacimientos
+                </button>
+                <button mat-menu-item disabled><mat-icon>favorite</mat-icon> Matrimonio</button>
+                <button mat-menu-item disabled><mat-icon>sentiment_very_dissatisfied</mat-icon> Defunciones</button>
+                <button mat-menu-item disabled><mat-icon>how_to_reg</mat-icon> Reconocimientos</button>
+                <button mat-menu-item disabled><mat-icon>gavel</mat-icon> Divorcios</button>
+                <button mat-menu-item disabled><mat-icon>child_friendly</mat-icon> Adopciones</button>
+                <button mat-menu-item disabled><mat-icon>assignment</mat-icon> Inscripción de Sentencias</button>
+              </mat-menu>
+            </div>
+
+            <div class="module-block">
+              <div class="module-label">
+                <mat-icon>manage_search</mat-icon>
+                Buscadores
+              </div>
+              <p class="module-desc">Consulta y localización de solicitudes</p>
+              <button mat-stroked-button class="action-button accent" [matMenuTriggerFor]="buscadoresMenu">
+                <mat-icon>expand_circle_down</mat-icon>
+                Seleccionar buscador
+              </button>
+              <mat-menu #buscadoresMenu="matMenu" class="rc-menu">
+                <button mat-menu-item (click)="irATrabajo($event)">
+                  <mat-icon>work</mat-icon> Trabajo
+                </button>
+                <button mat-menu-item (click)="irAModificacion($event)">
+                  <mat-icon>edit</mat-icon> Modificación
+                </button>
+              </mat-menu>
+            </div>
+
+            <div class="module-block">
+              <div class="module-label">
+                <mat-icon>payments</mat-icon>
+                Pagos
+              </div>
+              <p class="module-desc">Actualización de pagos pendientes</p>
+              <button mat-stroked-button class="action-button warn" (click)="irAActualizarPago($event)">
+                <mat-icon>attach_money</mat-icon>
+                Actualizar pago
+              </button>
+            </div>
+
+            <div class="module-block">
+              <div class="module-label">
+                <mat-icon>verified</mat-icon>
+                Certificaciones
+              </div>
+              <p class="module-desc">Certificacion/Cancelacion de hojas valoradas</p>
+              <button mat-stroked-button class="action-button teal" [matMenuTriggerFor]="certificacionmenu">
+                <mat-icon>expand_circle_down</mat-icon>
+                Seleccionar acción
+              </button>
+              <mat-menu #certificacionmenu="matMenu" class="rc-menu">
+                <button mat-menu-item (click)="irAImpresiones($event)">
+                  <mat-icon>print</mat-icon> Imprimir
+                </button>
+                <button mat-menu-item (click)="irACancelaciones($event)">
+                  <mat-icon>block</mat-icon> Cancelar certificaciones
+                </button>
+              </mat-menu>
+            </div>
+
+            <div class="module-block">
+              <div class="module-label">
+                <mat-icon>print</mat-icon>
+                Reimpresión
+              </div>
+              <p class="module-desc">Reimpresión de certificaciones emitidas</p>
+              <button mat-stroked-button class="action-button accent" [matMenuTriggerFor]="reimpresionMenu">
+                <mat-icon>expand_circle_down</mat-icon>
+                Seleccionar tipo
+              </button>
+              <mat-menu #reimpresionMenu="matMenu" class="rc-menu">
+                <button mat-menu-item (click)="irAReimpresionSolicitudes($event)">
+                  <mat-icon>description</mat-icon> Solicitudes
+                </button>
+                <button mat-menu-item (click)="irAReimpresionLineaCaptura($event)">
+                  <mat-icon>qr_code</mat-icon> Con línea de captura
+                </button>
+              </mat-menu>
+            </div>
+
+            <div class="module-block">
+              <div class="module-label">
+                <mat-icon>inventory_2</mat-icon>
+                Entrega de Documentos
+              </div>
+              <p class="module-desc">Registro y control de entregas a solicitantes</p>
+              <button mat-stroked-button class="action-button primary" [matMenuTriggerFor]="entregaMenu">
+                <mat-icon>expand_circle_down</mat-icon>
+                Seleccionar acción
+              </button>
+              <mat-menu #entregaMenu="matMenu" class="rc-menu">
+                <button mat-menu-item (click)="irAEntrega($event)">
+                  <mat-icon>task_alt</mat-icon> Búsqueda para entrega de documentos
+                </button>
+              </mat-menu>
+            </div>
+
+          </div>
+
         </mat-card-content>
       </mat-card>
+
     </div>
   </div>
 
   <div class="usuarios-container slide-up" *ngIf="vistaActual === 'usuarios'">
-
     <div class="usuarios-topbar">
       <div class="usuarios-topbar-left">
         <h3 class="usuarios-heading">
@@ -153,13 +241,13 @@
     </div>
 
     <div class="loading-state" *ngIf="cargando">
-      <mat-spinner diameter="40"></mat-spinner>
-      <p>Cargando usuarios...</p>
+      <mat-spinner diameter="36"></mat-spinner>
+      <p>Cargando usuarios…</p>
     </div>
 
     <div class="usuarios-grid" *ngIf="!cargando">
-
       <div class="usuario-row" *ngFor="let u of usuarios" [class.inactivo]="!u.activo">
+
         <div class="urow-identity">
           <div class="urow-avatar" [class.inactivo]="!u.activo">
             {{ u.nombre[0] }}{{ u.apellido_paterno[0] }}
@@ -172,9 +260,7 @@
         </div>
 
         <div class="urow-meta">
-          <span class="badge-rol" [class]="'rol-' + u.rol.clave.toLowerCase()">
-            {{ u.rol.nombre }}
-          </span>
+          <span class="badge-rol" [class]="'rol-' + u.rol.clave.toLowerCase()">{{ u.rol.nombre }}</span>
           <span class="badge-estado" [class.off]="!u.activo">
             <span class="dot"></span>
             {{ u.activo ? 'Activo' : 'Inactivo' }}
@@ -186,11 +272,11 @@
             <input [type]="mostrarPassword ? 'text' : 'password'" [(ngModel)]="nuevaPassword"
               placeholder="Nueva contraseña (mín. 8)" class="inline-input" />
             <button class="icon-btn" (click)="mostrarPassword = !mostrarPassword"
-              [matTooltip]="mostrarPassword ? 'Ocultar contraseña' : 'Ver contraseña'">
+              [matTooltip]="mostrarPassword ? 'Ocultar' : 'Ver'">
               <mat-icon>{{ mostrarPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
             </button>
             <button class="btn-ok" (click)="guardarPassword(u.id)" [disabled]="guardandoPassword">
-              {{ guardandoPassword ? '...' : '✓' }}
+              {{ guardandoPassword ? '…' : '✓' }}
             </button>
             <button class="btn-x" (click)="cancelarPassword()">✕</button>
           </div>
@@ -205,7 +291,7 @@
               <option *ngFor="let a of areas" [value]="a.id">{{ a.nombre }}</option>
             </select>
             <button class="btn-ok" (click)="guardarEditUsuario(usuarioEditando!)" [disabled]="guardandoEdicion">
-              {{ guardandoEdicion ? '...' : '✓' }}
+              {{ guardandoEdicion ? '…' : '✓' }}
             </button>
             <button class="btn-x" (click)="cancelarEditUsuario()">✕</button>
           </div>
@@ -222,8 +308,8 @@
               <mat-icon>{{ u.activo ? 'person_off' : 'person' }}</mat-icon>
             </button>
           </div>
-
         </div>
+
       </div>
 
       <div class="empty-state" *ngIf="usuarios.length === 0">

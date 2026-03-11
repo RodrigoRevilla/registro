@@ -1,0 +1,380 @@
+$ink:        #5a0e22;
+$ink-soft:   #7a1530;
+$gold:       #8b1a3a;
+$cream:      #f7f7f7;
+$cream-dark: #eeeeee;
+$rust:       #c0392b;
+$slate:      #4a4a4a;
+$border:     #d0d0d0;
+$white:      #ffffff;
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+.dialog-wrapper {
+  font-family: 'IBM Plex Sans', sans-serif;
+  background: $cream;
+  width: 760px;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  background: $gold;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      45deg, transparent, transparent 20px,
+      rgba(#ffffff, 0.03) 20px, rgba(#ffffff, 0.03) 21px
+    );
+    pointer-events: none;
+  }
+}
+
+.dialog-title-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: relative;
+}
+
+.dialog-escudo {
+  width: 44px;
+  height: 44px;
+  background: $white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 2px rgba(#ffffff, 0.25), 0 4px 12px rgba(0,0,0,0.25);
+
+  mat-icon { font-size: 20px; width: 20px; height: 20px; color: $gold; }
+}
+
+.dialog-super {
+  font-size: 10px;
+  color: rgba(#ffffff, 0.55);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: 0 0 2px;
+  font-family: 'IBM Plex Sans', sans-serif;
+}
+
+.dialog-title {
+  margin: 0;
+  font-family: 'Playfair Display', serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: $white;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+
+.btn-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: rgba(#ffffff, 0.1);
+  border: 1px solid rgba(#ffffff, 0.25);
+  border-radius: 2px;
+  cursor: pointer;
+  color: rgba(#ffffff, 0.7);
+  font-size: 12px;
+  font-weight: 700;
+  transition: all 0.15s;
+  flex-shrink: 0;
+
+  &:hover { background: rgba($rust, 0.2); border-color: rgba($rust, 0.4); color: #f0a090; }
+}
+
+.gold-rule {
+  height: 3px;
+  background: linear-gradient(90deg, transparent, rgba(#ffffff, 0.4), rgba(#ffffff, 0.7), rgba(#ffffff, 0.4), transparent);
+  flex-shrink: 0;
+}
+
+.dialog-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.search-card {
+  background: $white;
+  border: 1px solid $border;
+  border-radius: 2px;
+  padding: 16px 20px;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, $gold, $ink);
+  }
+}
+
+.search-fields {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+::ng-deep {
+  .dial-field {
+    flex: 1;
+    min-width: 160px;
+
+    .mat-mdc-form-field-subscript-wrapper { display: none !important; }
+    .mat-mdc-form-field-infix {
+      padding-top: 10px !important;
+      padding-bottom: 10px !important;
+      min-height: unset !important;
+    }
+
+    .mdc-notched-outline__leading,
+    .mdc-notched-outline__notch,
+    .mdc-notched-outline__trailing {
+      border-color: $border !important;
+      border-width: 1.5px !important;
+      border-radius: 0 !important;
+    }
+
+    &.mat-focused {
+      .mdc-notched-outline__leading,
+      .mdc-notched-outline__notch,
+      .mdc-notched-outline__trailing { border-color: $gold !important; }
+    }
+
+    .mdc-floating-label, .mat-mdc-floating-label {
+      font-family: 'IBM Plex Sans', sans-serif !important;
+      font-size: 12px !important;
+      color: $slate !important;
+    }
+
+    .mat-mdc-input-element {
+      font-family: 'IBM Plex Sans', sans-serif !important;
+      font-size: 13.5px !important;
+      color: $ink !important;
+      caret-color: $gold;
+    }
+
+    .mdc-text-field { background: $cream !important; border-radius: 0 !important; }
+    &.mat-focused .mdc-text-field { background: $white !important; }
+    .mat-mdc-form-field-focus-overlay { background: transparent !important; }
+  }
+}
+
+.btn-buscar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 42px;
+  padding: 0 20px;
+  background: $gold;
+  color: $white;
+  border: none;
+  border-radius: 2px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-family: 'IBM Plex Sans', sans-serif;
+  transition: all 0.2s;
+  box-shadow: 0 4px 14px rgba($gold, 0.32);
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+  &:hover:not(:disabled) { background: $ink; transform: translateY(-1px); }
+  &:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+}
+
+.form-section {
+  background: $white;
+  border: 1px solid $border;
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, $gold, $ink);
+  }
+}
+
+.section-header {
+  background: rgba($gold, 0.05);
+  border-bottom: 1px solid $border;
+  padding: 10px 20px 10px 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-icon {
+  width: 26px;
+  height: 26px;
+  background: $gold;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  mat-icon { font-size: 12px; width: 12px; height: 12px; color: $white; }
+}
+
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: $ink;
+  margin: 0;
+}
+
+.section-body {
+  padding: 14px 24px 16px;
+}
+
+.fields-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px 12px;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  &--wide  { grid-column: span 2; }
+  &--wide2 { grid-column: span 3; }
+  &--full  { grid-column: span 4; }
+}
+
+.campo-label {
+  font-size: 9px;
+  font-weight: 600;
+  color: $slate;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-family: 'IBM Plex Sans', sans-serif;
+}
+
+.campo-valor {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: $ink;
+  background: $cream-dark;
+  border: 1px solid $border;
+  padding: 5px 9px;
+  min-height: 30px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  display: flex;
+  align-items: center;
+}
+
+.error-msg {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: rgba($rust, 0.07);
+  border: 1px solid rgba($rust, 0.25);
+  border-radius: 2px;
+  font-size: 12px;
+  color: $rust;
+  font-weight: 500;
+  font-family: 'IBM Plex Sans', sans-serif;
+
+  mat-icon { font-size: 15px; width: 15px; height: 15px; flex-shrink: 0; }
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 20px;
+  background: $white;
+  border-top: 1px solid $border;
+  flex-shrink: 0;
+}
+
+.btn-cancelar {
+  height: 36px;
+  padding: 0 20px;
+  border: 1.5px solid $border;
+  background: $white;
+  border-radius: 2px;
+  color: $slate;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-family: 'IBM Plex Sans', sans-serif;
+  transition: all 0.2s;
+
+  &:hover { border-color: $ink; color: $ink; }
+}
+
+.btn-accion {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 20px;
+  background: $gold;
+  color: $white;
+  border: none;
+  border-radius: 2px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-family: 'IBM Plex Sans', sans-serif;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba($gold, 0.3);
+
+  mat-icon { font-size: 15px; width: 15px; height: 15px; }
+  &:hover:not(:disabled) { background: $ink; transform: translateY(-1px); }
+  &:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; transform: none; }
+}
+
+@media (max-width: 640px) {
+  .fields-grid { grid-template-columns: 1fr 1fr; }
+  .campo--wide2, .campo--full { grid-column: span 2; }
+  .search-fields { flex-direction: column; align-items: stretch; }
+  .btn-buscar { width: 100%; justify-content: center; }
+}

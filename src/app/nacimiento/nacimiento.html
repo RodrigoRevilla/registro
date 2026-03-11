@@ -1,83 +1,448 @@
-<div class="page-wrapper">
+<header class="page-header">
+  <div class="header-inner">
 
-  <div class="page-header">
-    <div class="header-left">
-      <span class="header-icon">📄</span>
-      <div>
-        <h1>Consulta de Nacimientos</h1>
-        <span>Ingrese uno o más criterios para localizar un acta</span>
-      </div>
+    <div class="header-escudo">
+      <img src="/oaxaca.png" alt="Registro Civil" />
     </div>
-    <button class="home-btn" (click)="goHome()">
-      ← Volver
-    </button>
+
+    <div class="header-text">
+      <span class="header-supratitle">Gobierno del Estado de Oaxaca</span>
+      <h1>Registro Civil del Estado</h1>
+      <span class="header-sub">Formulario · Acta de Nacimiento</span>
+    </div>
+
+    <div class="header-actions">
+      <button mat-button class="header-action-btn" (click)="goHome()">
+        <mat-icon>arrow_back</mat-icon>
+        Inicio
+      </button>
+    </div>
+
   </div>
+</header>
+<div class="header-rule"></div>
 
-  <form [formGroup]="nacimientoForm" class="form-body">
+<div class="container">
+  <form [formGroup]="nacimientoForm" autocomplete="off">
 
-    <div class="row-top">
-
-      <fieldset class="panel">
-        <legend>Datos del Acta</legend>
-        <div class="field-row"><label>Entidad</label><input formControlName="entidad" placeholder="Ej: Oaxaca" /></div>
-        <div class="field-row"><label>Municipio</label><input formControlName="municipio" /></div>
-        <div class="field-row"><label>Oficialía</label><input formControlName="oficialia" /></div>
-        <div class="field-row"><label>Distrito</label><input formControlName="distrito" /></div>
-        <div class="field-row"><label>Localidad</label><input formControlName="localidad" /></div>
-        <div class="field-row"><label>Fecha reg.</label><input type="date" formControlName="fechaRegistro" /></div>
-        <div class="field-row"><label>Año</label><input type="number" formControlName="anioRegistro" /></div>
-        <div class="field-row"><label>Foja</label><input formControlName="foja" /></div>
-        <div class="field-row"><label>Núm. Acta</label><input formControlName="numeroActa" /></div>
-        <div class="field-row"><label>CURP</label><input formControlName="curp" maxlength="18"
-            style="text-transform:uppercase" /></div>
-        <div class="field-row"><label>CURP Reg.</label><input formControlName="curp_regciv" /></div>
-      </fieldset>
-
-      <fieldset class="panel">
-        <legend>Datos de Nacimiento</legend>
-        <div class="field-row"><label>Entidad nac.</label><input formControlName="entidadNacimiento" /></div>
-        <div class="field-row"><label>Municipio nac.</label><input formControlName="municipioNacimiento" /></div>
-        <div class="field-row"><label>Distrito nac.</label><input formControlName="distritoNacimiento" /></div>
-        <div class="field-row"><label>Localidad nac.</label><input formControlName="localidadNacimiento" /></div>
-        <div class="field-row"><label>Fecha nac.</label><input type="date" formControlName="fechaNacimiento" /></div>
-        <div class="field-row"><label>Hora nac.</label><input type="time" formControlName="horaNacimiento" /></div>
-
-        <div class="panel-divider">Datos de los Padres</div>
-
-        <div class="field-row"><label>Nombre padre</label><input formControlName="nombrePadre" /></div>
-        <div class="field-row"><label>Edad padre</label><input type="number" formControlName="edadPadre" /></div>
-        <div class="field-row"><label>Nombre madre</label><input formControlName="nombreMadre" /></div>
-        <div class="field-row"><label>Edad madre</label><input type="number" formControlName="edadMadre" /></div>
-      </fieldset>
-
-    </div>
-
-    <fieldset class="panel panel-full">
-      <legend>Datos del Registrado</legend>
-      <div class="registrado-grid">
-        <div class="field-row field-row-wide"><label>Nombre(s)</label><input formControlName="nombre" /></div>
-        <div class="field-row field-row-wide"><label>Ap. Paterno</label><input formControlName="apellidoPaterno" />
-        </div>
-        <div class="field-row field-row-wide"><label>Ap. Materno</label><input formControlName="apellidoMaterno" />
-        </div>
-        <div class="field-row field-row-mid">
-          <label>Sexo</label>
-          <select formControlName="sexo">
-            <option value="">—</option>
-            <option value="M">Masculino</option>
-            <option value="F">Femenino</option>
-            <option value="N">No especificado</option>
-          </select>
-        </div>
-        <div class="field-row field-row-mid"><label>Libro</label><input type="number" formControlName="libro" /></div>
-        <div class="field-row field-row-mid"><label>Status</label><input formControlName="status" /></div>
+    <section class="form-section">
+      <div class="section-header">
+        <div class="section-icon"><mat-icon>article</mat-icon></div>
+        <h2 class="section-title">Datos del Acta</h2>
+        <span class="section-num">01 / 04</span>
       </div>
-    </fieldset>
+      <div class="section-body">
 
-    <div class="actions">
-      <button type="button" class="btn-secondary" (click)="limpiarFormulario()">🗑️ Limpiar</button>
-      <button type="button" class="btn-primary" (click)="buscarActa()">🔍 Buscar</button>
+        <div class="fields-grid fields-grid--4">
+
+          <div class="field-wrap">
+            <label class="field-label">Entidad <span class="req">*</span></label>
+            <mat-form-field appearance="outline" class="nac-field">
+              <mat-select formControlName="entidad" panelClass="nac-select-panel"
+                          placeholder="— Seleccionar —">
+                <mat-option value="">— Seleccionar —</mat-option>
+                <mat-option value="Aguascalientes">Aguascalientes</mat-option>
+                <mat-option value="Baja California">Baja California</mat-option>
+                <mat-option value="Baja California Sur">Baja California Sur</mat-option>
+                <mat-option value="Campeche">Campeche</mat-option>
+                <mat-option value="Chiapas">Chiapas</mat-option>
+                <mat-option value="Chihuahua">Chihuahua</mat-option>
+                <mat-option value="Ciudad de México">Ciudad de México</mat-option>
+                <mat-option value="Coahuila">Coahuila</mat-option>
+                <mat-option value="Colima">Colima</mat-option>
+                <mat-option value="Durango">Durango</mat-option>
+                <mat-option value="Guanajuato">Guanajuato</mat-option>
+                <mat-option value="Guerrero">Guerrero</mat-option>
+                <mat-option value="Hidalgo">Hidalgo</mat-option>
+                <mat-option value="Jalisco">Jalisco</mat-option>
+                <mat-option value="México">México</mat-option>
+                <mat-option value="Michoacán">Michoacán</mat-option>
+                <mat-option value="Morelos">Morelos</mat-option>
+                <mat-option value="Nayarit">Nayarit</mat-option>
+                <mat-option value="Nuevo León">Nuevo León</mat-option>
+                <mat-option value="Oaxaca">Oaxaca</mat-option>
+                <mat-option value="Puebla">Puebla</mat-option>
+                <mat-option value="Querétaro">Querétaro</mat-option>
+                <mat-option value="Quintana Roo">Quintana Roo</mat-option>
+                <mat-option value="San Luis Potosí">San Luis Potosí</mat-option>
+                <mat-option value="Sinaloa">Sinaloa</mat-option>
+                <mat-option value="Sonora">Sonora</mat-option>
+                <mat-option value="Tabasco">Tabasco</mat-option>
+                <mat-option value="Tamaulipas">Tamaulipas</mat-option>
+                <mat-option value="Tlaxcala">Tlaxcala</mat-option>
+                <mat-option value="Veracruz">Veracruz</mat-option>
+                <mat-option value="Yucatán">Yucatán</mat-option>
+                <mat-option value="Zacatecas">Zacatecas</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="field-wrap">
+            <label class="field-label">Municipio <span class="req">*</span></label>
+            <mat-form-field appearance="outline" class="nac-field">
+              <input matInput formControlName="municipio">
+            </mat-form-field>
+          </div>
+
+          <div class="field-wrap">
+            <label class="field-label">Oficialía <span class="req">*</span></label>
+            <mat-form-field appearance="outline" class="nac-field">
+              <input matInput formControlName="oficialia" placeholder="Ej. 01">
+            </mat-form-field>
+          </div>
+
+          <div class="field-wrap">
+            <label class="field-label">Distrito</label>
+            <mat-form-field appearance="outline" class="nac-field">
+              <input matInput formControlName="distrito" placeholder="Ej. 03">
+            </mat-form-field>
+          </div>
+
+        </div>
+
+        <div class="fields-grid fields-grid--4 mt">
+
+          <div class="field-wrap span2">
+            <label class="field-label">Localidad</label>
+            <mat-form-field appearance="outline" class="nac-field">
+              <input matInput formControlName="localidad" placeholder="Nombre de la localidad">
+            </mat-form-field>
+          </div>
+
+          <div class="field-wrap">
+            <label class="field-label">Fecha de Registro <span class="req">*</span></label>
+            <mat-form-field appearance="outline" class="nac-field">
+              <input matInput [matDatepicker]="pickerReg" formControlName="fechaRegistro"
+                     name="fecha-registro-acta" autocomplete="off">
+              <mat-datepicker-toggle matIconSuffix [for]="pickerReg"></mat-datepicker-toggle>
+              <mat-datepicker #pickerReg></mat-datepicker>
+            </mat-form-field>
+          </div>
+
+          <div class="field-wrap">
+            <label class="field-label">Año</label>
+            <mat-form-field appearance="outline" class="nac-field">
+              <input matInput formControlName="anioRegistro" placeholder="AAAA"
+                     name="anio-registro-acta" autocomplete="off">
+            </mat-form-field>
+          </div>
+
+        </div>
+
+        <hr class="sub-divider">
+
+        <div class="fields-grid fields-grid--4">
+
+          <div class="field-wrap">
+            <label class="field-label">Foja</label>
+            <mat-form-field appearance="outline" class="nac-field">
+              <input matInput formControlName="foja" placeholder="Número de foja"
+                     name="foja-acta" autocomplete="off">
+            </mat-form-field>
+          </div>
+
+          <div class="field-wrap">
+            <label class="field-label">Número de Acta <span class="req">*</span></label>
+            <mat-form-field appearance="outline" class="nac-field">
+              <input matInput formControlName="numeroActa" placeholder="Ej. 00123">
+            </mat-form-field>
+          </div>
+
+          <div class="field-wrap span2">
+            <label class="field-label">CURP <span class="req">*</span></label>
+            <mat-form-field appearance="outline" class="nac-field curp-field">
+              <input matInput formControlName="curp"
+                     placeholder="XXXX000000XXXXXXXX00"
+                     maxlength="18"
+                     (input)="$any($event.target).value = $any($event.target).value.toUpperCase()">
+            </mat-form-field>
+          </div>
+
+        </div>
+
+        <div class="fields-grid fields-grid--4 mt">
+
+          <div class="field-wrap span2">
+            <label class="field-label">CURP Registro Civil</label>
+            <mat-form-field appearance="outline" class="nac-field curp-field">
+              <input matInput formControlName="curp_regciv"
+                     placeholder="CURP del Registro Civil"
+                     maxlength="18"
+                     (input)="$any($event.target).value = $any($event.target).value.toUpperCase()">
+            </mat-form-field>
+          </div>
+
+          <div class="field-wrap">
+            <label class="field-label">Libro</label>
+            <mat-form-field appearance="outline" class="nac-field">
+              <input matInput formControlName="libro" placeholder="Ej. 01-A">
+            </mat-form-field>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <section class="form-section">
+      <div class="section-header">
+        <div class="section-icon"><mat-icon>local_hospital</mat-icon></div>
+        <h2 class="section-title">Datos de Nacimiento</h2>
+        <span class="section-num">02 / 04</span>
+      </div>
+      <div class="section-body">
+
+        <div class="fields-grid fields-grid--4">
+
+          <div class="field-wrap">
+            <label class="field-label">Entidad de Nacimiento <span class="req">*</span></label>
+            <mat-form-field appearance="outline" class="nac-field">
+              <mat-select formControlName="entidadNacimiento" panelClass="nac-select-panel">
+                <mat-option value="">— Seleccionar —</mat-option>
+                <mat-option value="Aguascalientes">Aguascalientes</mat-option>
+                <mat-option value="Baja California">Baja California</mat-option>
+                <mat-option value="Campeche">Campeche</mat-option>
+                <mat-option value="Chiapas">Chiapas</mat-option>
+                <mat-option value="Chihuahua">Chihuahua</mat-option>
+                <mat-option value="Ciudad de México">Ciudad de México</mat-option>
+                <mat-option value="Coahuila">Coahuila</mat-option>
+                <mat-option value="Colima">Colima</mat-option>
+                <mat-option value="Durango">Durango</mat-option>
+                <mat-option value="Guanajuato">Guanajuato</mat-option>
+                <mat-option value="Guerrero">Guerrero</mat-option>
+                <mat-option value="Hidalgo">Hidalgo</mat-option>
+                <mat-option value="Jalisco">Jalisco</mat-option>
+                <mat-option value="México">México</mat-option>
+                <mat-option value="Michoacán">Michoacán</mat-option>
+                <mat-option value="Morelos">Morelos</mat-option>
+                <mat-option value="Nayarit">Nayarit</mat-option>
+                <mat-option value="Nuevo León">Nuevo León</mat-option>
+                <mat-option value="Oaxaca">Oaxaca</mat-option>
+                <mat-option value="Puebla">Puebla</mat-option>
+                <mat-option value="Querétaro">Querétaro</mat-option>
+                <mat-option value="Quintana Roo">Quintana Roo</mat-option>
+                <mat-option value="San Luis Potosí">San Luis Potosí</mat-option>
+                <mat-option value="Sinaloa">Sinaloa</mat-option>
+                <mat-option value="Sonora">Sonora</mat-option>
+                <mat-option value="Tabasco">Tabasco</mat-option>
+                <mat-option value="Tamaulipas">Tamaulipas</mat-option>
+                <mat-option value="Tlaxcala">Tlaxcala</mat-option>
+                <mat-option value="Veracruz">Veracruz</mat-option>
+                <mat-option value="Yucatán">Yucatán</mat-option>
+                <mat-option value="Zacatecas">Zacatecas</mat-option>
+                <mat-option value="Extranjero">Extranjero</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="field-wrap">
+            <label class="field-label">Municipio de Nacimiento</label>
+            <mat-form-field appearance="outline" class="nac-field">
+              <input matInput formControlName="municipioNacimiento">
+            </mat-form-field>
+          </div>
+
+          <div class="field-wrap">
+            <label class="field-label">Distrito de Nacimiento</label>
+            <mat-form-field appearance="outline" class="nac-field">
+              <input matInput formControlName="distritoNacimiento" placeholder="Ej. 02">
+            </mat-form-field>
+          </div>
+
+          <div class="field-wrap">
+            <label class="field-label">Localidad de Nacimiento</label>
+            <mat-form-field appearance="outline" class="nac-field">
+              <input matInput formControlName="localidadNacimiento" placeholder="Nombre de localidad">
+            </mat-form-field>
+          </div>
+
+        </div>
+
+        <div class="fields-grid fields-grid--4 mt">
+
+          <div class="field-wrap span2">
+            <label class="field-label">Fecha de Nacimiento <span class="req">*</span></label>
+            <mat-form-field appearance="outline" class="nac-field">
+              <input matInput [matDatepicker]="pickerNac" formControlName="fechaNacimiento"
+                     name="fecha-nacimiento-reg" autocomplete="off">
+              <mat-datepicker-toggle matIconSuffix [for]="pickerNac"></mat-datepicker-toggle>
+              <mat-datepicker #pickerNac></mat-datepicker>
+            </mat-form-field>
+          </div>
+
+          <div class="field-wrap">
+            <label class="field-label">Hora de Nacimiento</label>
+            <mat-form-field appearance="outline" class="nac-field">
+              <input matInput type="time" formControlName="horaNacimiento">
+            </mat-form-field>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <section class="form-section">
+      <div class="section-header">
+        <div class="section-icon"><mat-icon>person</mat-icon></div>
+        <h2 class="section-title">Datos del Registrado</h2>
+        <span class="section-num">03 / 04</span>
+      </div>
+      <div class="section-body">
+
+        <div class="fields-grid fields-grid--3">
+
+          <div class="field-wrap">
+            <label class="field-label">Nombre(s) <span class="req">*</span></label>
+            <mat-form-field appearance="outline" class="nac-field">
+              <input matInput formControlName="nombre" placeholder="Nombre(s)">
+            </mat-form-field>
+          </div>
+
+          <div class="field-wrap">
+            <label class="field-label">Apellido Paterno <span class="req">*</span></label>
+            <mat-form-field appearance="outline" class="nac-field">
+              <input matInput formControlName="apellidoPaterno" placeholder="Apellido paterno">
+            </mat-form-field>
+          </div>
+
+          <div class="field-wrap">
+            <label class="field-label">Apellido Materno</label>
+            <mat-form-field appearance="outline" class="nac-field">
+              <input matInput formControlName="apellidoMaterno" placeholder="Apellido materno">
+            </mat-form-field>
+          </div>
+
+        </div>
+
+        <div class="fields-grid fields-grid--2 mt">
+
+          <div class="field-wrap">
+            <label class="field-label">Sexo <span class="req">*</span></label>
+            <div class="sex-row">
+              <button type="button" class="sex-btn"
+                      [class.active]="nacimientoForm.get('sexo')?.value === 'M'"
+                      (click)="nacimientoForm.get('sexo')?.setValue('M')">
+                <mat-icon>male</mat-icon> Masculino
+              </button>
+              <button type="button" class="sex-btn"
+                      [class.active]="nacimientoForm.get('sexo')?.value === 'F'"
+                      (click)="nacimientoForm.get('sexo')?.setValue('F')">
+                <mat-icon>female</mat-icon> Femenino
+              </button>
+              <button type="button" class="sex-btn"
+                      [class.active]="nacimientoForm.get('sexo')?.value === 'X'"
+                      (click)="nacimientoForm.get('sexo')?.setValue('X')">
+                <mat-icon>blur_on</mat-icon> No esp.
+              </button>
+            </div>
+          </div>
+
+          <div class="field-wrap">
+            <label class="field-label">Estatus del Acta</label>
+            <div class="status-row">
+              <button type="button" class="status-btn"
+                      [class.active]="nacimientoForm.get('status')?.value === 'Vigente'"
+                      (click)="nacimientoForm.get('status')?.setValue('Vigente')">
+                <span class="dot"></span> Vigente
+              </button>
+              <button type="button" class="status-btn"
+                      [class.active]="nacimientoForm.get('status')?.value === 'Cancelada'"
+                      (click)="nacimientoForm.get('status')?.setValue('Cancelada')">
+                <span class="dot"></span> Cancelada
+              </button>
+              <button type="button" class="status-btn"
+                      [class.active]="nacimientoForm.get('status')?.value === 'Rectificada'"
+                      (click)="nacimientoForm.get('status')?.setValue('Rectificada')">
+                <span class="dot"></span> Rectificada
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <section class="form-section">
+      <div class="section-header">
+        <div class="section-icon"><mat-icon>group</mat-icon></div>
+        <h2 class="section-title">Datos de los Padres</h2>
+        <span class="section-num">04 / 04</span>
+      </div>
+      <div class="section-body">
+
+        <div class="parents-grid">
+
+          <div class="parent-card">
+            <span class="parent-card-label">Padre</span>
+            <div class="fields-grid fields-grid--2" style="margin-top:10px">
+              <div class="field-wrap span2">
+                <label class="field-label">Nombre Completo</label>
+                <mat-form-field appearance="outline" class="nac-field">
+                  <input matInput formControlName="nombrePadre" placeholder="Nombre(s) y apellidos del padre">
+                </mat-form-field>
+              </div>
+              <div class="field-wrap">
+                <label class="field-label">Edad</label>
+                <mat-form-field appearance="outline" class="nac-field">
+                  <input matInput type="number" formControlName="edadPadre" placeholder="Años" min="0" max="120">
+                </mat-form-field>
+              </div>
+              <div class="field-wrap">
+                <label class="field-label">Nacionalidad</label>
+                <mat-form-field appearance="outline" class="nac-field">
+                  <input matInput formControlName="nacionalidadPadre" placeholder="Ej. Mexicana"
+                         name="nacionalidad-padre" autocomplete="off">
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+
+          <div class="parent-card">
+            <span class="parent-card-label">Madre</span>
+            <div class="fields-grid fields-grid--2" style="margin-top:10px">
+              <div class="field-wrap span2">
+                <label class="field-label">Nombre Completo</label>
+                <mat-form-field appearance="outline" class="nac-field">
+                  <input matInput formControlName="nombreMadre" placeholder="Nombre(s) y apellidos de la madre">
+                </mat-form-field>
+              </div>
+              <div class="field-wrap">
+                <label class="field-label">Edad</label>
+                <mat-form-field appearance="outline" class="nac-field">
+                  <input matInput type="number" formControlName="edadMadre" placeholder="Años" min="0" max="120">
+                </mat-form-field>
+              </div>
+              <div class="field-wrap">
+                <label class="field-label">Nacionalidad</label>
+                <mat-form-field appearance="outline" class="nac-field">
+                  <input matInput formControlName="nacionalidadMadre" placeholder="Ej. Mexicana"
+                         name="nacionalidad-madre" autocomplete="off">
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <div class="action-bar">
+      <button mat-button class="btn-search" type="button" (click)="buscarActa()">
+        <mat-icon>search</mat-icon>
+        Buscar Registro
+      </button>
     </div>
 
   </form>
 </div>
+
+<button mat-button class="btn-clear-fab" type="button" (click)="limpiarFormulario()"
+        title="Limpiar formulario">
+  <mat-icon>delete_sweep</mat-icon>
+  <span class="fab-label">Limpiar</span>
+</button>
+
+<span class="watermark">Registro Civil</span>

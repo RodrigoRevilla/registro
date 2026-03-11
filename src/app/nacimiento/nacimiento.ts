@@ -15,6 +15,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDialog } from '@angular/material/dialog';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { ActaDetalleComponent } from '../acta-detalle/acta-detalle';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-nacimiento',
@@ -31,50 +32,62 @@ import { ActaDetalleComponent } from '../acta-detalle/acta-detalle';
     MatButtonModule,
     MatSelectModule,
     MatExpansionModule,
+    MatIconModule
   ],
   templateUrl: './nacimiento.html',
-  styleUrls: ['./nacimiento.scss']
+  styleUrls: ['./nacimiento.scss'],
+  host: {
+    style: 'display: flex; flex-direction: column; height: 100%; overflow: hidden; min-height: 0;'
+  }
 })
 export class NacimientoComponent implements OnInit {
 
   nacimientoForm: FormGroup;
 
   constructor(
-    private fb:     FormBuilder,
+    private fb: FormBuilder,
     private router: Router,
     private dialog: MatDialog,
-    private http:   HttpClient,
+    private http: HttpClient,
   ) {
     this.nacimientoForm = this.fb.group({
-      entidad:             [''],
-      municipio:           [''],
-      oficialia:           [''],
-      distrito:            [''],
-      fechaRegistro:       [null],
-      anioRegistro:        [''],
-      foja:                [''],
-      numeroActa:          [''],
-      curp:                [''],
-      curp_regciv:         [''],
-      entidadNacimiento:   [''],
+      entidad: [''],
+      municipio: [''],
+      oficialia: [''],
+      distrito: [''],
+      fechaRegistro: [null],
+      anioRegistro: [''],
+      foja: [''],
+      numeroActa: [''],
+      curp: [''],
+      curp_regciv: [''],
+      entidadNacimiento: [''],
       municipioNacimiento: [''],
-      distritoNacimiento:  [''],
-      localidad:           [''],
+      distritoNacimiento: [''],
+      localidad: [''],
       localidadNacimiento: [''],
-      fechaNacimiento:     [''],
-      horaNacimiento:      [''],
-      nombre:              [''],
-      apellidoPaterno:     [''],
-      apellidoMaterno:     [''],
-      sexo:                [''],
-      libro:               [''],
-      status:              [''],
-      nombrePadre:         [''],
-      edadPadre:           [''],
-      nacionalidadPadre:   [''],
-      nombreMadre:         [''],
-      edadMadre:           [''],
-      nacionalidadMadre:   [''],
+      fechaNacimiento: [''],
+      horaNacimiento: [''],
+      nombre: [''],
+      apellidoPaterno: [''],
+      apellidoMaterno: [''],
+      sexo: [''],
+      libro: [''],
+      status: [''],
+      nombrePadre: [''],
+      edadPadre: [''],
+      nacionalidadPadre: [''],
+      nombreMadre: [''],
+      edadMadre: [''],
+      nacionalidadMadre: [''],
+    });
+
+    this.nacimientoForm.get('curp')?.valueChanges.subscribe(val => {
+      if (val) this.nacimientoForm.get('curp')?.setValue(val.toUpperCase(), { emitEvent: false });
+    });
+
+    this.nacimientoForm.get('curp_regciv')?.valueChanges.subscribe(val => {
+      if (val) this.nacimientoForm.get('curp_regciv')?.setValue(val.toUpperCase(), { emitEvent: false });
     });
 
     this.nacimientoForm.get('fechaRegistro')?.valueChanges.subscribe((fecha: Date) => {
@@ -87,7 +100,7 @@ export class NacimientoComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   mostrarNombre(m: any): string {
     return m ? (typeof m === 'string' ? m : m.nombre) : '';
@@ -103,12 +116,12 @@ export class NacimientoComponent implements OnInit {
 
   buscarActa(): void {
     const dialogRef = this.dialog.open(ActaDetalleComponent, {
-      width:        '95vw',
-      height:       '90vh',
-      maxWidth:     '1400px',
-      panelClass:   'acta-detalle-dialog',
+      width: '95vw',
+      height: '90vh',
+      maxWidth: '1400px',
+      panelClass: 'acta-detalle-dialog',
       disableClose: false,
-      autoFocus:    true,
+      autoFocus: true,
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -116,33 +129,37 @@ export class NacimientoComponent implements OnInit {
     });
   }
 
+
+
   rellenarFormulario(datos: any): void {
     this.nacimientoForm.patchValue({
-      entidad:             datos.entidad,
-      municipio:           datos.municipio,
-      oficialia:           datos.oficialia,
-      distrito:            datos.distrito,
-      fechaRegistro:       datos.fechaRegistro ? new Date(datos.fechaRegistro) : null,
-      anioRegistro:        datos.anioRegistro,
-      foja:                datos.foja,
-      numeroActa:          datos.numeroActa,
-      curp:                datos.curp,
-      entidadNacimiento:   datos.entidadNacimiento,
+      entidad: datos.entidad,
+      municipio: datos.municipio,
+      oficialia: datos.oficialia,
+      distrito: datos.distrito,
+      fechaRegistro: datos.fechaRegistro ? new Date(datos.fechaRegistro) : null,
+      anioRegistro: datos.anioRegistro,
+      foja: datos.foja,
+      numeroActa: datos.numeroActa,
+      curp: datos.curp,
+      entidadNacimiento: datos.entidadNacimiento,
       municipioNacimiento: datos.municipioNacimiento,
-      distritoNacimiento:  datos.distritoNacimiento,
-      localidad:           datos.localidad,
-      fechaNacimiento:     datos.fechaNacimiento,
-      horaNacimiento:      datos.horaNacimiento,
-      nombre:              datos.nombre,
-      apellidoPaterno:     datos.apellidoPaterno,
-      apellidoMaterno:     datos.apellidoMaterno,
-      sexo:                datos.sexo,
-      libro:               datos.libro,
-      status:              datos.status,
-      nombrePadre:         datos.nombrePadre,
-      edadPadre:           datos.edadPadre,
-      nombreMadre:         datos.nombreMadre,
-      edadMadre:           datos.edadMadre,
+      distritoNacimiento: datos.distritoNacimiento,
+      localidad: datos.localidad,
+      fechaNacimiento: datos.fechaNacimiento,
+      horaNacimiento: datos.horaNacimiento,
+      nombre: datos.nombre,
+      apellidoPaterno: datos.apellidoPaterno,
+      apellidoMaterno: datos.apellidoMaterno,
+      sexo: datos.sexo,
+      libro: datos.libro,
+      status: datos.status,
+      nombrePadre: datos.nombrePadre,
+      edadPadre: datos.edadPadre,
+      nacionalidadPadre: datos.nacionalidadPadre,
+      nombreMadre: datos.nombreMadre,
+      edadMadre: datos.edadMadre,
+      nacionalidadMadre: datos.nacionalidadMadre,
     });
   }
 }

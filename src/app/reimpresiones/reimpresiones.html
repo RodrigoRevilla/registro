@@ -1,0 +1,237 @@
+<div class="dialog-wrapper">
+  <div class="dialog-header">
+    <div class="dialog-title-row">
+      <div class="dialog-escudo">
+        <mat-icon>description</mat-icon>
+      </div>
+      <div>
+        <p class="dialog-super">Registro Civil del Estado</p>
+        <h2 class="dialog-title">Reimpresión de Solicitudes</h2>
+      </div>
+    </div>
+    <button class="btn-close" (click)="cerrar()">✕</button>
+  </div>
+  <div class="gold-rule"></div>
+
+  <div class="dialog-body">
+    <div class="search-card">
+      <div class="search-fields">
+        <mat-form-field appearance="outline" class="dial-field">
+          <mat-label>Folio</mat-label>
+          <input matInput [(ngModel)]="folio" (keyup.enter)="buscarPorFolio()" />
+        </mat-form-field>
+        <button class="btn-buscar" (click)="buscarPorFolio()" [disabled]="buscando">
+          <mat-icon>search</mat-icon>
+          {{ buscando ? 'Buscando...' : 'Buscar' }}
+        </button>
+      </div>
+      <div class="search-fields" style="margin-top: 10px;">
+        <mat-form-field appearance="outline" class="dial-field">
+          <mat-label>ó el nombre</mat-label>
+          <input matInput [(ngModel)]="nombre" (keyup.enter)="buscarPorNombre()" />
+        </mat-form-field>
+        <button class="btn-buscar" (click)="buscarPorNombre()" [disabled]="buscando">
+          <mat-icon>search</mat-icon>
+          {{ buscando ? 'Buscando...' : 'Buscar' }}
+        </button>
+      </div>
+    </div>
+
+    <ng-container *ngIf="solicitud">
+      <div class="form-section">
+        <div class="section-header">
+          <div class="section-icon"><mat-icon>article</mat-icon></div>
+          <h3 class="section-title">Datos del Acta</h3>
+        </div>
+        <div class="section-body">
+          <div class="fields-grid">
+            <div class="campo">
+              <span class="campo-label">Entidad</span>
+              <span class="campo-valor">{{ solicitud.entidad || '—' }}</span>
+            </div>
+            <div class="campo campo--wide">
+              <span class="campo-label">Municipio</span>
+              <span class="campo-valor">{{ solicitud.municipio || '—' }}</span>
+            </div>
+            <div class="campo">
+              <span class="campo-label">Foja</span>
+              <span class="campo-valor">{{ solicitud.foja || '—' }}</span>
+            </div>
+            <div class="campo">
+              <span class="campo-label">Distrito</span>
+              <span class="campo-valor">{{ solicitud.distrito || '—' }}</span>
+            </div>
+            <div class="campo campo--wide">
+              <span class="campo-label">Oficialía</span>
+              <span class="campo-valor">{{ solicitud.oficialia || '—' }}</span>
+            </div>
+            <div class="campo">
+              <span class="campo-label">Acta</span>
+              <span class="campo-valor">{{ solicitud.acta || '—' }}</span>
+            </div>
+            <div class="campo">
+              <span class="campo-label">Localidad</span>
+              <span class="campo-valor">{{ solicitud.localidad || '—' }}</span>
+            </div>
+            <div class="campo">
+              <span class="campo-label">Fecha</span>
+              <span class="campo-valor">{{ solicitud.fechaActa || '—' }}</span>
+            </div>
+            <div class="campo">
+              <span class="campo-label">Año</span>
+              <span class="campo-valor">{{ solicitud.anio || '—' }}</span>
+            </div>
+            <div class="campo">
+              <span class="campo-label">EnDoc</span>
+              <span class="campo-valor">{{ solicitud.enDoc || '—' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-header">
+          <div class="section-icon"><mat-icon>person</mat-icon></div>
+          <h3 class="section-title">Datos del(os) Registrado(s)</h3>
+        </div>
+        <div class="section-body">
+          <div class="fields-grid">
+            <div class="campo campo--wide2">
+              <span class="campo-label">Nombre(s)</span>
+              <span class="campo-valor">{{ solicitud.nombre || '—' }}</span>
+            </div>
+            <div class="campo campo--wide">
+              <span class="campo-label">CRIP</span>
+              <span class="campo-valor">{{ solicitud.crip || '—' }}</span>
+            </div>
+            <div class="campo">
+              <span class="campo-label">Entidad nac.</span>
+              <span class="campo-valor">{{ solicitud.entidadNac || '—' }}</span>
+            </div>
+            <div class="campo campo--wide">
+              <span class="campo-label">Municipio nac.</span>
+              <span class="campo-valor">{{ solicitud.municipioNac || '—' }}</span>
+            </div>
+            <div class="campo">
+              <span class="campo-label">Distrito nac.</span>
+              <span class="campo-valor">{{ solicitud.distritoNac || '—' }}</span>
+            </div>
+            <div class="campo campo--wide">
+              <span class="campo-label">Localidad nac.</span>
+              <span class="campo-valor">{{ solicitud.localidadNac || '—' }}</span>
+            </div>
+            <div class="campo campo--wide2">
+              <span class="campo-label">Padre</span>
+              <span class="campo-valor">{{ solicitud.padre || '—' }}</span>
+            </div>
+            <div class="campo campo--wide2">
+              <span class="campo-label">Madre</span>
+              <span class="campo-valor">{{ solicitud.madre || '—' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-header">
+          <div class="section-icon"><mat-icon>miscellaneous_services</mat-icon></div>
+          <h3 class="section-title">Servicio</h3>
+        </div>
+        <div class="section-body">
+          <div class="fields-grid">
+            <div class="campo campo--wide2">
+              <span class="campo-label">Servicio</span>
+              <span class="campo-valor">{{ solicitud.servicio || '—' }}</span>
+            </div>
+            <div class="campo campo--wide">
+              <span class="campo-label">Dcto. Presentado</span>
+              <span class="campo-valor">{{ solicitud.dctoPresentado || '—' }}</span>
+            </div>
+            <div class="campo">
+              <span class="campo-label">Tipo Acta</span>
+              <span class="campo-valor">{{ solicitud.tipoActa || '—' }}</span>
+            </div>
+            <div class="campo">
+              <span class="campo-label">Copias Solicitadas</span>
+              <span class="campo-valor">{{ solicitud.copiasSolicitadas || '—' }}</span>
+            </div>
+            <div class="campo">
+              <span class="campo-label">Modalidad</span>
+              <span class="campo-valor">{{ solicitud.modalidad || '—' }}</span>
+            </div>
+            <div class="campo">
+              <span class="campo-label">Años de Búsqueda</span>
+              <span class="campo-valor">{{ solicitud.aniosBusqueda || '—' }}</span>
+            </div>
+            <div class="campo">
+              <span class="campo-label">Rango Búsqueda</span>
+              <span class="campo-valor">{{ solicitud.rangoBusqueda || '—' }}</span>
+            </div>
+            <div class="campo">
+              <span class="campo-label">Fecha Entrega</span>
+              <span class="campo-valor">{{ solicitud.fechaEntrega || '—' }}</span>
+            </div>
+            <div class="campo">
+              <span class="campo-label">Hora Entrega</span>
+              <span class="campo-valor">{{ solicitud.horaEntrega || '—' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-header">
+          <div class="section-icon"><mat-icon>receipt_long</mat-icon></div>
+          <h3 class="section-title">Facturación</h3>
+        </div>
+        <div class="section-body">
+          <div class="fields-grid">
+            <div class="campo campo--wide2">
+              <span class="campo-label">Nombre</span>
+              <span class="campo-valor">{{ solicitud.facturaNombre || '—' }}</span>
+            </div>
+            <div class="campo campo--wide">
+              <span class="campo-label">CFDI</span>
+              <span class="campo-valor">{{ solicitud.cfdi || '—' }}</span>
+            </div>
+            <div class="campo">
+              <span class="campo-label">RFC</span>
+              <span class="campo-valor">{{ solicitud.rfc || '—' }}</span>
+            </div>
+            <div class="campo campo--wide">
+              <span class="campo-label">Régimen</span>
+              <span class="campo-valor">{{ solicitud.regimen || '—' }}</span>
+            </div>
+            <div class="campo campo--wide2">
+              <span class="campo-label">Correo</span>
+              <span class="campo-valor">{{ solicitud.correo || '—' }}</span>
+            </div>
+            <div class="campo">
+              <span class="campo-label">Código Postal</span>
+              <span class="campo-valor">{{ solicitud.codigoPostal || '—' }}</span>
+            </div>
+            <div class="campo campo--full">
+              <span class="campo-label">Observaciones</span>
+              <span class="campo-valor">{{ solicitud.observaciones || '—' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </ng-container>
+    <div class="error-msg" *ngIf="error">
+      <mat-icon>warning_amber</mat-icon>
+      {{ error }}
+    </div>
+
+  </div>
+
+  <div class="dialog-footer">
+    <button class="btn-cancelar" (click)="cerrar()">Cerrar</button>
+    <button class="btn-accion" (click)="reimprimir()" [disabled]="!solicitud || procesando">
+      <mat-icon>print</mat-icon>
+      {{ procesando ? 'Procesando...' : 'Reimprimir' }}
+    </button>
+  </div>
+
+</div>

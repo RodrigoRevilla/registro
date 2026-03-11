@@ -1,13 +1,16 @@
 <div class="dialog-wrapper">
   <div class="dialog-header">
-    <div class="dialog-title-row">
-      <mat-icon>print</mat-icon>
-      <div>
-        <h2 class="dialog-title">Datos de la Solicitud</h2>
-        <span class="dialog-folio">{{ datos.folio }}</span>
+    <div class="dialog-header-inner">
+      <div class="dialog-title-row">
+        <mat-icon>print</mat-icon>
+        <div class="dialog-title-text">
+          <h2 class="dialog-title">Datos de la Solicitud</h2>
+          <span class="dialog-folio">{{ datos.folio }}</span>
+        </div>
       </div>
+      <button class="btn-close" (click)="cerrar()" matTooltip="Cerrar">✕</button>
     </div>
-    <button class="btn-close" (click)="cerrar()" matTooltip="Cerrar">✕</button>
+    <div class="dialog-header-rule"></div>
   </div>
 
   <div class="dialog-body">
@@ -142,8 +145,7 @@
       <div class="grid-2">
         <div class="campo">
           <span class="campo-label">Folio hoja valorada *</span>
-          <input class="campo-input" type="number" min="1"
-            [(ngModel)]="folioHV" placeholder="Ej. 1042" />
+          <input class="campo-input" type="number" min="1" [(ngModel)]="folioHV" placeholder="Ej. 1042" />
         </div>
         <div class="campo">
           <span class="campo-label">Observaciones</span>

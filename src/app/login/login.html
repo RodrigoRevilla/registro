@@ -1,51 +1,87 @@
 <div class="login-container">
-  <mat-card class="login-card">
+  <div class="login-left">
+    <div class="left-content">
+      <div class="seal-ring">
+        <img src="registro.png" alt="Escudo" class="seal-img">
+      </div>
+      <h1 class="left-title">Registro Civil</h1>
+      <p class="left-subtitle">Sistema de Trámites y Servicios Registrales</p>
+      <p class="left-tagline">"Cada acto civil, una historia que preservamos"</p>
 
-    <div class="header">
-      <img src="registro.png" alt="Escudo" class="logo">
-      <h2>Registro Civil</h2>
-      <span>Sistema Institucional de Gestión</span>
+      <div class="modules-section">
+        <span class="modules-label">Módulos del sistema</span>
+        <div class="modules-chips">
+          <span class="module-chip">Nacimientos</span>
+          <span class="module-chip">Matrimonios</span>
+          <span class="module-chip">Defunciones</span>
+          <span class="module-chip">Certificaciones</span>
+          <span class="module-chip">Reportes</span>
+        </div>
+      </div>
     </div>
 
-    <form [formGroup]="loginForm" (ngSubmit)="login()">
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Usuario</mat-label>
-        <input matInput formControlName="username">
-        <mat-icon matSuffix>person</mat-icon>
-        <mat-error *ngIf="loginForm.get('username')?.hasError('required')">
-          El usuario es obligatorio
-        </mat-error>
-      </mat-form-field>
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Contraseña</mat-label>
-        <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password">
-        <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword">
-          <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+    <div class="deco-circle deco-circle--top"></div>
+    <div class="deco-circle deco-circle--bottom"></div>
+  </div>
+
+  <div class="login-right">
+    <mat-card class="login-card">
+
+      <div class="card-eyebrow">Acceso al sistema</div>
+      <h2 class="card-title">Iniciar sesión</h2>
+      <p class="card-subtitle">Ingrese sus credenciales institucionales para continuar</p>
+
+      <div class="info-alert">
+        <mat-icon class="alert-icon">info_outline</mat-icon>
+        <span>Acceso exclusivo para funcionarios autorizados. Sesión auditada.</span>
+      </div>
+
+      <form [formGroup]="loginForm" (ngSubmit)="login()">
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Nombre de usuario</mat-label>
+          <input matInput formControlName="username">
+          <mat-icon matSuffix>person</mat-icon>
+          <mat-error *ngIf="loginForm.get('username')?.hasError('required')">
+            El usuario es obligatorio
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Contraseña</mat-label>
+          <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password">
+          <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword"
+                  [attr.aria-label]="'Mostrar contraseña'" [attr.aria-pressed]="!hidePassword">
+            <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
+            La contraseña es obligatoria
+          </mat-error>
+        </mat-form-field>
+
+        <button mat-raised-button
+                class="submit-btn full-width"
+                type="submit"
+                [disabled]="loading">
+          <mat-progress-spinner
+            *ngIf="loading"
+            diameter="20"
+            mode="indeterminate"
+            class="spinner-white">
+          </mat-progress-spinner>
+          <span *ngIf="!loading" class="btn-content">
+            <span>Ingresar al sistema</span>
+            <mat-icon>arrow_forward</mat-icon>
+          </span>
         </button>
-        <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
-          La contraseña es obligatoria
-        </mat-error>
-      </mat-form-field>
-      <button mat-raised-button
-              color="primary"
-              class="full-width"
-              type="submit"
-              [disabled]="loading">
 
-        <mat-progress-spinner
-          *ngIf="loading"
-          diameter="20"
-          mode="indeterminate">
-        </mat-progress-spinner>
+      </form>
 
-        <span *ngIf="!loading">Iniciar Sesión</span>
-      </button>
+      <div class="footer-copy">
+        © 2026 Registro Civil — Gobierno Nacional
+      </div>
 
-    </form>
+    </mat-card>
+  </div>
 
-    <div class="footer">
-      © 2026 Registro Civil - Gobierno Nacional
-    </div>
-
-  </mat-card>
 </div>

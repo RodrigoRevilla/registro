@@ -1,128 +1,147 @@
-<div class="page-container">
-  <div class="page-header">
-    <div class="page-title-row">
-      <mat-icon>payments</mat-icon>
-      <h2 class="page-title">Consulta de Pago</h2>
+<header class="page-header">
+  <div class="header-inner">
+
+    <div class="header-escudo">
+      <img src="/oaxaca.png" alt="Registro Civil" />
     </div>
-    <button class="btn-volver" (click)="goHome()">
-      <mat-icon>arrow_back</mat-icon>
-      Volver
-    </button>
+
+    <div class="header-text">
+      <span class="header-supratitle">Gobierno del Estado de Oaxaca</span>
+      <h1>Registro Civil del Estado</h1>
+      <span class="header-sub">Actualizar Pago de Solicitud</span>
+    </div>
+
+    <div class="header-actions">
+      <button mat-button class="header-action-btn" (click)="goHome()">
+        <mat-icon>arrow_back</mat-icon>
+        Volver
+      </button>
+    </div>
+
   </div>
+</header>
+<div class="header-rule"></div>
+
+<div class="container">
 
   <div class="search-card">
     <div class="search-fields">
-      <mat-form-field appearance="outline" class="search-field">
+
+      <mat-form-field appearance="outline" class="cons-field">
         <mat-label>Folio</mat-label>
         <input matInput [(ngModel)]="folioBuscar" (keyup.enter)="buscarFolio()" />
       </mat-form-field>
+
       <button class="btn-buscar" (click)="buscarFolio()" [disabled]="procesando$ | async">
         <mat-icon>search</mat-icon>
         {{ (procesando$ | async) ? 'Buscando...' : 'Buscar' }}
       </button>
+
     </div>
   </div>
 
   <ng-container *ngIf="solicitud$ | async as sol">
 
-    <div class="seccion-card">
-      <div class="seccion-titulo">
-        <mat-icon>description</mat-icon>
-        Detalles de la Solicitud
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-icon"><mat-icon>description</mat-icon></div>
+        <h3 class="section-title">Detalles de la Solicitud</h3>
       </div>
+      <div class="section-body">
 
-      <div class="form-grid-3">
+        <div class="fields-grid fields-grid--3">
 
-        <div class="form-campo">
-          <label>Años de Búsqueda</label>
-          <input class="campo-input readonly" [value]="sol.aniosBusqueda" readonly />
-        </div>
-        <div class="form-campo">
-          <label>Solicitud</label>
-          <input class="campo-input readonly" [value]="sol.solicitud" readonly />
-        </div>
-        <div class="form-campo">
-          <label>Oficialía</label>
-          <input class="campo-input readonly" [value]="sol.oficialia" readonly />
-        </div>
-        <div class="form-campo">
-          <label>Número de Acta</label>
-          <input class="campo-input readonly" [value]="sol.numeroActa" readonly />
-        </div>
-        <div class="form-campo">
-          <label>Número de Foja</label>
-          <input class="campo-input readonly" [value]="sol.numeroFoja" readonly />
-        </div>
-        <div class="form-campo">
-          <label>Fecha de Registro</label>
-          <input class="campo-input readonly" type="date"
-            [value]="sol.fechaRegistro | date:'yyyy-MM-dd'" readonly />
-        </div>
-        <div class="form-campo">
-          <label>Lugar de Registro</label>
-          <input class="campo-input readonly" [value]="sol.lugarRegistro" readonly />
-        </div>
-        <div class="form-campo">
-          <label>Rango de Búsqueda</label>
-          <input class="campo-input readonly" [value]="sol.rangoBusqueda" readonly />
-        </div>
-        <div class="form-campo">
-          <label>Estado Biológico</label>
-          <input class="campo-input readonly" [value]="sol.estadoBiologico" readonly />
-        </div>
-        <div class="form-campo">
-          <label>Estado del Acta</label>
-          <input class="campo-input readonly" [value]="sol.estadoActa" readonly />
-        </div>
-        <div class="form-campo">
-          <label>Documento Presentado</label>
-          <input class="campo-input readonly" [value]="sol.documentoPresentado" readonly />
-        </div>
-        <div class="form-campo">
-          <label>Nombres</label>
-          <input class="campo-input readonly" [value]="sol.nombres" readonly />
-        </div>
-        <div class="form-campo">
-          <label>CRIP</label>
-          <input class="campo-input readonly" [value]="sol.crip" readonly />
-        </div>
-        <div class="form-campo">
-          <label>Sexo</label>
-          <input class="campo-input readonly" [value]="sol.sexo" readonly />
-        </div>
-        <div class="form-campo">
-          <label>Copias Solicitadas</label>
-          <input class="campo-input readonly" [value]="sol.copiasSolicitadas" readonly />
-        </div>
-        <div class="form-campo">
-          <label>Fecha de Entrega</label>
-          <input class="campo-input readonly" type="datetime-local"
-            [value]="sol.fechaEntregaHora ? (sol.fechaEntregaHora | date:'yyyy-MM-ddTHH:mm') : ''"
-            readonly />
-        </div>
-        <div class="form-campo">
-          <label>Fecha de Solicitud</label>
-          <input class="campo-input readonly" type="datetime-local"
-            [value]="sol.fechaSolicitudHora ? (sol.fechaSolicitudHora | date:'yyyy-MM-ddTHH:mm') : ''"
-            readonly />
-        </div>
-        <div class="form-campo">
-          <label>Status</label>
-          <input class="campo-input readonly" [value]="sol.status" readonly />
-        </div>
-        <div class="form-campo">
-          <label>Línea de Captura</label>
-          <input class="campo-input readonly" [value]="sol.lineaCaptura" readonly />
-        </div>
-        <div class="form-campo">
-          <label>Tipo de Acta</label>
-          <input class="campo-input readonly" [value]="sol.tipoActa" readonly />
-        </div>
+          <div class="field-wrap">
+            <label class="field-label">Años de Búsqueda</label>
+            <input class="campo-input" [value]="sol.aniosBusqueda" readonly />
+          </div>
+          <div class="field-wrap">
+            <label class="field-label">Solicitud</label>
+            <input class="campo-input" [value]="sol.solicitud" readonly />
+          </div>
+          <div class="field-wrap">
+            <label class="field-label">Oficialía</label>
+            <input class="campo-input" [value]="sol.oficialia" readonly />
+          </div>
+          <div class="field-wrap">
+            <label class="field-label">Número de Acta</label>
+            <input class="campo-input" [value]="sol.numeroActa" readonly />
+          </div>
+          <div class="field-wrap">
+            <label class="field-label">Número de Foja</label>
+            <input class="campo-input" [value]="sol.numeroFoja" readonly />
+          </div>
+          <div class="field-wrap">
+            <label class="field-label">Fecha de Registro</label>
+            <input class="campo-input" type="date"
+              [value]="sol.fechaRegistro | date:'yyyy-MM-dd'" readonly />
+          </div>
+          <div class="field-wrap">
+            <label class="field-label">Lugar de Registro</label>
+            <input class="campo-input" [value]="sol.lugarRegistro" readonly />
+          </div>
+          <div class="field-wrap">
+            <label class="field-label">Rango de Búsqueda</label>
+            <input class="campo-input" [value]="sol.rangoBusqueda" readonly />
+          </div>
+          <div class="field-wrap">
+            <label class="field-label">Estado Biológico</label>
+            <input class="campo-input" [value]="sol.estadoBiologico" readonly />
+          </div>
+          <div class="field-wrap">
+            <label class="field-label">Estado del Acta</label>
+            <input class="campo-input" [value]="sol.estadoActa" readonly />
+          </div>
+          <div class="field-wrap">
+            <label class="field-label">Documento Presentado</label>
+            <input class="campo-input" [value]="sol.documentoPresentado" readonly />
+          </div>
+          <div class="field-wrap">
+            <label class="field-label">Nombres</label>
+            <input class="campo-input" [value]="sol.nombres" readonly />
+          </div>
+          <div class="field-wrap">
+            <label class="field-label">CRIP</label>
+            <input class="campo-input" [value]="sol.crip" readonly />
+          </div>
+          <div class="field-wrap">
+            <label class="field-label">Sexo</label>
+            <input class="campo-input" [value]="sol.sexo" readonly />
+          </div>
+          <div class="field-wrap">
+            <label class="field-label">Copias Solicitadas</label>
+            <input class="campo-input" [value]="sol.copiasSolicitadas" readonly />
+          </div>
+          <div class="field-wrap">
+            <label class="field-label">Fecha de Entrega</label>
+            <input class="campo-input" type="datetime-local"
+              [value]="sol.fechaEntregaHora ? (sol.fechaEntregaHora | date:'yyyy-MM-ddTHH:mm') : ''"
+              readonly />
+          </div>
+          <div class="field-wrap">
+            <label class="field-label">Fecha de Solicitud</label>
+            <input class="campo-input" type="datetime-local"
+              [value]="sol.fechaSolicitudHora ? (sol.fechaSolicitudHora | date:'yyyy-MM-ddTHH:mm') : ''"
+              readonly />
+          </div>
+          <div class="field-wrap">
+            <label class="field-label">Status</label>
+            <input class="campo-input" [value]="sol.status" readonly />
+          </div>
+          <div class="field-wrap">
+            <label class="field-label">Línea de Captura</label>
+            <input class="campo-input mono" [value]="sol.lineaCaptura" readonly />
+          </div>
+          <div class="field-wrap">
+            <label class="field-label">Tipo de Acta</label>
+            <input class="campo-input" [value]="sol.tipoActa" readonly />
+          </div>
 
+        </div>
       </div>
     </div>
 
-    <div class="acciones-footer" *ngIf="sol.status === 'PENDIENTE_PAGO'">
+    <div class="action-bar" *ngIf="sol.status === 'PENDIENTE_PAGO'">
       <button class="btn-confirmar" [disabled]="procesando$ | async" (click)="confirmarPagoManual()">
         <mat-icon>payments</mat-icon>
         {{ (procesando$ | async) ? 'Procesando...' : 'Confirmar Pago' }}
@@ -132,3 +151,5 @@
   </ng-container>
 
 </div>
+
+<span class="watermark">Registro Civil</span>

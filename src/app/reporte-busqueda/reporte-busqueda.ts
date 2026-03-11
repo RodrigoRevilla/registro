@@ -347,4 +347,22 @@ export class ReporteBusquedaService {
 
     return asignaciones;
   }
+
+  async generarSoloPDF(folio: string): Promise<void> {
+    console.log(`[reimpresion] Generando PDF para ${folio}...`);
+
+    const datos = await this.obtenerDatos(folio);
+    if (!datos) {
+      alert(`No se pudieron obtener datos para el folio ${folio}`);
+      return;
+    }
+
+    const doc          = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'letter' });
+    const margenTop    = 10;
+
+    this.dibujarOrden(doc, datos, margenTop);
+
+    console.log(`[reimpresion] PDF listo para ${folio}`);
+    doc.save(`reimpresion-${folio}-${new Date().toISOString().slice(0, 10)}.pdf`);
+  }
 }

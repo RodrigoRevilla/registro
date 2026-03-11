@@ -48,7 +48,7 @@ export class SolicitudDialogComponent {
   abrirFormHV(): void {
     this.mostrarFormHV = true;
   }
-
+  
   cancelarHV(): void {
     this.mostrarFormHV  = false;
     this.folioHV        = null;

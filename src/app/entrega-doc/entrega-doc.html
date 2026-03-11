@@ -1,0 +1,134 @@
+<div class="dialog-wrapper">
+  <div class="dialog-header">
+    <div class="dialog-header-inner">
+      <div class="dialog-title-row">
+        <div class="dialog-escudo">
+          <mat-icon>inventory_2</mat-icon>
+        </div>
+        <div>
+          <p class="dialog-super">Registro Civil del Estado</p>
+          <h2 class="dialog-title">Entrega de Documentos</h2>
+        </div>
+      </div>
+      <button class="btn-close" (click)="cerrar()">✕</button>
+    </div>
+    <div class="gold-rule"></div>
+  </div>
+
+  <div class="dialog-body">
+
+    <div class="search-card">
+      <div class="search-fields">
+        <mat-form-field appearance="outline" class="dial-field">
+          <mat-label>Folio</mat-label>
+          <input matInput [(ngModel)]="folio" (keyup.enter)="buscar()" autocomplete="off" />
+          <mat-icon matSuffix>confirmation_number</mat-icon>
+        </mat-form-field>
+        <button class="btn-buscar" (click)="buscar()" [disabled]="buscando">
+          <mat-icon>search</mat-icon>
+          {{ buscando ? 'Buscando...' : 'Buscar' }}
+        </button>
+      </div>
+
+      <div class="error-msg" *ngIf="error">
+        <mat-icon>warning_amber</mat-icon>
+        {{ error }}
+      </div>
+    </div>
+
+    <ng-container *ngIf="solicitud">
+
+      <div class="form-section">
+        <div class="section-header">
+          <div class="section-icon"><mat-icon>description</mat-icon></div>
+          <h3 class="section-title">Situación de la Solicitud</h3>
+        </div>
+        <div class="section-body">
+
+          <div class="info-chips" style="margin-top: 0; margin-bottom: 10px;">
+            <div class="info-chip">
+              <span class="chip-label">Estado</span>
+              <span class="chip-valor" [class]="'status-' + solicitud.status?.toLowerCase()">
+                {{ solicitud.status }}
+              </span>
+            </div>
+            <div class="info-chip" style="flex: 1;">
+              <span class="chip-label">Folio</span>
+              <span class="chip-valor">{{ solicitud.folio }}</span>
+            </div>
+            <div class="info-chip" style="flex: 2;">
+              <span class="chip-label">Nombre</span>
+              <span class="chip-valor">{{ solicitud.nombre || '—' }}</span>
+            </div>
+            <div class="info-chip" style="flex: 2;">
+              <span class="chip-label">Servicio</span>
+              <span class="chip-valor">{{ solicitud.servicio || '—' }}</span>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px;">
+            <div class="campo">
+              <span class="campo-label">F. Solicitud</span>
+              <span class="campo-valor">{{ solicitud.fechaSolicitud || '—' }}</span>
+            </div>
+            <div class="campo">
+              <span class="campo-label">F. Entrega</span>
+              <span class="campo-valor">{{ solicitud.fechaEntrega || '—' }}</span>
+            </div>
+            <div class="campo">
+              <span class="campo-label">Hora Entrega</span>
+              <span class="campo-valor">{{ solicitud.horaEntrega || '—' }}</span>
+            </div>
+            <div class="campo">
+              <span class="campo-label">F. Pago</span>
+              <span class="campo-valor">{{ solicitud.fechaPago || '—' }}</span>
+            </div>
+          </div>
+
+          <div class="campo" style="margin-top: 8px;">
+            <span class="campo-label">Observaciones</span>
+            <span class="campo-valor">{{ solicitud.observaciones || '—' }}</span>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-header">
+          <div class="section-icon"><mat-icon>content_copy</mat-icon></div>
+          <h3 class="section-title">Fotocopia</h3>
+        </div>
+        <div class="section-body">
+          <div style="display: grid; grid-template-columns: 110px 1fr; gap: 12px; align-items: start;">
+            <div class="campo">
+              <span class="campo-label">Copias</span>
+              <input class="campo-valor" type="number" min="1" [(ngModel)]="copias"
+                style="width: 100%; box-sizing: border-box; cursor: text;" />
+            </div>
+            <div class="campo">
+              <span class="campo-label">Observaciones de entrega</span>
+              <textarea class="campo-valor" [(ngModel)]="observacionesEntrega" rows="2"
+                placeholder="Observaciones..."
+                style="resize: vertical; min-height: 56px; cursor: text;"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </ng-container>
+
+  </div>
+
+  <div class="dialog-footer">
+    <button class="btn-cancelar" (click)="cerrar()">Cerrar</button>
+    <button class="btn-accion btn-accion--secondary" *ngIf="solicitud" (click)="reimprimir()" [disabled]="procesando">
+      <mat-icon>print</mat-icon>
+      Reimpresión
+    </button>
+    <button class="btn-accion" (click)="registrarEntrega()" [disabled]="!solicitud || procesando">
+      <mat-icon>task_alt</mat-icon>
+      {{ procesando ? 'Procesando...' : 'Registrar Entrega' }}
+    </button>
+  </div>
+
+</div>

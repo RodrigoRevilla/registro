@@ -18,6 +18,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { AuthService } from '../auth';
 import { CancelacionDialogComponent } from '../cancelaciones/cancelaciones';
 import { ImpresionesComponent } from '../impresiones/impresiones';
+import { EntregaDialogComponent } from '../entrega-doc/entrega-doc';
 
 interface Usuario {
   id: number;
@@ -69,29 +70,29 @@ export class HomeComponent implements OnInit {
 
   private readonly API = '/api/v1';
 
-  isLoggedIn      = false;
-  esAdmin         = false;
+  isLoggedIn = false;
+  esAdmin = false;
   mostrarPassword = false;
   vistaActual: 'home' | 'usuarios' = 'home';
 
   usuarios: Usuario[] = [];
-  roles:    Rol[]     = [];
-  areas:    Area[]    = [];
-  cargando  = false;
+  roles: Rol[] = [];
+  areas: Area[] = [];
+  cargando = false;
   mostrarFormNuevo = false;
   nuevoUsuario = {
     username: '', password: '', nombre: '',
     apellido_paterno: '', apellido_materno: '',
     area_id: 1, rol_id: 1,
   };
-  guardandoNuevo    = false;
+  guardandoNuevo = false;
   editandoPasswordId: number | null = null;
-  nuevaPassword     = '';
+  nuevaPassword = '';
   guardandoPassword = false;
   editandoUsuarioId: number | null = null;
-  usuarioEditando:   Usuario | null = null;
+  usuarioEditando: Usuario | null = null;
   editForm = { rol_id: 1, area_id: 1 };
-  guardandoEdicion  = false;
+  guardandoEdicion = false;
 
   private get headers(): HttpHeaders {
     const token = sessionStorage.getItem('token') ?? '';
@@ -99,74 +100,110 @@ export class HomeComponent implements OnInit {
   }
 
   constructor(
-    private router:      Router,
-    private http:        HttpClient,
-    public  authService: AuthService,
-    private ngZone:      NgZone,
-    private cdr:         ChangeDetectorRef,
-    private dialog:      MatDialog,
-  ) {}
+    private router: Router,
+    private http: HttpClient,
+    public authService: AuthService,
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef,
+    private dialog: MatDialog,
+  ) { }
 
   ngOnInit(): void {
     this.isLoggedIn = this.authService.isLoggedIn();
     if (!this.isLoggedIn) { this.router.navigate(['/login']); return; }
     const rol = this.authService.getRolClave().toUpperCase();
     this.esAdmin = rol.includes('ADMIN');
-    this.cargarRoles(); 
+    this.cargarRoles();
   }
 
   irAGestionUsuarios(): void {
-    this.vistaActual      = 'usuarios';
-    this.usuarios         = [];
-    this.cargando         = true;
+    this.vistaActual = 'usuarios';
+    this.usuarios = [];
+    this.cargando = true;
     this.mostrarFormNuevo = false;
     this.cdr.detectChanges();
     this.cargarDatosUsuarios();
   }
 
   volverAHome(): void {
-    this.vistaActual        = 'home';
-    this.mostrarFormNuevo   = false;
+    this.vistaActual = 'home';
+    this.mostrarFormNuevo = false;
     this.editandoPasswordId = null;
-    this.editandoUsuarioId  = null;
-    this.cargando           = false;
+    this.editandoUsuarioId = null;
+    this.cargando = false;
   }
 
   logout(): void { this.authService.logout(); this.router.navigate(['/login']); }
 
-  irANacimiento(event: MouseEvent)  { event?.stopImmediatePropagation(); this.router.navigate(['/nacimiento']); }
-  irATrabajo(event: MouseEvent)     { event?.stopImmediatePropagation(); this.router.navigate(['/trabajo']); }
-  irAModificacion(event: Event)     { event.stopPropagation(); this.router.navigate(['/modificacion']); }
-  irAActualizarPago(event: Event)   { event.preventDefault(); this.router.navigate(['/actualizar']); }
+  irANacimiento(event: MouseEvent): void { event?.stopImmediatePropagation(); this.router.navigate(['/nacimiento']); }
+  irATrabajo(event: MouseEvent): void    { event?.stopImmediatePropagation(); this.router.navigate(['/trabajo']); }
+  irAModificacion(event: Event): void    { event.stopPropagation(); this.router.navigate(['/modificacion']); }
+  irAActualizarPago(event: Event): void  { event.preventDefault(); this.router.navigate(['/actualizar']); }
 
   irAImpresiones(event: Event): void {
     event.preventDefault();
     this.dialog.open(ImpresionesComponent, {
-      width: '500px',
-      maxHeight: '90vh',
+      width:        '500px',
+      maxHeight:    '90vh',
       disableClose: false,
-      panelClass: 'impresiones-panel',
+      panelClass:   'impresiones-panel',
     }).afterClosed().subscribe(result => {
-      if (result?.accion === 'ligar') {}
+      if (result?.accion === 'ligar') { }
+    });
+  }
+
+  irAEntrega(event: Event): void {
+    event.preventDefault();
+    this.dialog.open(EntregaDialogComponent, {
+      width:        '720px',
+      maxHeight:    '90vh',
+      disableClose: false,
+      panelClass:   'cancelacion-panel',
+    }).afterClosed().subscribe(result => {
+      if (result?.accion === 'entregado') {
+        alert(`Entrega registrada correctamente para el folio ${result.folio}`);
+      }
     });
   }
 
   irACancelaciones(event: Event): void {
     event.preventDefault();
     this.dialog.open(CancelacionDialogComponent, {
-      width: '720px',
-      maxHeight: '90vh',
+      width:        '720px',
+      maxHeight:    '90vh',
       disableClose: false,
-      panelClass: 'cancelacion-panel',
+      panelClass:   'cancelacion-panel',
     }).afterClosed().subscribe(result => {
       if (result?.accion === 'cancelado') {
         const mensajes: Record<string, string> = {
-          PERDIDA:  `Hoja valorada anulada correctamente`,
-          LIBERAR:  `Hoja valorada liberada correctamente`,
-          CANCELAR: `Hoja valorada cancelada correctamente`,
+          PERDIDA: 'Hoja valorada anulada correctamente',
+          LIBERAR: 'Hoja valorada liberada correctamente',
+          CANCELAR: 'Hoja valorada cancelada correctamente',
         };
         alert(mensajes[result.tipo] ?? 'Operación completada');
       }
+    });
+  }
+
+  irAReimpresionSolicitudes(event: Event): void {
+    event.preventDefault();
+    this.dialog.open(ImpresionesComponent, {
+      width:        '500px',
+      maxHeight:    '90vh',
+      disableClose: false,
+      panelClass:   'impresiones-panel',
+      data:         { modo: 'solicitudes' },
+    });
+  }
+
+  irAReimpresionLineaCaptura(event: Event): void {
+    event.preventDefault();
+    this.dialog.open(ImpresionesComponent, {
+      width:        '500px',
+      maxHeight:    '90vh',
+      disableClose: false,
+      panelClass:   'impresiones-panel',
+      data:         { modo: 'linea-captura' },
     });
   }
 
@@ -197,27 +234,21 @@ export class HomeComponent implements OnInit {
   cargarRoles(): void {
     this.http.get<any>(`${this.API}/catalogos/roles`, { headers: this.headers })
       .subscribe({
-        next: resp => {
-          this.roles = resp?.data ?? [];
-          this.cdr.detectChanges();
-        },
-        error: () => {}
+        next: resp => { this.roles = resp?.data ?? []; this.cdr.detectChanges(); },
+        error: () => { }
       });
   }
 
   cargarAreas(): void {
     this.http.get<any>(`${this.API}/catalogos/areas`, { headers: this.headers })
       .subscribe({
-        next: resp => {
-          this.areas = resp?.data ?? [];
-          this.cdr.detectChanges();
-        },
-        error: () => {}
+        next: resp => { this.areas = resp?.data ?? []; this.cdr.detectChanges(); },
+        error: () => { }
       });
   }
 
   abrirFormNuevo(): void {
-    this.mostrarFormNuevo  = true;
+    this.mostrarFormNuevo = true;
     this.editandoUsuarioId = null;
     this.nuevoUsuario = {
       username: '', password: '', nombre: '',
@@ -247,9 +278,7 @@ export class HomeComponent implements OnInit {
       area_id:          Number(u.area_id),
       rol_id:           Number(u.rol_id),
     };
-    if (u.apellido_materno?.trim()) {
-      body.apellido_materno = u.apellido_materno.trim();
-    }
+    if (u.apellido_materno?.trim()) body.apellido_materno = u.apellido_materno.trim();
 
     this.http.post<any>(`${this.API}/usuarios`, body, { headers: this.headers })
       .subscribe({
@@ -308,10 +337,7 @@ export class HomeComponent implements OnInit {
     this.editandoUsuarioId  = usuario.id;
     this.usuarioEditando    = usuario;
     this.editandoPasswordId = null;
-    this.editForm = {
-      rol_id:  usuario.rol_id,
-      area_id: usuario.area_id,
-    };
+    this.editForm = { rol_id: usuario.rol_id, area_id: usuario.area_id };
   }
 
   cancelarEditUsuario(): void {
@@ -330,26 +356,21 @@ export class HomeComponent implements OnInit {
       area_id:          Number(this.editForm.area_id),
       rol_id:           Number(this.editForm.rol_id),
     };
-    if (usuario.apellido_materno?.trim()) {
-      body.apellido_materno = usuario.apellido_materno.trim();
-    }
+    if (usuario.apellido_materno?.trim()) body.apellido_materno = usuario.apellido_materno.trim();
 
-    this.http.put<any>(
-      `${this.API}/usuarios/${usuario.id}`,
-      body,
-      { headers: this.headers }
-    ).subscribe({
-      next: resp => {
-        this.guardandoEdicion  = false;
-        this.editandoUsuarioId = null;
-        if (resp?.ok) { this.cargarUsuarios(); }
-        else { alert('Error al actualizar usuario'); }
-      },
-      error: err => {
-        this.guardandoEdicion = false;
-        alert(err?.error?.error?.message ?? 'Error al editar usuario');
-      }
-    });
+    this.http.put<any>(`${this.API}/usuarios/${usuario.id}`, body, { headers: this.headers })
+      .subscribe({
+        next: resp => {
+          this.guardandoEdicion  = false;
+          this.editandoUsuarioId = null;
+          if (resp?.ok) { this.cargarUsuarios(); }
+          else { alert('Error al actualizar usuario'); }
+        },
+        error: err => {
+          this.guardandoEdicion = false;
+          alert(err?.error?.error?.message ?? 'Error al editar usuario');
+        }
+      });
   }
 
   toggleActivo(usuario: Usuario): void {

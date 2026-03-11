@@ -1,25 +1,33 @@
 <div class="dialog-wrapper">
   <div class="dialog-header">
-    <div class="dialog-title-row">
-      <mat-icon>print</mat-icon>
-      <div>
-        <h2 class="dialog-title">Impresión de Certificaciones</h2>
+    <div class="dialog-header-inner">
+      <div class="dialog-title-row">
+        <div class="dialog-escudo">
+          <mat-icon>print</mat-icon>
+        </div>
+        <div>
+          <p class="dialog-super">Registro Civil del Estado</p>
+          <h2 class="dialog-title">Impresión de Certificaciones</h2>
+        </div>
       </div>
+      <button class="btn-close" (click)="cerrar()">✕</button>
     </div>
-    <button class="btn-close" (click)="cerrar()">✕</button>
+    <div class="gold-rule"></div>
   </div>
 
   <div class="dialog-body">
     <div class="search-card">
-      <div class="seccion-titulo">
+
+      <div class="search-label">
         <mat-icon>confirmation_number</mat-icon>
         Ingresa el folio para generar la certificación
       </div>
+
       <div class="search-fields">
-        <mat-form-field appearance="outline" class="search-field">
+        <mat-form-field appearance="outline" class="dial-field">
           <mat-label>Folio</mat-label>
-          <input matInput [(ngModel)]="folio" placeholder="Ej. RC-20260224-0009"
-            autocomplete="off" (keyup.enter)="buscar()" />
+          <input matInput [(ngModel)]="folio" placeholder="Ej. RC-20260224-0009" autocomplete="off"
+            (keyup.enter)="buscar()" />
           <mat-icon matSuffix>confirmation_number</mat-icon>
         </mat-form-field>
         <button class="btn-buscar" (click)="buscar()" [disabled]="buscando">
@@ -29,18 +37,20 @@
       </div>
 
       <div class="buscando-msg" *ngIf="buscando">
-        <mat-spinner diameter="18"></mat-spinner>
+        <mat-spinner diameter="16"></mat-spinner>
         <span>Buscando...</span>
       </div>
 
       <div class="error-msg" *ngIf="error">
-        ⚠️ {{ error }}
+        <mat-icon>warning_amber</mat-icon>
+        {{ error }}
       </div>
+
     </div>
   </div>
 
   <div class="dialog-footer">
-    <button class="btn-secundario" (click)="cerrar()">Cancelar</button>
+    <button class="btn-cancelar" (click)="cerrar()">Cancelar</button>
   </div>
 
 </div>

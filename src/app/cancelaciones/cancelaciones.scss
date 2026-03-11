@@ -1,23 +1,41 @@
-@use 'sass:color';
-$red:        #9e2a47;
-$red-light:  #fdf2f6;
-$red-border: #f5c2d0;
-$navy:       #1a3a5c;
-$amber:      #c46b00;
-$amber-light:#fff8f0;
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
-$text:    #1a1a2e;
-$gray:    #6b7f8f;
-$border:  #e0e0e0;
-$surface: #ffffff;
-$bg:      #f0f2f5;
+
+@mixin sans    { font-family: 'Inter', sans-serif; }
+@mixin display { font-family: 'Playfair Display', serif; }
+@mixin mono    { font-family: 'IBM Plex Mono', monospace; }
+
+$ink:          #5a0e22;
+$ink-soft:     #7a1530;
+$gold:         #6e1530;
+$gold-dark:    #55102a;
+$gold-dim:     rgba(#6e1530, 0.12);
+$cream:        #f7f7f7;
+$white:        #ffffff;
+$slate:        #4a4a4a;
+$slate-dim:    #777777;
+$border:       #d0d0d0;
+$bg:           #f0f2f5;
+$navy:         #1a3a5c;
+$amber:        #c46b00;
+$amber-light:  #fff8f0;
+$rust:         #c0392b;
+$green:        #2e7d32;
+$teal:         #00695c;
+$blue-light:   #e8f0f7;
+$red:         $gold;
+$red-light:   $gold-dim;
+$red-border:  rgba($gold, 0.3);
+$surface:     $white;
+$text:        $ink;
+$gray:        $slate;
 
 $r:  8px;
 $tr: all 0.15s ease;
 
 .dialog-wrapper {
-  font-family: 'Segoe UI', sans-serif;
-  background: $bg;
+  @include sans;
+  background: $cream;
   width: 700px;
   max-width: 100%;
   display: flex;
@@ -26,27 +44,84 @@ $tr: all 0.15s ease;
 }
 
 .dialog-header {
+  background-color: $gold;
+  background-image: url('/header.png');
+  background-repeat: repeat-x;
+  background-position: center center;
+  background-size: auto 100%;
+  position: relative;
+  flex-shrink: 0;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba($gold-dark, 0.72);
+    pointer-events: none;
+  }
+}
+
+.dialog-header-inner {
+  padding: 18px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.9rem 1.4rem;
-  background: $surface;
-  border-bottom: 1px solid $border;
-  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
 }
 
 .dialog-title-row {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  mat-icon { color: $red; font-size: 1.2rem; width: 1.2rem; height: 1.2rem; }
+  gap: 14px;
+
+  mat-icon {
+    color: rgba(#ffffff, 0.75);
+    font-size: 1.3rem;
+    width: 1.3rem;
+    height: 1.3rem;
+  }
+}
+
+.dialog-title-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.dialog-super {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: rgba(#ffffff, 0.72);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding-bottom: 3px;
+  border-bottom: 1px solid rgba(#ffffff, 0.18);
+  margin: 0 0 3px;
+  display: block;
+  @include sans;
 }
 
 .dialog-title {
+  @include display;
   margin: 0;
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 700;
-  color: $text;
+  color: $white;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+
+.dialog-header-rule {
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    rgba(#ffffff, 0.55) 0%,
+    rgba(#ffffff, 0.2) 50%,
+    transparent 100%
+  );
+  position: relative;
+  z-index: 1;
 }
 
 .btn-close {
@@ -55,15 +130,22 @@ $tr: all 0.15s ease;
   justify-content: center;
   width: 30px;
   height: 30px;
-  background: $bg;
-  border: 1.5px solid $border;
-  border-radius: 99px;
+  background: transparent;
+  border: 1px solid rgba(#ffffff, 0.35);
+  border-radius: 2px;
   cursor: pointer;
-  color: $gray;
+  color: rgba(#ffffff, 0.8);
   font-size: 0.9rem;
   font-weight: 700;
   transition: $tr;
-  &:hover { border-color: $red; color: $red; background: $red-light; }
+  position: relative;
+  z-index: 1;
+
+  &:hover {
+    background: rgba(#ffffff, 0.12);
+    border-color: rgba(#ffffff, 0.65);
+    color: $white;
+  }
 }
 
 .dialog-body {
@@ -100,17 +182,21 @@ $tr: all 0.15s ease;
   height: 40px;
   margin-bottom: 22px;
   padding: 0 1.2rem;
-  background: $red;
-  color: #fff;
+  background: $gold;
+  color: $white;
   border: none;
-  border-radius: 99px;
+  border-radius: 2px;
   font-size: 0.8rem;
   font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
   cursor: pointer;
   transition: $tr;
   font-family: inherit;
+  box-shadow: 0 2px 8px rgba($gold, 0.28);
+
   mat-icon { font-size: 16px; width: 16px; height: 16px; }
-  &:hover:not(:disabled) { background: color.adjust($red, $lightness: -8%); }
+  &:hover:not(:disabled) { background: $gold-dark; }
   &:disabled { opacity: 0.6; cursor: not-allowed; }
 }
 
@@ -135,7 +221,7 @@ $tr: all 0.15s ease;
 .chip-label {
   font-size: 0.6rem;
   font-weight: 700;
-  color: $gray;
+  color: $slate;
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
@@ -143,16 +229,17 @@ $tr: all 0.15s ease;
 .chip-valor {
   font-size: 0.82rem;
   font-weight: 600;
-  color: $text;
+  color: $ink;
 
-  &.status-pendiente_pago { color: #c46b00; }
+  &.status-pendiente_pago { color: $amber; }
   &.status-pagada,
   &.status-encontrada,
-  &.status-cotejada { color: #2e7d32; }
-  &.status-cancelada { color: $red; }
+  &.status-cotejada { color: $green; }
+  &.status-cancelada { color: $gold; }
 }
 
-.seccion-card {
+.seccion-card,
+.form-section {
   background: $surface;
   border: 1px solid $border;
   border-radius: $r;
@@ -160,18 +247,38 @@ $tr: all 0.15s ease;
   box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
 
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.7rem;
+}
+
+.section-icon {
+  mat-icon {
+    color: $gold;
+    font-size: 15px;
+    width: 15px;
+    height: 15px;
+  }
+}
+
+.section-title,
 .seccion-titulo {
   display: flex;
   align-items: center;
   gap: 0.35rem;
   font-size: 0.68rem;
   font-weight: 800;
-  color: $red;
+  color: $gold;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  margin-bottom: 0.7rem;
+  margin: 0;
+
   mat-icon { font-size: 13px; width: 13px; height: 13px; }
 }
+
+.section-body {}
 
 .grid-2 {
   display: grid;
@@ -188,7 +295,7 @@ $tr: all 0.15s ease;
 .campo-label {
   font-size: 0.62rem;
   font-weight: 700;
-  color: $gray;
+  color: $slate;
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
@@ -196,7 +303,7 @@ $tr: all 0.15s ease;
 .campo-valor {
   font-size: 0.84rem;
   font-weight: 500;
-  color: $text;
+  color: $ink;
   background: $bg;
   border: 1px solid $border;
   border-radius: 6px;
@@ -228,14 +335,14 @@ $tr: all 0.15s ease;
   text-transform: uppercase;
   letter-spacing: 0.07em;
   padding: 0.6rem 0.9rem;
-  background: #e8f0f7;
+  background: $blue-light;
   border-bottom: 1px solid $border;
 
   mat-icon { font-size: 13px; width: 13px; height: 13px; }
 
   &.canceladas {
-    color: $red;
-    background: $red-light;
+    color: $gold;
+    background: $gold-dim;
   }
 }
 
@@ -247,7 +354,7 @@ $tr: all 0.15s ease;
   padding: 0 6px;
   font-size: 0.65rem;
   font-weight: 800;
-  color: $gray;
+  color: $slate;
 }
 
 .hv-table {
@@ -262,7 +369,7 @@ $tr: all 0.15s ease;
       text-align: left;
       font-size: 0.63rem;
       font-weight: 700;
-      color: $gray;
+      color: $slate;
       text-transform: uppercase;
       letter-spacing: 0.05em;
       border-bottom: 1px solid $border;
@@ -274,20 +381,17 @@ $tr: all 0.15s ease;
     cursor: pointer;
     transition: $tr;
 
-    td {
-      padding: 0.35rem 0.7rem;
-      color: $text;
-    }
+    td { padding: 0.35rem 0.7rem; color: $ink; }
 
     &:hover { background: $bg; }
-    &.selected { background: $red-light; }
+    &.selected { background: $gold-dim; }
     &:last-child { border-bottom: none; }
   }
 }
 
 .empty-row {
   text-align: center;
-  color: $gray;
+  color: $slate;
   font-style: italic;
   font-size: 0.78rem;
   padding: 0.8rem !important;
@@ -313,46 +417,43 @@ $tr: all 0.15s ease;
   input[type="radio"] {
     margin-top: 3px;
     flex-shrink: 0;
-    accent-color: $red;
+    accent-color: $gold;
     width: 15px;
     height: 15px;
     cursor: pointer;
   }
 
-  &.active {
-    border-color: $red;
-    background: $red-light;
-  }
-
+  &.active { border-color: $gold; background: $gold-dim; }
   &:hover:not(.active) { border-color: #bbb; background: $bg; }
 }
 
-.radio-content {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
+.radio-content { display: flex; flex-direction: column; gap: 2px; }
 
 .radio-titulo {
   font-size: 0.82rem;
   font-weight: 700;
-  color: $text;
+  color: $ink;
 }
 
 .radio-desc {
   font-size: 0.74rem;
-  color: $gray;
+  color: $slate;
   line-height: 1.4;
 }
 
 .error-msg {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
   padding: 0.6rem 0.9rem;
-  background: $red-light;
-  border: 1px solid $red-border;
+  background: $gold-dim;
+  border: 1px solid rgba($gold, 0.3);
   border-radius: 7px;
   font-size: 0.82rem;
-  color: $red;
+  color: $gold;
   font-weight: 500;
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; flex-shrink: 0; }
 }
 
 .dialog-footer {
@@ -365,40 +466,47 @@ $tr: all 0.15s ease;
   flex-shrink: 0;
 }
 
-.btn-secundario {
+.btn-secundario,
+.btn-cancelar {
   display: flex;
   align-items: center;
   gap: 0.3rem;
   padding: 0.45rem 1.1rem;
   border: 1.5px solid $border;
   background: $surface;
-  border-radius: 99px;
-  color: $gray;
-  font-size: 0.8rem;
+  border-radius: 2px;
+  color: $slate;
+  font-size: 0.75rem;
   font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
   cursor: pointer;
   transition: $tr;
   font-family: inherit;
-  &:hover { border-color: $red; color: $red; background: $red-light; }
+
+  &:hover { border-color: $gold; color: $gold; background: $gold-dim; }
 }
 
-.btn-cancelar-folio {
+.btn-cancelar-folio,
+.btn-accion-destructiva {
   display: flex;
   align-items: center;
   gap: 0.35rem;
   padding: 0.45rem 1.3rem;
-  background: $red;
-  color: #fff;
+  background: $gold;
+  color: $white;
   border: none;
-  border-radius: 8px;
-  font-size: 0.82rem;
+  border-radius: 2px;
+  font-size: 0.78rem;
   font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
   cursor: pointer;
   transition: $tr;
   font-family: inherit;
-  box-shadow: 0 3px 10px rgba(158,42,71,0.25);
+  box-shadow: 0 2px 8px rgba($gold, 0.28);
 
   mat-icon { font-size: 17px; width: 17px; height: 17px; }
-  &:hover:not(:disabled) { background: color.adjust($red, $lightness: -8%); transform: translateY(-1px); }
-  &:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; transform: none; }
+  &:hover:not(:disabled) { background: $gold-dark; transform: translateY(-1px); }
+  &:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; transform: none; }
 }

@@ -1,167 +1,196 @@
-<div class="page-container">
-  <div class="page-header">
-    <div class="page-title-row">
-      <mat-icon>edit</mat-icon>
-      <h2 class="page-title">Modificación de Solicitudes</h2>
+<header class="page-header">
+  <div class="header-inner">
+
+    <div class="header-escudo">
+      <img src="/oaxaca.png" alt="Registro Civil" />
     </div>
+
+    <div class="header-text">
+      <span class="header-supratitle">Gobierno del Estado de Oaxaca</span>
+      <h1>Registro Civil del Estado</h1>
+      <span class="header-sub">Modificación de Solicitudes</span>
+    </div>
+
     <div class="header-actions">
-      <button class="btn-limpiar" (click)="limpiarRegistro()" matTooltip="Limpiar registro">
+      <button mat-button class="header-action-btn header-action-btn--warn" (click)="limpiarRegistro()"
+        matTooltip="Limpiar registro">
         <mat-icon>cleaning_services</mat-icon>
         Limpiar
       </button>
-      <button class="btn-volver" (click)="goHome()">
+      <button mat-button class="header-action-btn" (click)="goHome()">
         <mat-icon>arrow_back</mat-icon>
         Volver
       </button>
     </div>
+
+  </div>
+</header>
+<div class="header-rule"></div>
+
+<div class="container" [formGroup]="formulario">
+
+  <div class="search-card">
+    <div class="search-fields">
+
+      <mat-form-field appearance="outline" class="mod-field">
+        <mat-label>Folio</mat-label>
+        <input matInput formControlName="folio" />
+      </mat-form-field>
+
+      <button class="btn-buscar" (click)="buscarSolicitud()">
+        <mat-icon>search</mat-icon>
+        Buscar
+      </button>
+
+      <mat-form-field appearance="outline" class="mod-field mod-field--wide" panelClass="mod-select-panel">
+        <mat-label>Seleccione una opción</mat-label>
+        <mat-select formControlName="estadoSeleccionado">
+          <mat-option *ngFor="let op of opcionesEstado" [value]="op.value">
+            {{ op.label }}
+          </mat-option>
+        </mat-select>
+        <mat-hint *ngIf="opcionesEstado.length === 0" style="color:#c62828; font-size:11px">
+          Sin opciones para tu rol
+        </mat-hint>
+      </mat-form-field>
+
+      <button class="btn-reimprimir" (click)="reImprimir()">
+        <mat-icon>print</mat-icon>
+        Re-imprimir
+      </button>
+
+    </div>
   </div>
 
-  <div [formGroup]="formulario">
-    <div class="search-card">
-      <div class="search-fields">
-
-        <mat-form-field appearance="outline" class="search-field">
-          <mat-label>Folio</mat-label>
-          <input matInput formControlName="folio" />
-        </mat-form-field>
-
-        <button class="btn-buscar" (click)="buscarSolicitud()">
-          <mat-icon>search</mat-icon>
-          Buscar
-        </button>
-
-        <mat-form-field appearance="outline" class="search-field select-field">
-          <mat-label>Seleccione una opción</mat-label>
-          <mat-select formControlName="estadoSeleccionado">
-            <mat-option *ngFor="let op of opcionesEstado" [value]="op.value">
-              {{ op.label }}
-            </mat-option>
-          </mat-select>
-          <mat-hint *ngIf="opcionesEstado.length === 0" style="color:#c62828">
-            Sin opciones para tu rol
-          </mat-hint>
-        </mat-form-field>
-
-        <button class="btn-reimprimir" (click)="reImprimir()">
-          <mat-icon>print</mat-icon>
-          Re-imprimir
-        </button>
-
-      </div>
+  <div class="form-section">
+    <div class="section-header">
+      <div class="section-icon"><mat-icon>description</mat-icon></div>
+      <h3 class="section-title">Datos del Acta</h3>
     </div>
+    <div class="section-body">
 
-    <div class="seccion-card">
-      <div class="seccion-titulo">
-        <mat-icon>description</mat-icon>
-        Datos del Acta
-      </div>
-      <div class="form-grid-4">
-        <div class="form-campo">
-          <label>Servicio</label>
+      <div class="fields-grid fields-grid--4">
+        <div class="field-wrap">
+          <label class="field-label">Servicio</label>
           <input formControlName="servicio" readonly class="campo-input readonly" />
         </div>
-        <div class="form-campo">
-          <label>Tipo de Acta</label>
+        <div class="field-wrap">
+          <label class="field-label">Tipo de Acta</label>
           <input formControlName="tipoActa" readonly class="campo-input readonly" />
         </div>
-        <div class="form-campo">
-          <label>Año</label>
+        <div class="field-wrap">
+          <label class="field-label">Año</label>
           <input formControlName="anio" class="campo-input" />
         </div>
-        <div class="form-campo">
-          <label>Años de Búsqueda</label>
+        <div class="field-wrap">
+          <label class="field-label">Años de Búsqueda</label>
           <input formControlName="aniosBusqueda" readonly class="campo-input readonly" />
         </div>
-        <div class="form-campo">
-          <label>Rango de Búsqueda</label>
+        <div class="field-wrap">
+          <label class="field-label">Rango de Búsqueda</label>
           <input formControlName="rangoBusqueda" readonly class="campo-input readonly" />
         </div>
-        <div class="form-campo">
-          <label>Fecha de Registro</label>
+        <div class="field-wrap">
+          <label class="field-label">Fecha de Registro</label>
           <input type="date" formControlName="fechaRegistro" class="campo-input" />
         </div>
       </div>
-      <div class="form-grid-3" style="margin-top: 0.75rem">
-        <div class="form-campo">
-          <label>Oficialía</label>
+
+      <div class="fields-grid fields-grid--3 mt">
+        <div class="field-wrap">
+          <label class="field-label">Oficialía</label>
           <input formControlName="oficialia" class="campo-input" />
         </div>
-        <div class="form-campo">
-          <label>No. de Acta</label>
+        <div class="field-wrap">
+          <label class="field-label">No. de Acta</label>
           <input formControlName="noActa" class="campo-input" />
         </div>
-        <div class="form-campo">
-          <label>No. de Foja</label>
+        <div class="field-wrap">
+          <label class="field-label">No. de Foja</label>
           <input formControlName="noFoja" class="campo-input" />
         </div>
       </div>
-    </div>
 
-    <div class="seccion-card">
-      <div class="seccion-titulo">
-        <mat-icon>place</mat-icon>
-        Registro
-      </div>
-      <div class="form-grid-4">
-        <div class="form-campo">
-          <label>Localidad</label>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <div class="section-header">
+      <div class="section-icon"><mat-icon>place</mat-icon></div>
+      <h3 class="section-title">Registro</h3>
+    </div>
+    <div class="section-body">
+
+      <div class="fields-grid fields-grid--4">
+        <div class="field-wrap">
+          <label class="field-label">Localidad</label>
           <input formControlName="localidad" class="campo-input" />
         </div>
-        <div class="form-campo">
-          <label>Estado</label>
+        <div class="field-wrap">
+          <label class="field-label">Estado</label>
           <input formControlName="estadoRegistro" class="campo-input" />
         </div>
-        <div class="form-campo">
-          <label>Distrito</label>
+        <div class="field-wrap">
+          <label class="field-label">Distrito</label>
           <input formControlName="distrito" class="campo-input" />
         </div>
-        <div class="form-campo">
-          <label>Municipio</label>
+        <div class="field-wrap">
+          <label class="field-label">Municipio</label>
           <input formControlName="municipio" class="campo-input" />
         </div>
       </div>
-      <div class="form-campo full-width" style="margin-top: 0.75rem">
-        <label>Nombre(s)</label>
+
+      <div class="field-wrap span-full mt">
+        <label class="field-label">Nombre(s)</label>
         <input formControlName="nombres" class="campo-input" />
       </div>
-    </div>
 
-    <div class="seccion-card">
-      <div class="seccion-titulo">
-        <mat-icon>calendar_today</mat-icon>
-        Fechas
-      </div>
-      <div class="form-grid-3">
-        <div class="form-campo">
-          <label>Fecha Solicitud</label>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <div class="section-header">
+      <div class="section-icon"><mat-icon>calendar_today</mat-icon></div>
+      <h3 class="section-title">Fechas</h3>
+    </div>
+    <div class="section-body">
+
+      <div class="fields-grid fields-grid--3">
+        <div class="field-wrap">
+          <label class="field-label">Fecha Solicitud</label>
           <input type="date" formControlName="fechaSolicitud" class="campo-input" />
         </div>
-        <div class="form-campo">
-          <label>Fecha Entrega</label>
+        <div class="field-wrap">
+          <label class="field-label">Fecha Entrega</label>
           <input type="date" formControlName="fechaEntrega" class="campo-input" />
         </div>
-        <div class="form-campo">
-          <label>Fecha Pago</label>
+        <div class="field-wrap">
+          <label class="field-label">Fecha Pago</label>
           <input type="date" formControlName="fechaPago" class="campo-input" />
         </div>
       </div>
-    </div>
 
-    <div class="seccion-card">
-      <div class="seccion-titulo">
-        <mat-icon>notes</mat-icon>
-        Observaciones
-      </div>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <div class="section-header">
+      <div class="section-icon"><mat-icon>notes</mat-icon></div>
+      <h3 class="section-title">Observaciones</h3>
+    </div>
+    <div class="section-body">
       <textarea formControlName="observaciones" class="campo-input textarea" rows="4"></textarea>
     </div>
-
-    <div class="acciones-footer">
-      <button class="btn-cancelar" (click)="cancelar()">Cancelar</button>
-      <button class="btn-guardar" (click)="guardarCambios()">
-        <mat-icon>save</mat-icon>
-        Guardar Cambios
-      </button>
-    </div>
-
   </div>
+
+  <div class="action-bar">
+    <button class="btn-cancelar" (click)="cancelar()">Cancelar</button>
+    <button class="btn-guardar" (click)="guardarCambios()">
+      <mat-icon>save</mat-icon>
+      Guardar Cambios
+    </button>
+  </div>
+
 </div>
+
+<span class="watermark">Registro Civil</span>

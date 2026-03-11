@@ -1,20 +1,34 @@
-<div class="page-container">
-  <div class="page-header">
-    <div class="page-title-row">
-      <mat-icon>manage_search</mat-icon>
-      <h2 class="page-title">Búsqueda de Solicitudes</h2>
-      <span class="count-badge">{{ resultsCount }}</span>
-    </div>
-    <button class="btn-volver" (click)="goHome()">
-      <mat-icon>arrow_back</mat-icon>
-      Volver
-    </button>
-  </div>
+<header class="page-header">
+  <div class="header-inner">
 
+    <div class="header-escudo">
+      <img src="/oaxaca.png" alt="Registro Civil" />
+    </div>
+
+    <div class="header-text">
+      <span class="header-supratitle">Gobierno del Estado de Oaxaca</span>
+      <h1>Registro Civil del Estado</h1>
+      <span class="header-sub">Búsqueda de Solicitudes</span>
+    </div>
+
+    <div class="header-actions">
+      <button mat-button class="header-action-btn">
+        <mat-icon>tag</mat-icon>
+        {{ resultsCount }}
+      </button>
+      <button mat-button class="header-action-btn" (click)="goHome()">
+        <mat-icon>arrow_back</mat-icon>
+        Volver
+      </button>
+    </div>
+
+  </div>
+</header>
+<div class="header-rule"></div>
+
+<div class="container">
   <div class="filtros-row">
-    <button *ngFor="let filter of filters"
-      class="filter-chip"
-      [class.active]="currentFilter === filter.value"
+    <button *ngFor="let filter of filters" class="filter-chip" [class.active]="currentFilter === filter.value"
       (click)="setFilter(filter.value)">
       {{ filter.label }}
     </button>
@@ -23,7 +37,7 @@
   <div class="search-card">
     <div class="search-fields">
 
-      <mat-form-field appearance="outline" class="search-field">
+      <mat-form-field appearance="outline" class="trab-field">
         <mat-label>Fecha de recepción</mat-label>
         <input matInput [matDatepicker]="picker" [(ngModel)]="fechaPago" placeholder="dd/mm/aaaa">
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
@@ -31,11 +45,8 @@
       </mat-form-field>
 
       <ng-container *ngIf="!folioHojaBloqueado">
-        <mat-form-field appearance="outline" class="search-field">
-          <mat-label>Folio inicial hoja valorada</mat-label>
-          <input matInput type="number" min="1" [(ngModel)]="folioInput" placeholder="Ej. 1042">
-          <mat-hint>Se bloqueará al presionar Establecer</mat-hint>
-        </mat-form-field>
+        <input class="folio-input" type="number" min="1" [(ngModel)]="folioInput"
+          placeholder="Folio inicial hoja valorada" autocomplete="off" name="folio-hoja-val">
         <button class="btn-establecer" (click)="establecerFolioInicial()"
           matTooltip="Establece el folio inicial. No podrá editarse en esta sesión.">
           <mat-icon>lock</mat-icon>
@@ -59,9 +70,7 @@
     </div>
 
     <div class="year-strip">
-      <button *ngFor="let yr of yearRanges"
-        class="year-chip"
-        [class.active]="isYearRangeSelected(yr.range)"
+      <button *ngFor="let yr of yearRanges" class="year-chip" [class.active]="isYearRangeSelected(yr.range)"
         (click)="selectYearRange(yr.range)">
         <span class="yr-range">{{ yr.range }}</span>
         <span class="yr-count">{{ yr.count }}</span>
@@ -70,14 +79,12 @@
   </div>
 
   <div class="acciones-row" *ngIf="payments.length > 0">
-    <button class="btn-pdf btn-sel" (click)="generarReporteSeleccionados()"
-      [disabled]="selectedCount === 0"
+    <button class="btn-pdf btn-sel" (click)="generarReporteSeleccionados()" [disabled]="selectedCount === 0"
       matTooltip="PDF de seleccionados">
       <mat-icon>picture_as_pdf</mat-icon>
       Seleccionados ({{ selectedCount }})
     </button>
-    <button class="btn-pdf btn-all" (click)="generarReporte()"
-      matTooltip="PDF de todos">
+    <button class="btn-pdf btn-all" (click)="generarReporte()" matTooltip="PDF de todos">
       <mat-icon>picture_as_pdf</mat-icon>
       Todos ({{ payments.length }})
     </button>
@@ -90,18 +97,16 @@
 
   <div class="empty" *ngIf="!isLoading && payments.length === 0">
     {{ selectedYearRange || currentFilter !== 'todos' || fechaPago
-      ? 'Sin resultados para los criterios seleccionados'
-      : 'Selecciona un filtro y presiona Buscar' }}
+    ? 'Sin resultados para los criterios seleccionados'
+    : 'Selecciona un filtro y presiona Buscar' }}
   </div>
 
   <div class="lista" *ngIf="!isLoading && payments.length > 0">
-    <div class="solicitud-card"
-      *ngFor="let payment of payments"
-      [class.is-selected]="payment.selected"
-      [class.is-impreso]="payment.impreso"
-      [id]="'payment-' + payment.id">
+    <div class="solicitud-card" *ngFor="let payment of payments" [class.is-selected]="payment.selected"
+      [class.is-impreso]="payment.impreso" [id]="'payment-' + payment.id">
 
       <div class="s-avatar">{{ payment.id[0] }}</div>
+
       <div class="s-info">
         <span class="s-folio">{{ payment.id }}</span>
         <span class="s-concepto">{{ payment.concepto }}</span>
@@ -112,7 +117,7 @@
       </div>
 
       <div class="s-chips">
-        <span class="estado-chip" [class]="'estado-' + payment.estadoClave">
+        <span class="estado-chip" [ngClass]="'estado-' + payment.estadoClave">
           {{ payment.estadoNombre }}
         </span>
         <span class="hoja-chip" *ngIf="payment.folioHojaUsado">
@@ -128,3 +133,5 @@
   </div>
 
 </div>
+
+<span class="watermark">Registro Civil</span>

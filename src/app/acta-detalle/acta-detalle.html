@@ -1,306 +1,205 @@
-<div class="acta-detalle-container">
-  <div class="header">
-    <h2 mat-dialog-title class="fade-in">
-      <mat-icon>description</mat-icon>
-      Detalles del Acta de Nacimiento
-    </h2>
-    <button (click)="cerrar()" class="close-button">&times;</button>
+<div class="dialog-wrapper">
+  <div class="dialog-header">
+    <div class="dialog-title-row">
+      <div class="dialog-escudo">
+        <mat-icon>description</mat-icon>
+      </div>
+      <div>
+        <p class="dialog-super">Registro Civil del Estado</p>
+        <h2 class="dialog-title">Detalles del Acta de Nacimiento</h2>
+      </div>
+    </div>
+    <button class="btn-close" (click)="cerrar()">✕</button>
   </div>
+  <div class="gold-rule"></div>
 
-  <mat-dialog-content>
-    <mat-card class="info-section slide-up" style="animation-delay: 0.2s">
-      <mat-card-header>
-        <mat-card-title>
-          <mat-icon>person</mat-icon>
-          Datos del Registrado
-        </mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="info-grid">
-          <div class="info-item highlight">
-            <label>
-              <mat-icon class="label-icon">badge</mat-icon>
-              Nombre Completo
-            </label>
-            <p class="nombre-completo">{{ actaData.nombreCompleto }}</p>
+  <div class="dialog-body">
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-icon"><mat-icon>person</mat-icon></div>
+        <h3 class="section-title">Datos del Registrado</h3>
+      </div>
+      <div class="section-body">
+        <div class="campo full">
+          <span class="campo-label"><mat-icon>badge</mat-icon> Nombre Completo</span>
+          <span class="campo-valor nombre-grande">{{ actaData.nombreCompleto }}</span>
+        </div>
+        <div class="grid-3 mt">
+          <div class="campo">
+            <span class="campo-label"><mat-icon>drive_file_rename_outline</mat-icon> Nombre(s)</span>
+            <span class="campo-valor">{{ actaData.nombre }}</span>
           </div>
-
-          <div class="info-item">
-            <label>
-              <mat-icon class="label-icon">drive_file_rename_outline</mat-icon>
-              Nombre(s)
-            </label>
-            <p>{{ actaData.nombre }}</p>
+          <div class="campo">
+            <span class="campo-label"><mat-icon>badge</mat-icon> Apellido Paterno</span>
+            <span class="campo-valor">{{ actaData.apellidoPaterno }}</span>
           </div>
-
-          <div class="info-item">
-            <label>
-              <mat-icon class="label-icon">badge</mat-icon>
-              Apellido Paterno
-            </label>
-            <p>{{ actaData.apellidoPaterno }}</p>
+          <div class="campo">
+            <span class="campo-label"><mat-icon>badge</mat-icon> Apellido Materno</span>
+            <span class="campo-valor">{{ actaData.apellidoMaterno }}</span>
           </div>
-
-          <div class="info-item">
-            <label>
-              <mat-icon class="label-icon">badge</mat-icon>
-              Apellido Materno
-            </label>
-            <p>{{ actaData.apellidoMaterno }}</p>
+        </div>
+        <div class="grid-2 mt">
+          <div class="campo">
+            <span class="campo-label"><mat-icon>wc</mat-icon> Sexo</span>
+            <span class="campo-valor">{{ getSexoLabel(actaData.sexo) }}</span>
           </div>
-
-          <div class="info-item">
-            <label>
-              <mat-icon class="label-icon">wc</mat-icon>
-              Sexo
-            </label>
-            <p class="sexo-badge">{{ getSexoLabel(actaData.sexo) }}</p>
-          </div>
-
-          <div class="info-item">
-            <label>
-              <mat-icon class="label-icon">health_and_safety</mat-icon>
-              Estado Vital
-            </label>
-            <p [class.estado-vivo]="actaData.estadoVital === 'Vivo'"
+          <div class="campo">
+            <span class="campo-label"><mat-icon>health_and_safety</mat-icon> Estado Vital</span>
+            <span class="campo-valor estado-chip"
+              [class.estado-vivo]="actaData.estadoVital === 'Vivo'"
               [class.estado-finado]="actaData.estadoVital === 'Finado'">
-              <mat-icon>
-                {{ actaData.estadoVital === 'Vivo' ? 'favorite' : 'heart_broken' }}
-              </mat-icon>
+              <mat-icon>{{ actaData.estadoVital === 'Vivo' ? 'favorite' : 'heart_broken' }}</mat-icon>
               {{ actaData.estadoVital }}
-            </p>
+            </span>
           </div>
         </div>
-      </mat-card-content>
-    </mat-card>
+      </div>
+    </div>
 
-    <mat-divider class="section-divider"></mat-divider>
-    <mat-card class="info-section slide-up" style="animation-delay: 0.3s">
-      <mat-card-header>
-        <mat-card-title>
-          <mat-icon>article</mat-icon>
-          Datos del Acta
-        </mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="info-grid">
-          <div class="info-item highlight-secondary">
-            <label>
-              <mat-icon class="label-icon">numbers</mat-icon>
-              Número de Acta
-            </label>
-            <p class="acta-numero">{{ actaData.numeroActa }}</p>
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-icon"><mat-icon>article</mat-icon></div>
+        <h3 class="section-title">Datos del Acta</h3>
+      </div>
+      <div class="section-body">
+        <div class="grid-3">
+          <div class="campo">
+            <span class="campo-label"><mat-icon>numbers</mat-icon> Número de Acta</span>
+            <span class="campo-valor campo-mono destacado">{{ actaData.numeroActa }}</span>
           </div>
-
-          <div class="info-item">
-            <label>
-              <mat-icon class="label-icon">event</mat-icon>
-              Año de Registro
-            </label>
-            <p>{{ actaData.anioRegistro }}</p>
+          <div class="campo">
+            <span class="campo-label"><mat-icon>event</mat-icon> Año de Registro</span>
+            <span class="campo-valor">{{ actaData.anioRegistro }}</span>
           </div>
-
-          <div class="info-item">
-            <label>
-              <mat-icon class="label-icon">menu_book</mat-icon>
-              Foja
-            </label>
-            <p>{{ actaData.foja }}</p>
-          </div>
-
-          <div class="info-item highlight-tertiary">
-            <label>
-              <mat-icon class="label-icon">fingerprint</mat-icon>
-              CURP del Registrado
-            </label>
-            <p class="curp">{{ actaData.curp }}</p>
-          </div>
-
-          <div class="info-item">
-            <label>
-              <mat-icon class="label-icon">map</mat-icon>
-              Entidad
-            </label>
-            <p>{{ actaData.entidad }}</p>
-          </div>
-
-          <div class="info-item">
-            <label>
-              <mat-icon class="label-icon">location_city</mat-icon>
-              Municipio
-            </label>
-            <p>{{ actaData.municipio }}</p>
-          </div>
-
-          <div class="info-item">
-            <label>
-              <mat-icon class="label-icon">account_balance</mat-icon>
-              Oficialía
-            </label>
-            <p>{{ actaData.oficialia }}</p>
-          </div>
-
-          <div class="info-item">
-            <label>
-              <mat-icon class="label-icon">location_on</mat-icon>
-              Distrito
-            </label>
-            <p>{{ actaData.distrito }}</p>
-          </div>
-
-          <div class="info-item">
-            <label>
-              <mat-icon class="label-icon">calendar_today</mat-icon>
-              Fecha de Registro
-            </label>
-            <p>{{ formatearFecha(actaData.fechaRegistro) }}</p>
+          <div class="campo">
+            <span class="campo-label"><mat-icon>menu_book</mat-icon> Foja</span>
+            <span class="campo-valor">{{ actaData.foja }}</span>
           </div>
         </div>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-divider class="section-divider"></mat-divider>
-    <mat-card class="info-section slide-up" style="animation-delay: 0.4s">
-      <mat-card-header>
-        <mat-card-title>
-          <mat-icon>cake</mat-icon>
-          Datos de Nacimiento
-        </mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="info-grid">
-          <div class="info-item">
-            <label>
-              <mat-icon class="label-icon">event</mat-icon>
-              Fecha de Nacimiento
-            </label>
-            <p class="fecha-importante">
-              {{ formatearFecha(actaData.fechaNacimiento) }}
-            </p>
+        <div class="campo full mt">
+          <span class="campo-label"><mat-icon>fingerprint</mat-icon> CURP del Registrado</span>
+          <span class="campo-valor campo-mono">{{ actaData.curp }}</span>
+        </div>
+        <div class="grid-3 mt">
+          <div class="campo">
+            <span class="campo-label"><mat-icon>map</mat-icon> Entidad</span>
+            <span class="campo-valor">{{ actaData.entidad }}</span>
           </div>
-
-          <div class="info-item">
-            <label>
-              <mat-icon class="label-icon">schedule</mat-icon>
-              Hora de Nacimiento
-            </label>
-            <p>{{ actaData.horaNacimiento }} hrs</p>
+          <div class="campo">
+            <span class="campo-label"><mat-icon>location_city</mat-icon> Municipio</span>
+            <span class="campo-valor">{{ actaData.municipio }}</span>
           </div>
-
-          <div class="info-item">
-            <label>
-              <mat-icon class="label-icon">map</mat-icon>
-              Entidad de Nacimiento
-            </label>
-            <p>{{ actaData.entidadNacimiento }}</p>
+          <div class="campo">
+            <span class="campo-label"><mat-icon>account_balance</mat-icon> Oficialía</span>
+            <span class="campo-valor">{{ actaData.oficialia }}</span>
           </div>
-
-          <div class="info-item">
-            <label>
-              <mat-icon class="label-icon">location_city</mat-icon>
-              Municipio de Nacimiento
-            </label>
-            <p>{{ actaData.municipioNacimiento }}</p>
+          <div class="campo">
+            <span class="campo-label"><mat-icon>location_on</mat-icon> Distrito</span>
+            <span class="campo-valor">{{ actaData.distrito }}</span>
           </div>
-
-          <div class="info-item">
-            <label>
-              <mat-icon class="label-icon">place</mat-icon>
-              Localidad
-            </label>
-            <p>{{ actaData.localidad }}</p>
+          <div class="campo">
+            <span class="campo-label"><mat-icon>calendar_today</mat-icon> Fecha de Registro</span>
+            <span class="campo-valor">{{ formatearFecha(actaData.fechaRegistro) }}</span>
           </div>
         </div>
-      </mat-card-content>
-    </mat-card>
+      </div>
+    </div>
 
-    <mat-divider class="section-divider"></mat-divider>
-    <mat-card class="info-section slide-up" style="animation-delay: 0.5s">
-      <mat-card-header>
-        <mat-card-title>
-          <mat-icon>family_restroom</mat-icon>
-          Datos de los Padres
-        </mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="parent-section">
-          <h3 class="parent-title padre">
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-icon"><mat-icon>cake</mat-icon></div>
+        <h3 class="section-title">Datos de Nacimiento</h3>
+      </div>
+      <div class="section-body">
+        <div class="grid-3">
+          <div class="campo">
+            <span class="campo-label"><mat-icon>event</mat-icon> Fecha de Nacimiento</span>
+            <span class="campo-valor destacado">{{ formatearFecha(actaData.fechaNacimiento) }}</span>
+          </div>
+          <div class="campo">
+            <span class="campo-label"><mat-icon>schedule</mat-icon> Hora de Nacimiento</span>
+            <span class="campo-valor">{{ actaData.horaNacimiento }} hrs</span>
+          </div>
+          <div class="campo">
+            <span class="campo-label"><mat-icon>map</mat-icon> Entidad de Nacimiento</span>
+            <span class="campo-valor">{{ actaData.entidadNacimiento }}</span>
+          </div>
+          <div class="campo">
+            <span class="campo-label"><mat-icon>location_city</mat-icon> Municipio de Nacimiento</span>
+            <span class="campo-valor">{{ actaData.municipioNacimiento }}</span>
+          </div>
+          <div class="campo">
+            <span class="campo-label"><mat-icon>place</mat-icon> Localidad</span>
+            <span class="campo-valor">{{ actaData.localidad }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-icon"><mat-icon>family_restroom</mat-icon></div>
+        <h3 class="section-title">Datos de los Padres</h3>
+      </div>
+      <div class="section-body">
+
+        <div class="parent-block">
+          <div class="parent-heading">
             <mat-icon>man</mat-icon>
             Padre
-          </h3>
-          <div class="info-grid">
-            <div class="info-item full-width">
-              <label>
-                <mat-icon class="label-icon">person</mat-icon>
-                Nombre del Padre
-              </label>
-              <p class="nombre-padre">{{ actaData.nombrePadre }}</p>
+          </div>
+          <div class="campo full">
+            <span class="campo-label"><mat-icon>person</mat-icon> Nombre del Padre</span>
+            <span class="campo-valor nombre-grande">{{ actaData.nombrePadre }}</span>
+          </div>
+          <div class="grid-2 mt">
+            <div class="campo">
+              <span class="campo-label"><mat-icon>cake</mat-icon> Edad al momento del registro</span>
+              <span class="campo-valor">{{ actaData.edadPadre }} años</span>
             </div>
-
-            <div class="info-item">
-              <label>
-                <mat-icon class="label-icon">cake</mat-icon>
-                Edad al momento del registro
-              </label>
-              <p>{{ actaData.edadPadre }} años</p>
-            </div>
-
-            <div class="info-item">
-              <label>
-                <mat-icon class="label-icon">public</mat-icon>
-                Nacionalidad
-              </label>
-              <p>{{ actaData.nacionalidadPadre }}</p>
+            <div class="campo">
+              <span class="campo-label"><mat-icon>public</mat-icon> Nacionalidad</span>
+              <span class="campo-valor">{{ actaData.nacionalidadPadre }}</span>
             </div>
           </div>
         </div>
 
-        <mat-divider class="parent-divider"></mat-divider>
+        <div class="parent-divider"></div>
 
-        <div class="parent-section">
-          <h3 class="parent-title madre">
+        <div class="parent-block">
+          <div class="parent-heading">
             <mat-icon>woman</mat-icon>
             Madre
-          </h3>
-          <div class="info-grid">
-            <div class="info-item full-width">
-              <label>
-                <mat-icon class="label-icon">person</mat-icon>
-                Nombre de la Madre
-              </label>
-              <p class="nombre-madre">{{ actaData.nombreMadre }}</p>
+          </div>
+          <div class="campo full">
+            <span class="campo-label"><mat-icon>person</mat-icon> Nombre de la Madre</span>
+            <span class="campo-valor nombre-grande">{{ actaData.nombreMadre }}</span>
+          </div>
+          <div class="grid-2 mt">
+            <div class="campo">
+              <span class="campo-label"><mat-icon>cake</mat-icon> Edad al momento del registro</span>
+              <span class="campo-valor">{{ actaData.edadMadre }} años</span>
             </div>
-
-            <div class="info-item">
-              <label>
-                <mat-icon class="label-icon">cake</mat-icon>
-                Edad al momento del registro
-              </label>
-              <p>{{ actaData.edadMadre }} años</p>
-            </div>
-
-            <div class="info-item">
-              <label>
-                <mat-icon class="label-icon">public</mat-icon>
-                Nacionalidad
-              </label>
-              <p>{{ actaData.nacionalidadMadre }}</p>
+            <div class="campo">
+              <span class="campo-label"><mat-icon>public</mat-icon> Nacionalidad</span>
+              <span class="campo-valor">{{ actaData.nacionalidadMadre }}</span>
             </div>
           </div>
         </div>
-      </mat-card-content>
-    </mat-card>
 
-  </mat-dialog-content>
+      </div>
+    </div>
 
-  <mat-dialog-actions align="end" class="actions-container fade-in" style="animation-delay: 0.6s">
-    <button mat-button (click)="cerrar()" class="btn-cancel">
+  </div>
+  <div class="dialog-footer">
+    <button class="btn-cancelar" (click)="cerrar()">
       <mat-icon>close</mat-icon>
       Cancelar
     </button>
-    <button mat-raised-button color="primary" (click)="generar()" class="btn-primary">
+    <button class="btn-generar" (click)="generar()">
       <mat-icon>download</mat-icon>
       Generar
     </button>
-  </mat-dialog-actions>
+  </div>
+
 </div>
