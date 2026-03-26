@@ -1,18 +1,37 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
-@Injectable({
-  providedIn: 'root'
-})
+// ── MOCK MODE — revertir cuando el backend esté disponible ──────────────────
+const MOCK_TOKEN   = 'mock-token-dev';
+const MOCK_USUARIO = {
+  id: 1,
+  username: 'admin',
+  nombre: 'Admin',
+  apellido_paterno: 'Sistema',
+  apellido_materno: '',
+  area_id: 5,
+  rol_id: 6,
+  activo: true,
+  rol: { id: 6, clave: 'ADMINISTRADOR', nombre: 'Administrador', area_id: 5, activo: true },
+  permisos: [
+    { id: 1, clave: 'RECEPCION',   nombre: 'Recepción de solicitudes' },
+    { id: 2, clave: 'IMPRESION',   nombre: 'Impresión de certificaciones' },
+    { id: 3, clave: 'ENTREGA',     nombre: 'Entrega de documentos' },
+    { id: 4, clave: 'CANCELACION', nombre: 'Cancelación de solicitudes' },
+  ],
+};
+// ── FIN MOCK ─────────────────────────────────────────────────────────────────
+
+@Injectable({ providedIn: 'root' })
 export class AuthService {
-  private tokenKey = 'token';
+  private tokenKey   = 'token';
   private usuarioKey = 'usuario';
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) { }
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
 
   login(token: string, usuario: any) {
     if (isPlatformBrowser(this.platformId)) {
-      sessionStorage.setItem(this.tokenKey, token);
+      sessionStorage.setItem(this.tokenKey,   token);
       sessionStorage.setItem(this.usuarioKey, JSON.stringify(usuario));
     }
   }
@@ -25,25 +44,22 @@ export class AuthService {
   }
 
   isLoggedIn(): boolean {
-    if (isPlatformBrowser(this.platformId)) {
-      return !!sessionStorage.getItem(this.tokenKey);
-    }
-    return false;
+    return true; // ── MOCK
   }
 
   getToken(): string | null {
     if (isPlatformBrowser(this.platformId)) {
-      return sessionStorage.getItem(this.tokenKey);
+      return sessionStorage.getItem(this.tokenKey) ?? MOCK_TOKEN;
     }
-    return null;
+    return MOCK_TOKEN;
   }
 
   getUsuario(): any {
     if (isPlatformBrowser(this.platformId)) {
       const u = sessionStorage.getItem(this.usuarioKey);
-      return u ? JSON.parse(u) : null;
+      return u ? JSON.parse(u) : MOCK_USUARIO;
     }
-    return null;
+    return MOCK_USUARIO;
   }
 
   getNombre(): string {
@@ -52,17 +68,14 @@ export class AuthService {
   }
 
   getRol(): string {
-    const usuario = this.getUsuario();
-    return usuario?.rol?.nombre ?? '';
+    return this.getUsuario()?.rol?.nombre ?? '';
   }
 
   getRolClave(): string {
-    const usuario = this.getUsuario();
-    return usuario?.rol?.clave ?? '';
+    return this.getUsuario()?.rol?.clave ?? '';
   }
 
   hasPermiso(clave: string): boolean {
-    const usuario = this.getUsuario();
-    return usuario?.permisos?.some((p: any) => p.clave === clave) ?? false;
+    return this.getUsuario()?.permisos?.some((p: any) => p.clave === clave) ?? false;
   }
 }

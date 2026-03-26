@@ -30,7 +30,9 @@
   </header>
 
   <div class="dashboard-content slide-up" *ngIf="vistaActual === 'home'">
-
+    <button mat-menu-item (click)="generarFotocopia()">
+      <mat-icon>content_copy</mat-icon> Generar PDF
+    </button>
     <div class="dashboard-header-row">
       <p class="dashboard-subtitle">¿Qué deseas hacer hoy?</p>
       <div class="session-pill">
