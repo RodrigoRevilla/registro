@@ -38,16 +38,16 @@ export class PdfService {
     const doc = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
-      format: 'letter',
+      format: [216, 330],
     });
 
-    const pw  = 215.9;
-    const ph  = 279.4;
-    const lm  = 15;
+    const pw  = 216;
+    const ph  = 330;
+    const lm  = 20;
     const pad = 6;
 
-    const recuadroTop    = ph * 0.52;
-    const recuadroBottom = ph - 6;    
+    const recuadroBottom = ph - 10;
+    const recuadroTop    = recuadroBottom - 105;
     const recuadroH      = recuadroBottom - recuadroTop;
     const recuadroW      = pw - lm * 2;
 
@@ -57,11 +57,11 @@ export class PdfService {
 
     const x  = lm + pad;
     const rw = recuadroW - pad * 2;
-    const cx = lm + recuadroW / 2;  
+    const cx = lm + recuadroW / 2;
     let   y  = recuadroTop + 9;
-    const lh = 5.4;  
+    const lh = 5.4;
     const fs = 8.5;
-    const ulo = 1.1; 
+    const ulo = 1.1;
 
     doc.setFontSize(fs);
     doc.setFont('helvetica', 'normal');
@@ -71,7 +71,7 @@ export class PdfService {
       segments: { text: string; bold: boolean }[],
       startX: number,
       posY: number,
-      extendLast = false  
+      extendLast = false
     ): number => {
       let curX = startX;
       const lastBoldIdx = extendLast
@@ -109,13 +109,13 @@ export class PdfService {
       doc.line(x, y + ulo, x + tw, y + ulo);
       doc.setFont('helvetica', 'normal');
     }
-    y += lh * 2;  
+    y += lh * 2;
 
     doc.setFontSize(fs);
     doc.setFont('helvetica', 'bold');
     doc.text('CERTIFICA:', cx, y, { align: 'center' });
     doc.setFont('helvetica', 'normal');
-    y += lh * 2; 
+    y += lh * 2;
 
     inline([
       { text: 'Que la presente fotocopia del registrado de ', bold: false },
@@ -123,7 +123,7 @@ export class PdfService {
       { text: '  a nombre de  ',                              bold: false },
       { text: datos.nombreRegistrado,                         bold: true  },
     ], x, y, true);
-    y += lh * 2;   
+    y += lh * 2;
 
     inline([
       { text: 'es fiel y exacta reproducción del acervo registral que obran en  ', bold: false },
@@ -156,12 +156,12 @@ export class PdfService {
       'Civil vigente, se extiende la presente, a los ' +
       datos.diaDe + ' días del mes de ' + datos.mesDe + ' de ' + datos.anioDe + ', doy fe.';
 
-    const pLines = doc.splitTextToSize(parrafoLimpio, rw);
-    const boldValues = [datos.diaDe, datos.mesDe, datos.anioDe];
+    const pLines      = doc.splitTextToSize(parrafoLimpio, rw);
+    const boldValues  = [datos.diaDe, datos.mesDe, datos.anioDe];
 
     for (const line of pLines) {
       let remaining = line;
-      let curX = x;
+      let curX      = x;
 
       while (remaining.length > 0) {
         let firstIdx = -1;
@@ -220,12 +220,13 @@ export class PdfService {
     doc.text('ENCARGADO DE EXPEDICIÓN DE DOCUMENTOS *', x, encY1);
     doc.setFont('helvetica', 'normal');
     doc.text(datos.encargado, x, encY2);
+
     doc.setFontSize(6.5);
     doc.setFont('helvetica', 'normal');
     doc.text(
       '"CAUSA DERECHOS CONFORME AL ARTICULO 43 DE LA LEY ESTATAL DE DERECHOS DE OAXACA"',
       pw / 2,
-      ph - 2,
+      recuadroBottom + 6,
       { align: 'center' }
     );
 
