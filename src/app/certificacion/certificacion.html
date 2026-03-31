@@ -338,7 +338,7 @@
             <label class="field-label">Fecha de Entrega</label>
             <mat-form-field appearance="outline" class="sol-field">
               <input matInput [matDatepicker]="pickerEntrega" [(ngModel)]="fechaEntrega" name="fecha-entrega-sol"
-                autocomplete="off" (dateChange)="autoFechaEntrega()">
+                autocomplete="off" (dateChange)="autoFechaEntrega()" (blur)="autoFechaEntrega()">
               <mat-datepicker-toggle matIconSuffix [for]="pickerEntrega"></mat-datepicker-toggle>
               <mat-datepicker #pickerEntrega></mat-datepicker>
             </mat-form-field>

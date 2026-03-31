@@ -156,10 +156,10 @@ export class CertificacionComponent implements OnInit {
           this.folioGenerado = response?.data?.solicitud?.folio ?? null;
           this.lineaCaptura = response?.data?.pago?.referencia_pago ?? null;
 
-          setTimeout(() => {                   
+          setTimeout(() => {
             if (url) {
               this.urlPdf = url;
-              this.mostrarPdf = true;              
+              this.mostrarPdf = true;
               this.cdr.detectChanges();
               const ventana = window.open(url, '_blank', `width=${screen.width},height=${screen.height},top=0,left=0`);
               ventana?.addEventListener('load', () => ventana.print());
@@ -185,7 +185,10 @@ export class CertificacionComponent implements OnInit {
   }
 
   autoFechaEntrega(): void {
-    if (!this.fechaEntrega) this.fechaEntrega = this.today;
+    if (!this.fechaEntrega) {
+      const [anio, mes, dia] = this.today.split('-').map(Number);
+      this.fechaEntrega = new Date(anio, mes - 1, dia); 
+    }
   }
 
   autoHoraEntrega(): void {

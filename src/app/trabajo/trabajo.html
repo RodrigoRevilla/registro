@@ -44,21 +44,18 @@
         <mat-datepicker #picker></mat-datepicker>
       </mat-form-field>
 
-      <ng-container *ngIf="!folioHojaBloqueado">
+      <!-- Folio HV — solo visible en fotocopias -->
+      <div class="folio-hv-wrap" *ngIf="currentFilter === 'fotocopias'">
         <input class="folio-input" type="number" min="1" [(ngModel)]="folioInput"
           placeholder="Folio inicial hoja valorada" autocomplete="off" name="folio-hoja-val">
         <button class="btn-establecer" (click)="establecerFolioInicial()"
-          matTooltip="Establece el folio inicial. No podrá editarse en esta sesión.">
-          <mat-icon>lock</mat-icon>
+          matTooltip="Establece el folio inicial de hoja valorada para esta sesión.">
+          <mat-icon>check</mat-icon>
           Establecer
         </button>
-      </ng-container>
-
-      <div *ngIf="folioHojaBloqueado" class="folio-bloqueado">
-        <mat-icon>lock</mat-icon>
-        <div>
-          <span class="folio-lbl">Siguiente hoja valorada</span>
-          <strong class="folio-num">{{ folioHojaValorada }}</strong>
+        <div class="folio-hint" *ngIf="folioHojaValorada !== null">
+          <mat-icon>bookmark</mat-icon>
+          <span>Siguiente: <strong>{{ siguienteFolioEsperado }}</strong></span>
         </div>
       </div>
 

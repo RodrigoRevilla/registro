@@ -353,29 +353,41 @@ $blue-border:  #90caf9;
   }
 }
 
-.folio-bloqueado {
+.folio-hv-wrap {
   display: flex;
   align-items: center;
-  gap: 12px;
-  height: 38px;
-  padding: 0 16px;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.folio-hint {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 28px;
+  padding: 0 10px;
   background: $gold-dim;
-  border: 1.5px solid rgba($gold, 0.28);
+  border: 1px solid rgba($gold, 0.28);
   border-radius: 2px;
-  flex-shrink: 0;
+  @include sans;
+  font-size: 11px;
+  color: $ink-soft;
+  white-space: nowrap;
 
   mat-icon {
-    font-size: 15px !important;
-    width: 15px !important;
-    height: 15px !important;
+    font-size: 13px !important;
+    width: 13px !important;
+    height: 13px !important;
     color: $gold;
     flex-shrink: 0;
   }
 
-  div {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+  strong {
+    @include mono;
+    font-size: 12px;
+    font-weight: 700;
+    color: $ink;
+    letter-spacing: 0.04em;
   }
 }
 
@@ -754,6 +766,7 @@ $blue-border:  #90caf9;
   .header-sub        { display: none; }
   .search-fields     { flex-direction: column; align-items: stretch; }
   .trab-field        { max-width: 100% !important; }
+  .folio-hv-wrap     { flex-direction: column; align-items: stretch; }
   .btn-establecer,
   .btn-buscar        { width: 100%; justify-content: center; }
   .solicitud-card    { flex-wrap: wrap; }

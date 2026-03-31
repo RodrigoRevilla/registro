@@ -1,29 +1,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
-$ink: #5a0e22;
+$ink:      #5a0e22;
 $ink-soft: #7a1530;
-$gold: #6e1530;
+$gold:     #6e1530;
 $gold-dark: #55102a;
 $gold-dim: rgba(#6e1530, 0.12);
-$cream: #f7f7f7;
+$cream:    #f7f7f7;
 $cream-dark: #eeeeee;
-$rust: #c0392b;
-$slate: #4a4a4a;
+$rust:     #c0392b;
+$slate:    #4a4a4a;
 $slate-dim: #777777;
-$border: #d0d0d0;
-$white: #ffffff;
+$border:   #d0d0d0;
+$white:    #ffffff;
 
-@mixin mono {
-  font-family: 'IBM Plex Mono', monospace;
-}
-
-@mixin display {
-  font-family: 'Playfair Display', serif;
-}
-
-@mixin sans {
-  font-family: 'Inter', sans-serif;
-}
+@mixin mono    { font-family: 'IBM Plex Mono', monospace; }
+@mixin display { font-family: 'Playfair Display', serif; }
+@mixin sans    { font-family: 'Inter', sans-serif; }
 
 @mixin label-caps {
   font-size: 10px;
@@ -45,7 +37,7 @@ $white: #ffffff;
 
 .dialog-header {
   background-color: $gold;
-  background-image: url('/header.png'); 
+  background-image: url('/header.png');
   background-repeat: repeat-x;
   background-position: center center;
   background-size: auto 100%;
@@ -151,15 +143,131 @@ $white: #ffffff;
 .gold-rule {
   height: 3px;
   background: linear-gradient(90deg,
-      rgba(#ffffff, 0.55) 0%,
-      rgba(#ffffff, 0.2) 50%,
-      transparent 100%);
+    rgba(#ffffff, 0.55) 0%,
+    rgba(#ffffff, 0.2) 50%,
+    transparent 100%);
   flex-shrink: 0;
 }
 
 .dialog-body {
   padding: 1.5rem;
   background: $cream;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hv-card {
+  background: $white;
+  border: 1px solid $border;
+  border-radius: 3px;
+  padding: 1.2rem 1.5rem;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, $gold, $ink);
+  }
+}
+
+.hv-fields {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.folio-input {
+  height: 36px;
+  padding: 0 12px;
+  border: 1.5px solid $border;
+  border-radius: 2px;
+  background: $cream;
+  @include sans;
+  font-size: 13px;
+  color: $ink;
+  outline: none;
+  transition: border-color 0.15s, background 0.15s;
+  min-width: 180px;
+  flex: 1;
+  box-sizing: border-box;
+
+  &::placeholder {
+    color: rgba($slate, 0.4);
+    font-style: italic;
+    font-size: 11.5px;
+  }
+
+  &:focus {
+    border-color: $gold;
+    background: $white;
+    box-shadow: 0 0 0 3px rgba($gold, 0.1);
+  }
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  -moz-appearance: textfield;
+}
+
+.btn-establecer {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 36px;
+  padding: 0 14px;
+  border: 1.5px solid $border;
+  background: $white;
+  border-radius: 2px;
+  color: $slate;
+  @include sans;
+  @include label-caps;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  mat-icon { font-size: 14px !important; width: 14px !important; height: 14px !important; }
+
+  &:hover {
+    border-color: $gold;
+    color: $ink;
+    background: $gold-dim;
+  }
+}
+
+.folio-hint {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 28px;
+  padding: 0 10px;
+  background: $gold-dim;
+  border: 1px solid rgba($gold, 0.28);
+  border-radius: 2px;
+  @include sans;
+  font-size: 11px;
+  color: $ink-soft;
+  white-space: nowrap;
+
+  mat-icon {
+    font-size: 13px !important;
+    width: 13px !important;
+    height: 13px !important;
+    color: $gold;
+    flex-shrink: 0;
+  }
+
+  strong {
+    @include mono;
+    font-size: 12px;
+    font-weight: 700;
+    color: $ink;
+    letter-spacing: 0.04em;
+  }
 }
 
 .search-card {
@@ -174,9 +282,7 @@ $white: #ffffff;
   &::before {
     content: '';
     position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
+    left: 0; top: 0; bottom: 0;
     width: 4px;
     background: linear-gradient(180deg, $gold, $ink);
   }
@@ -211,9 +317,7 @@ $white: #ffffff;
     flex: 1;
     min-width: 180px;
 
-    .mat-mdc-form-field-subscript-wrapper {
-      display: none !important;
-    }
+    .mat-mdc-form-field-subscript-wrapper { display: none !important; }
 
     .mat-mdc-form-field-infix {
       display: flex !important;
@@ -243,12 +347,9 @@ $white: #ffffff;
     }
 
     &.mat-focused {
-
       .mdc-notched-outline__leading,
       .mdc-notched-outline__notch,
-      .mdc-notched-outline__trailing {
-        border-color: $gold !important;
-      }
+      .mdc-notched-outline__trailing { border-color: $gold !important; }
     }
 
     .mdc-floating-label,
@@ -270,14 +371,8 @@ $white: #ffffff;
       border-radius: 0 !important;
     }
 
-    &.mat-focused .mdc-text-field {
-      background: $white !important;
-    }
-
-    .mat-mdc-form-field-focus-overlay {
-      background: transparent !important;
-    }
-
+    &.mat-focused .mdc-text-field { background: $white !important; }
+    .mat-mdc-form-field-focus-overlay { background: transparent !important; }
     .mat-mdc-form-field-icon-suffix mat-icon {
       color: $slate !important;
       font-size: 16px !important;
@@ -303,11 +398,7 @@ $white: #ffffff;
   white-space: nowrap;
   flex-shrink: 0;
 
-  mat-icon {
-    font-size: 15px !important;
-    width: 15px !important;
-    height: 15px !important;
-  }
+  mat-icon { font-size: 15px !important; width: 15px !important; height: 15px !important; }
 
   &:hover:not(:disabled) {
     background: $gold-dark;
@@ -315,9 +406,7 @@ $white: #ffffff;
     transform: translateY(-1px);
   }
 
-  &:active {
-    transform: translateY(0);
-  }
+  &:active { transform: translateY(0); }
 
   &:disabled {
     opacity: 0.5;
@@ -337,9 +426,7 @@ $white: #ffffff;
   color: $slate-dim;
   letter-spacing: 0.03em;
 
-  ::ng-deep .mat-mdc-progress-spinner circle {
-    stroke: $gold !important;
-  }
+  ::ng-deep .mat-mdc-progress-spinner circle { stroke: $gold !important; }
 }
 
 .error-msg {
@@ -356,12 +443,7 @@ $white: #ffffff;
   font-weight: 600;
   color: $rust;
 
-  mat-icon {
-    font-size: 15px !important;
-    width: 15px !important;
-    height: 15px !important;
-    flex-shrink: 0;
-  }
+  mat-icon { font-size: 15px !important; width: 15px !important; height: 15px !important; flex-shrink: 0; }
 }
 
 .dialog-footer {
@@ -410,20 +492,10 @@ $white: #ffffff;
   transition: all 0.15s;
   box-shadow: 0 2px 8px rgba($gold, 0.3);
 
-  mat-icon {
-    font-size: 14px !important;
-    width: 14px !important;
-    height: 14px !important;
-  }
+  mat-icon { font-size: 14px !important; width: 14px !important; height: 14px !important; }
 
-  &:hover:not(:disabled) {
-    background: $gold-dark;
-  }
-
-  &:disabled {
-    opacity: 0.45;
-    cursor: default;
-  }
+  &:hover:not(:disabled) { background: $gold-dark; }
+  &:disabled { opacity: 0.45; cursor: default; }
 }
 
 .dialog-header-inner {

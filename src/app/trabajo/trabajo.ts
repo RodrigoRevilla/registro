@@ -133,11 +133,10 @@ export class TrabajoComponent implements OnInit {
     { label: 'TODOS',        value: 'todos'        },
   ];
 
-  currentFilter          = 'todos';
-  fechaPago: Date | null = null;
-  folioInput: number | null    = null; 
-  folioHojaValorada: number | null = null;  
-  folioHojaBloqueado           = false;
+  currentFilter            = 'todos';
+  fechaPago: Date | null   = null;
+  folioInput: number | null        = null;
+  folioHojaValorada: number | null = null;
 
   yearRanges: YearRange[]          = buildYearRanges().map(r => ({ ...r, count: 0 }));
   selectedYearRange: string | null = null;
@@ -155,27 +154,31 @@ export class TrabajoComponent implements OnInit {
     } catch { return new Set<number>(); }
   }
 
+  private leerFolioActual(): number | null {
+    const raw = sessionStorage.getItem(SK_FOLIO_ACTUAL);
+    const n   = raw ? parseInt(raw, 10) : NaN;
+    return !isNaN(n) && n > 0 ? n : null;
+  }
+
+  private siguienteLibre(desde: number): number {
+    const usados = this.leerUsados();
+    while (usados.has(desde)) { desde++; }
+    return desde;
+  }
+
   private guardarFolioActual(folio: number): void {
-    const anterior = this.folioHojaValorada;
     sessionStorage.setItem(SK_FOLIO_ACTUAL, String(folio));
     sessionStorage.setItem(SK_BLOQUEADO, '1');
-    this.folioHojaValorada  = folio;
-    this.folioHojaBloqueado = true;
-    if (anterior !== null && anterior !== folio) {
-      console.log(`[HV] Folio autoIncrementado: ${anterior} → ${folio}`);
-    } else {
-      console.log(`[HV] Folio establecido: ${folio} | sessionStorage[${SK_FOLIO_ACTUAL}]="${folio}"`);
-    }
+    this.folioHojaValorada = folio;
+    console.log(`[HV] Folio establecido: ${folio}`);
     console.log(`[HV] Usados en sesión:`, JSON.parse(sessionStorage.getItem(SK_FOLIO_USADOS) ?? '[]'));
   }
 
   private restaurarDesdeSession(): void {
     if (sessionStorage.getItem(SK_BLOQUEADO) !== '1') return;
-    const raw = sessionStorage.getItem(SK_FOLIO_ACTUAL);
-    const n   = raw ? parseInt(raw, 10) : NaN;
-    if (!isNaN(n) && n > 0) {
-      this.folioHojaValorada  = n;
-      this.folioHojaBloqueado = true;
+    const n = this.leerFolioActual();
+    if (n) {
+      this.folioHojaValorada = n;
       console.log(`[HV] Restaurado desde sessionStorage: folio actual = ${n}`);
     }
   }
@@ -187,6 +190,12 @@ export class TrabajoComponent implements OnInit {
 
   get selectedCount(): number {
     return this.payments.filter(p => p.selected).length;
+  }
+
+  get siguienteFolioEsperado(): number | null {
+    const actual = this.leerFolioActual();
+    if (!actual) return null;
+    return this.siguienteLibre(actual);
   }
 
   constructor(
@@ -201,14 +210,14 @@ export class TrabajoComponent implements OnInit {
     await this.cargarCatalogos();
   }
 
+  // ── Sin validación de secuencia — permite saltar folios dañados ──────────
   establecerFolioInicial(): void {
-    if (this.folioHojaBloqueado) return;
-
     const n = Number(this.folioInput);
     if (!n || isNaN(n) || n <= 0 || !Number.isInteger(n)) {
       alert('El folio debe ser un número entero mayor a 0.');
       return;
     }
+
     if (this.leerUsados().has(n)) {
       alert(`El folio ${n} ya fue usado en esta sesión.`);
       return;
@@ -263,8 +272,8 @@ export class TrabajoComponent implements OnInit {
   }
 
   async buscarPagos() {
-    if (!this.folioHojaBloqueado) {
-      alert('Es necesario ingresar un folio inicial de hoja valorada antes de buscar registros.');
+    if (this.currentFilter === 'fotocopias' && !this.leerFolioActual()) {
+      alert('Es necesario ingresar un folio inicial de hoja valorada antes de buscar en Fotocopias.');
       return;
     }
 
@@ -274,9 +283,9 @@ export class TrabajoComponent implements OnInit {
     this.selectedYearRange = null;
 
     try {
-      const estados     = ESTADOS_POR_FILTRO[this.currentFilter] ?? ESTADOS_POR_FILTRO['todos'];
-      const promesas    = estados.map(clave => this.cargarPorEstado(clave));
-      const resultados  = await Promise.all(promesas);
+      const estados    = ESTADOS_POR_FILTRO[this.currentFilter] ?? ESTADOS_POR_FILTRO['todos'];
+      const promesas   = estados.map(clave => this.cargarPorEstado(clave));
+      const resultados = await Promise.all(promesas);
       const solicitudes = resultados.flat();
 
       this.allPayments = solicitudes.map(s => this.toPayment(s));
@@ -428,7 +437,6 @@ export class TrabajoComponent implements OnInit {
     this.allPayments = this.allPayments.filter(p => !folios.has(p.id));
     this.recalcularConteos();
   }
-
 
   private async cargarCatalogos() {
     try {
