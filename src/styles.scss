@@ -418,3 +418,16 @@ button.mat-mdc-raised-button[color="primary"] {
     max-height: 90vh !important;
   }
 }
+
+.matrimonio-resultado-panel {
+
+  .mat-mdc-dialog-container,
+  .mdc-dialog__container,
+  .mdc-dialog__surface {
+    max-height: 90vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+  }
+}

@@ -142,7 +142,6 @@ export class ImpresionesComponent {
     return this.siguienteLibre(actual);
   }
 
-  // ── Sin validación de secuencia — permite saltar folios dañados ──────────
   establecerFolioInicial(): void {
     const n = Number(this.folioInput);
     if (!n || isNaN(n) || n <= 0 || !Number.isInteger(n)) {

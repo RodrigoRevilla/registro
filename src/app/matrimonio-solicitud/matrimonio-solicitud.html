@@ -1,0 +1,357 @@
+<div class="page-wrapper">
+  <header class="page-header">
+    <div class="page-header-inner">
+      <button class="btn-back" (click)="regresar()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="header-title-block">
+        <div class="header-escudo"><mat-icon>favorite</mat-icon></div>
+        <div>
+          <p class="header-super">Registro Civil del Estado</p>
+          <h1 class="header-title">Solicitud de Servicios de Matrimonios</h1>
+        </div>
+      </div>
+    </div>
+    <div class="gold-rule"></div>
+  </header>
+
+  <main class="page-body">
+
+    <!-- Resultado folio / línea de captura (visible tras generar) -->
+    <div class="resultado-card" *ngIf="folioGenerado">
+      <div class="resultado-row">
+        <span class="resultado-label">Folio</span>
+        <span class="resultado-valor">{{ folioGenerado }}</span>
+        <button class="btn-copiar" (click)="copiar(folioGenerado!)">
+          <mat-icon>content_copy</mat-icon> Copiar
+        </button>
+      </div>
+      <div class="resultado-row" *ngIf="lineaCaptura">
+        <span class="resultado-label">Línea de Captura</span>
+        <span class="resultado-valor">{{ lineaCaptura }}</span>
+        <button class="btn-copiar" (click)="copiar(lineaCaptura!)">
+          <mat-icon>content_copy</mat-icon> Copiar
+        </button>
+      </div>
+    </div>
+
+    <section class="form-section">
+      <div class="section-header">
+        <div class="section-icon"><mat-icon>article</mat-icon></div>
+        <h2 class="section-title">Datos del Acta</h2>
+      </div>
+      <div class="section-body">
+        <div class="fields-grid fields-grid--4">
+          <div class="campo">
+            <span class="campo-label">Entidad</span>
+            <span class="campo-valor">{{ entidad || '—' }}</span>
+          </div>
+          <div class="campo">
+            <span class="campo-label">Municipio</span>
+            <span class="campo-valor">{{ municipio || '—' }}</span>
+          </div>
+          <div class="campo">
+            <span class="campo-label">Oficialía</span>
+            <span class="campo-valor">{{ oficialia || '—' }}</span>
+          </div>
+          <div class="campo">
+            <span class="campo-label">Distrito</span>
+            <span class="campo-valor">{{ distrito || '—' }}</span>
+          </div>
+          <div class="campo campo--wide">
+            <span class="campo-label">Localidad</span>
+            <span class="campo-valor">{{ localidad || '—' }}</span>
+          </div>
+          <div class="campo">
+            <span class="campo-label">Fecha de Registro</span>
+            <span class="campo-valor">{{ fechaRegistro || '—' }}</span>
+          </div>
+          <div class="campo">
+            <span class="campo-label">Año</span>
+            <span class="campo-valor">{{ anio || '—' }}</span>
+          </div>
+          <div class="campo">
+            <span class="campo-label">Foja / Acta</span>
+            <span class="campo-valor">{{ acta || '—' }}</span>
+          </div>
+          <div class="campo">
+            <span class="campo-label">EnDoc</span>
+            <span class="campo-valor">{{ enDoc || '—' }}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <div class="section-header">
+        <div class="section-icon"><mat-icon>people</mat-icon></div>
+        <h2 class="section-title">Datos del(os) Registrado(s)</h2>
+      </div>
+      <div class="section-body">
+        <div class="fields-grid fields-grid--2">
+          <div class="campo">
+            <span class="campo-label">Nombre de Él</span>
+            <span class="campo-valor">{{ nombre1 }} {{ apellidoPaterno1 }} {{ apellidoMaterno1 }}</span>
+          </div>
+          <div class="campo">
+            <span class="campo-label">Nombre de Ella</span>
+            <span class="campo-valor">{{ nombre2 }} {{ apellidoPaterno2 }} {{ apellidoMaterno2 }}</span>
+          </div>
+          <div class="campo">
+            <span class="campo-label">CRIP</span>
+            <span class="campo-valor">{{ crip1 || '—' }}</span>
+          </div>
+          <div class="campo">
+            <span class="campo-label">CRIP</span>
+            <span class="campo-valor">{{ crip2 || '—' }}</span>
+          </div>
+          <div class="campo">
+            <span class="campo-label">Fecha de Nacimiento</span>
+            <span class="campo-valor">{{ fechaNacimiento1 || '—' }}</span>
+          </div>
+          <div class="campo">
+            <span class="campo-label">Fecha de Nacimiento</span>
+            <span class="campo-valor">{{ fechaNacimiento2 || '—' }}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <div class="section-header">
+        <div class="section-icon"><mat-icon>settings</mat-icon></div>
+        <h2 class="section-title">Servicio</h2>
+      </div>
+      <div class="section-body">
+
+        <div class="fields-grid fields-grid--4">
+          <div class="field-wrap span2">
+            <label class="field-label">Servicio</label>
+            <mat-form-field appearance="outline" class="page-field">
+              <mat-select [(ngModel)]="tipoServicioId" name="tipoServicioId" panelClass="page-select-panel">
+                <mat-option [value]="0">Seleccione un tipo</mat-option>
+                <mat-option *ngFor="let ts of tiposServicio" [value]="ts.id">{{ ts.nombre }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="field-wrap">
+            <label class="field-label">Docto Presentado</label>
+            <mat-form-field appearance="outline" class="page-field">
+              <mat-select [(ngModel)]="documentoPresentado" name="documentoPresentado" panelClass="page-select-panel">
+                <mat-option value="">Seleccione uno</mat-option>
+                <mat-option value="Presento fotocopia">Presentó fotocopia</mat-option>
+                <mat-option value="Datos verbales">Datos verbales</mat-option>
+                <mat-option value="Boleta de registro">Boleta de registro</mat-option>
+                <mat-option value="Certificado negativo">Certificado negativo</mat-option>
+                <mat-option value="Resolución">Resolución</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="field-wrap">
+            <label class="field-label">Tipo Acta</label>
+            <div class="campo-valor-readonly">MATRIMONIO</div>
+          </div>
+        </div>
+
+        <div class="fields-grid fields-grid--4 mt">
+          <div class="field-wrap">
+            <label class="field-label">Copias Solicitadas</label>
+            <mat-form-field appearance="outline" class="page-field">
+              <input matInput type="number" min="1" [(ngModel)]="copiasSolicitadas" name="copias">
+            </mat-form-field>
+          </div>
+          <div class="field-wrap">
+            <label class="field-label">Modalidad</label>
+            <div class="radio-mini-row">
+              <label class="radio-mini">
+                <input type="radio" name="modalidad" value="automatizado" [(ngModel)]="modalidad">
+                Automatizado
+              </label>
+              <label class="radio-mini">
+                <input type="radio" name="modalidad" value="semiautomatizado" [(ngModel)]="modalidad">
+                Semiautomatizado
+              </label>
+            </div>
+          </div>
+          <div class="field-wrap">
+            <label class="field-label">Años de Búsqueda</label>
+            <mat-form-field appearance="outline" class="page-field">
+              <input matInput [(ngModel)]="aniosBusqueda" name="aniosBusqueda">
+            </mat-form-field>
+          </div>
+          <div class="field-wrap">
+            <label class="field-label">Rango Búsqueda</label>
+            <mat-form-field appearance="outline" class="page-field">
+              <input matInput [(ngModel)]="rangoBusqueda" name="rangoBusqueda">
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="fields-grid fields-grid--4 mt">
+          <div class="field-wrap span2">
+            <label class="field-label">Fecha de Entrega <span class="req">*</span></label>
+            <mat-form-field appearance="outline" class="page-field">
+              <input matInput [matDatepicker]="pickerEntrega" [(ngModel)]="fechaEntrega"
+                     name="fechaEntrega" autocomplete="off"
+                     (dateChange)="autoFechaEntrega()" (blur)="autoFechaEntrega()">
+              <mat-datepicker-toggle matIconSuffix [for]="pickerEntrega"></mat-datepicker-toggle>
+              <mat-datepicker #pickerEntrega></mat-datepicker>
+            </mat-form-field>
+          </div>
+          <div class="field-wrap">
+            <label class="field-label">Hora de Entrega</label>
+            <mat-form-field appearance="outline" class="page-field">
+              <input matInput type="time" [(ngModel)]="horaEntrega" name="horaEntrega"
+                     (change)="autoHoraEntrega()">
+            </mat-form-field>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="form-section">
+      <div class="section-header">
+        <div class="section-icon"><mat-icon>notes</mat-icon></div>
+        <h2 class="section-title">Observaciones</h2>
+      </div>
+      <div class="section-body">
+        <textarea class="page-textarea" rows="3" [(ngModel)]="observaciones" name="observaciones"
+          placeholder="Anotaciones o información complementaria…"></textarea>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <div class="section-header">
+        <div class="section-icon"><mat-icon>gavel</mat-icon></div>
+        <h2 class="section-title">Servicio Condonado</h2>
+      </div>
+      <div class="section-body">
+        <div class="radio-row">
+          <label class="radio-pill" [class.active]="tipoCondonado === 'no'">
+            <input type="radio" name="tipoCondonado" value="no" [(ngModel)]="tipoCondonado">
+            No condonado
+          </label>
+          <label class="radio-pill" [class.active]="tipoCondonado === 'si'">
+            <input type="radio" name="tipoCondonado" value="si" [(ngModel)]="tipoCondonado">
+            Condonado
+          </label>
+        </div>
+        <div class="fields-grid fields-grid--4 mt">
+          <div class="field-wrap">
+            <label class="field-label">No. Oficio</label>
+            <mat-form-field appearance="outline" class="page-field">
+              <input matInput [(ngModel)]="numeroOficio" name="numeroOficio">
+            </mat-form-field>
+          </div>
+          <div class="field-wrap">
+            <label class="field-label">Fecha del Oficio</label>
+            <mat-form-field appearance="outline" class="page-field">
+              <input matInput [matDatepicker]="pickerOficio" [(ngModel)]="fechaOficio"
+                     name="fechaOficio" autocomplete="off">
+              <mat-datepicker-toggle matIconSuffix [for]="pickerOficio"></mat-datepicker-toggle>
+              <mat-datepicker #pickerOficio></mat-datepicker>
+            </mat-form-field>
+          </div>
+          <div class="field-wrap">
+            <label class="field-label">Recibo Número</label>
+            <mat-form-field appearance="outline" class="page-field">
+              <input matInput [(ngModel)]="reciboNumero" name="reciboNumero">
+            </mat-form-field>
+          </div>
+          <div class="field-wrap">
+            <label class="field-label">Fecha de Pago</label>
+            <mat-form-field appearance="outline" class="page-field">
+              <input matInput [matDatepicker]="pickerPago" [(ngModel)]="fechaPagoRecibo"
+                     name="fechaPagoRecibo" autocomplete="off">
+              <mat-datepicker-toggle matIconSuffix [for]="pickerPago"></mat-datepicker-toggle>
+              <mat-datepicker #pickerPago></mat-datepicker>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <div class="section-header">
+        <div class="section-icon"><mat-icon>receipt</mat-icon></div>
+        <h2 class="section-title">Facturación</h2>
+      </div>
+      <div class="section-body">
+        <div class="fields-grid fields-grid--4">
+          <div class="field-wrap span2">
+            <label class="field-label">Nombre del Contribuyente</label>
+            <mat-form-field appearance="outline" class="page-field">
+              <input matInput [(ngModel)]="nombreContribuyente" name="nombreContribuyente">
+            </mat-form-field>
+          </div>
+          <div class="field-wrap span2">
+            <label class="field-label">Uso de CFDI</label>
+            <mat-form-field appearance="outline" class="page-field">
+              <mat-select [(ngModel)]="usoCfdi" name="usoCfdi" panelClass="page-select-panel">
+                <mat-option value="S01">S01 — Sin efectos fiscales</mat-option>
+                <mat-option value="G01">G01 — Adquisición de mercancías</mat-option>
+                <mat-option value="G03">G03 — Gastos en general</mat-option>
+                <mat-option value="D03">D03 — Gastos funerales</mat-option>
+                <mat-option value="D04">D04 — Donativos</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="fields-grid fields-grid--4 mt">
+          <div class="field-wrap">
+            <label class="field-label">RFC</label>
+            <mat-form-field appearance="outline" class="page-field">
+              <input matInput [(ngModel)]="rfc" name="rfc"
+                     (input)="$any($event.target).value = $any($event.target).value.toUpperCase()">
+            </mat-form-field>
+          </div>
+          <div class="field-wrap span2">
+            <label class="field-label">Régimen Fiscal</label>
+            <mat-form-field appearance="outline" class="page-field">
+              <mat-select [(ngModel)]="regimenFiscal" name="regimenFiscal" panelClass="page-select-panel">
+                <mat-option value="616">616 — Sin obligaciones fiscales</mat-option>
+                <mat-option value="601">601 — General ley personas morales</mat-option>
+                <mat-option value="605">605 — Sueldos y salarios</mat-option>
+                <mat-option value="606">606 — Arrendamiento</mat-option>
+                <mat-option value="612">612 — Personas físicas con act. empresariales</mat-option>
+                <mat-option value="626">626 — Régimen simplificado de confianza</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="field-wrap">
+            <label class="field-label">Código Postal</label>
+            <mat-form-field appearance="outline" class="page-field">
+              <input matInput [(ngModel)]="codigoPostal" name="codigoPostal">
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="fields-grid fields-grid--4 mt">
+          <div class="field-wrap span2">
+            <label class="field-label">Correo Electrónico</label>
+            <mat-form-field appearance="outline" class="page-field">
+              <input matInput type="email" [(ngModel)]="email" name="email">
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="page-footer">
+    <button class="btn-regresar" (click)="regresar()">
+      <mat-icon>arrow_back</mat-icon> Regresar
+    </button>
+    <div class="footer-right">
+      <button class="btn-imprimir" (click)="imprimir()" *ngIf="urlPdf">
+        <mat-icon>print</mat-icon> Imprimir Hoja de Pago
+      </button>
+      <button class="btn-generar" (click)="generar()" [disabled]="procesando" *ngIf="!folioGenerado">
+        <mat-icon>credit_card</mat-icon>
+        {{ procesando ? 'Generando...' : 'Generar Hoja de Pago' }}
+      </button>
+    </div>
+  </footer>
+
+</div>

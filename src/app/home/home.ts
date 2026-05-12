@@ -177,6 +177,11 @@ export class HomeComponent implements OnInit {
     });
   }
 
+  irAMatrimonios(event: MouseEvent) {
+    event?.stopImmediatePropagation();
+    this.router.navigate(['/matrimonios']);
+  }
+
   irAReimpresionSolicitudes(event: Event): void {
     event.stopPropagation();
     this.router.navigate(['/reimpresion-solicitudes']);

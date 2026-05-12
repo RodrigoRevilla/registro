@@ -9,6 +9,8 @@ import { AuthGuard }              from './auth-guard';
 import { LogoutComponent }        from './logout/logout';
 import { ModificacionComponent }  from './modificacion/modificacion';
 import { ConsultaPagoComponent }  from './act-pag/act-pag';
+import { MatrimoniosComponent } from './matrimonios/matrimonios';
+import { MatrimonioSolicitudComponent } from './matrimonio-solicitud/matrimonio-solicitud';
 
 export const routes: Routes = [
   { path: '',       redirectTo: '/login', pathMatch: 'full' },
@@ -21,6 +23,8 @@ export const routes: Routes = [
   { path: 'generar',            component: CertificacionComponent, canActivate: [AuthGuard] },
   { path: 'modificacion',       component: ModificacionComponent,  canActivate: [AuthGuard] },
   { path: 'actualizar',         component: ConsultaPagoComponent,  canActivate: [AuthGuard] },
+  { path: 'matrimonios',        component: MatrimoniosComponent,   canActivate: [AuthGuard] },
+  { path: 'matrimonios/solicitud', component: MatrimonioSolicitudComponent, canActivate: [AuthGuard] },
 
   { path: '**', redirectTo: '/login' },
 ];
