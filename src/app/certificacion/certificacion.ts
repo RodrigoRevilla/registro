@@ -1,7 +1,8 @@
 import { Component, OnInit, NgZone, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { ApiService } from '../http';
+import { ApiService, RegistroNacimiento } from '../http';
+import { fechaLocal, nombreCompleto } from '../registro-nacimiento.mapper';
 import { AuthService } from '../auth';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -98,6 +99,42 @@ export class CertificacionComponent implements OnInit {
       return;
     }
     this.cargarCatalogos();
+    this.precargarRegistro();
+  }
+
+  private precargarRegistro(): void {
+    const r: RegistroNacimiento | undefined = history.state?.registroNacimiento;
+    if (!r) return;
+    const cod = (v: number | null) => (v != null ? `${v}` : '');
+    this.entidadCodigo = cod(r.estado_registro_historico_id);
+    this.entidadNombre = r.estado_registro_historico_texto ?? '';
+    this.distritoCodigo = cod(r.distrito_registro_historico_id);
+    this.distritoNombre = r.distrito_registro_historico_texto ?? '';
+    this.municipioCodigo = cod(r.municipio_registro_historico_id);
+    this.municipioNombre = r.municipio_registro_historico_texto ?? '';
+    this.localidadCodigo = cod(r.localidad_registro_historica_id);
+    this.localidadNombre = r.localidad_registro_historica_texto ?? '';
+    this.foja = r.foja != null ? `${r.foja}` : '';
+    this.oficialia = cod(r.oficialia);
+    this.acta = r.numero_acta != null ? `${r.numero_acta}` : (r.numero_acta_original ?? '');
+    const fReg = fechaLocal(r.fecha_registro)
+      ?? (r.anio_registro && r.mes_registro && r.dia_registro
+        ? new Date(r.anio_registro, r.mes_registro - 1, r.dia_registro)
+        : null);
+    this.fechaActa = fReg ?? '';
+    this.anioActa = cod(r.anio_registro);
+    this.nombreRegistrado = nombreCompleto(r.nombre, r.apellido_paterno, r.apellido_materno);
+    this.crip = r.crip_ed ?? r.curp ?? '';
+    this.entidadNacCodigo = cod(r.estado_nacimiento_historico_id);
+    this.entidadNacNombre = r.estado_nacimiento_historico_texto ?? '';
+    this.municipioNacCodigo = cod(r.municipio_nacimiento_historico_id);
+    this.municipioNacNombre = r.municipio_nacimiento_historico_texto ?? '';
+    this.distritoNacCodigo = cod(r.distrito_nacimiento_historico_id);
+    this.distritoNacNombre = r.distrito_nacimiento_historico_texto ?? '';
+    this.localidadNacCodigo = cod(r.localidad_nacimiento_historica_id);
+    this.localidadNacNombre = r.localidad_nacimiento_historica_texto ?? '';
+    this.padre = nombreCompleto(r.nombre_padre, r.apellido_paterno_padre, r.apellido_materno_padre);
+    this.madre = nombreCompleto(r.nombre_madre, r.apellido_paterno_madre, r.apellido_materno_madre);
   }
 
   private cargarCatalogos(): void {

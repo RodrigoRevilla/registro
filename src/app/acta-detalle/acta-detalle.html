@@ -1,205 +1,100 @@
-<div class="dialog-wrapper">
-  <div class="dialog-header">
-    <div class="dialog-title-row">
-      <div class="dialog-escudo">
-        <mat-icon>description</mat-icon>
-      </div>
-      <div>
-        <p class="dialog-super">Registro Civil del Estado</p>
-        <h2 class="dialog-title">Detalles del Acta de Nacimiento</h2>
-      </div>
-    </div>
-    <button class="btn-close" (click)="cerrar()">✕</button>
-  </div>
-  <div class="gold-rule"></div>
+<div class="ficha">
 
-  <div class="dialog-body">
-    <div class="form-section">
-      <div class="section-header">
-        <div class="section-icon"><mat-icon>person</mat-icon></div>
-        <h3 class="section-title">Datos del Registrado</h3>
+  <header class="ficha-head">
+    @if (acta(); as a) {
+      <div class="avatar">{{ iniciales(a.nombreCompleto) }}</div>
+      <div class="who">
+        <span class="sup">Acta de nacimiento · Acta {{ valor(a.numeroActa) }} · {{ valor(a.anioRegistro) }}</span>
+        <h2>{{ valor(a.nombreCompleto) }}</h2>
+        <div class="chips">
+          @if (a.curp) { <span class="chip chip-mono">{{ a.curp }}</span> }
+          @if (a.sexo) { <span class="chip">{{ getSexoLabel(a.sexo) }}</span> }
+          @if (a.estadoVital) {
+            <span class="chip" [class.chip-ok]="a.estadoVital === 'Vivo'" [class.chip-off]="a.estadoVital === 'Finado'">
+              {{ a.estadoVital }}
+            </span>
+          }
+          @if (a.origen) { <span class="chip chip-soft">{{ a.origen }}</span> }
+        </div>
       </div>
-      <div class="section-body">
-        <div class="campo full">
-          <span class="campo-label"><mat-icon>badge</mat-icon> Nombre Completo</span>
-          <span class="campo-valor nombre-grande">{{ actaData.nombreCompleto }}</span>
-        </div>
-        <div class="grid-3 mt">
-          <div class="campo">
-            <span class="campo-label"><mat-icon>drive_file_rename_outline</mat-icon> Nombre(s)</span>
-            <span class="campo-valor">{{ actaData.nombre }}</span>
-          </div>
-          <div class="campo">
-            <span class="campo-label"><mat-icon>badge</mat-icon> Apellido Paterno</span>
-            <span class="campo-valor">{{ actaData.apellidoPaterno }}</span>
-          </div>
-          <div class="campo">
-            <span class="campo-label"><mat-icon>badge</mat-icon> Apellido Materno</span>
-            <span class="campo-valor">{{ actaData.apellidoMaterno }}</span>
-          </div>
-        </div>
-        <div class="grid-2 mt">
-          <div class="campo">
-            <span class="campo-label"><mat-icon>wc</mat-icon> Sexo</span>
-            <span class="campo-valor">{{ getSexoLabel(actaData.sexo) }}</span>
-          </div>
-          <div class="campo">
-            <span class="campo-label"><mat-icon>health_and_safety</mat-icon> Estado Vital</span>
-            <span class="campo-valor estado-chip"
-              [class.estado-vivo]="actaData.estadoVital === 'Vivo'"
-              [class.estado-finado]="actaData.estadoVital === 'Finado'">
-              <mat-icon>{{ actaData.estadoVital === 'Vivo' ? 'favorite' : 'heart_broken' }}</mat-icon>
-              {{ actaData.estadoVital }}
+    } @else {
+      <div class="who">
+        <span class="sup">Registro Civil del Estado</span>
+        <h2>Acta de nacimiento</h2>
+      </div>
+    }
+    <button type="button" class="btn-x" (click)="cerrar()" aria-label="Cerrar">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+
+  <div class="ficha-body">
+    @if (cargando()) {
+      <div class="estado"><mat-spinner diameter="24"></mat-spinner> Cargando registro…</div>
+    } @else if (error()) {
+      <div class="estado estado-error"><mat-icon>error_outline</mat-icon> {{ error() }}</div>
+    } @else if (acta(); as a) {
+      <div class="cols">
+
+        <section class="bloque">
+          <h3><mat-icon>article</mat-icon> Datos del acta</h3>
+          <dl class="kv">
+            <dt>Núm. acta</dt><dd class="mono strong">{{ valor(a.numeroActa) }}</dd>
+            <dt>Año</dt><dd>{{ valor(a.anioRegistro) }}</dd>
+            <dt>Oficialía</dt><dd>{{ valor(a.oficialia) }}</dd>
+            <dt>Foja</dt><dd>{{ valor(a.foja) }}</dd>
+            <dt>Fecha registro</dt><dd>{{ formatearFecha(a.fechaRegistro) }}</dd>
+            <dt>Entidad</dt><dd>{{ valor(a.entidad) }}</dd>
+            <dt>Distrito</dt><dd>{{ valor(a.distrito) }}</dd>
+            <dt>Municipio</dt><dd>{{ valor(a.municipio) }}</dd>
+          </dl>
+        </section>
+
+        <section class="bloque">
+          <h3><mat-icon>cake</mat-icon> Nacimiento</h3>
+          <dl class="kv">
+            <dt>Fecha</dt><dd class="strong">{{ formatearFecha(a.fechaNacimiento) }}</dd>
+            <dt>Hora</dt><dd>{{ a.horaNacimiento ? a.horaNacimiento + ' hrs' : '—' }}</dd>
+            <dt>Entidad</dt><dd>{{ valor(a.entidadNacimiento) }}</dd>
+            <dt>Municipio</dt><dd>{{ valor(a.municipioNacimiento) }}</dd>
+            <dt>Localidad</dt><dd>{{ valor(a.localidad) }}</dd>
+            <dt>Sexo</dt><dd>{{ valor(getSexoLabel(a.sexo)) }}</dd>
+            <dt>Estado vital</dt><dd>{{ valor(a.estadoVital) }}</dd>
+          </dl>
+        </section>
+
+        <section class="bloque">
+          <h3><mat-icon>family_restroom</mat-icon> Padres</h3>
+          <div class="padre">
+            <span class="rol">Padre</span>
+            <strong>{{ valor(a.nombrePadre) }}</strong>
+            <span class="meta">
+              {{ a.edadPadre != null ? a.edadPadre + ' años' : 'Edad —' }} · {{ valor(a.nacionalidadPadre) }}
             </span>
           </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="form-section">
-      <div class="section-header">
-        <div class="section-icon"><mat-icon>article</mat-icon></div>
-        <h3 class="section-title">Datos del Acta</h3>
-      </div>
-      <div class="section-body">
-        <div class="grid-3">
-          <div class="campo">
-            <span class="campo-label"><mat-icon>numbers</mat-icon> Número de Acta</span>
-            <span class="campo-valor campo-mono destacado">{{ actaData.numeroActa }}</span>
+          <div class="padre">
+            <span class="rol">Madre</span>
+            <strong>{{ valor(a.nombreMadre) }}</strong>
+            <span class="meta">
+              {{ a.edadMadre != null ? a.edadMadre + ' años' : 'Edad —' }} · {{ valor(a.nacionalidadMadre) }}
+            </span>
           </div>
-          <div class="campo">
-            <span class="campo-label"><mat-icon>event</mat-icon> Año de Registro</span>
-            <span class="campo-valor">{{ actaData.anioRegistro }}</span>
-          </div>
-          <div class="campo">
-            <span class="campo-label"><mat-icon>menu_book</mat-icon> Foja</span>
-            <span class="campo-valor">{{ actaData.foja }}</span>
-          </div>
-        </div>
-        <div class="campo full mt">
-          <span class="campo-label"><mat-icon>fingerprint</mat-icon> CURP del Registrado</span>
-          <span class="campo-valor campo-mono">{{ actaData.curp }}</span>
-        </div>
-        <div class="grid-3 mt">
-          <div class="campo">
-            <span class="campo-label"><mat-icon>map</mat-icon> Entidad</span>
-            <span class="campo-valor">{{ actaData.entidad }}</span>
-          </div>
-          <div class="campo">
-            <span class="campo-label"><mat-icon>location_city</mat-icon> Municipio</span>
-            <span class="campo-valor">{{ actaData.municipio }}</span>
-          </div>
-          <div class="campo">
-            <span class="campo-label"><mat-icon>account_balance</mat-icon> Oficialía</span>
-            <span class="campo-valor">{{ actaData.oficialia }}</span>
-          </div>
-          <div class="campo">
-            <span class="campo-label"><mat-icon>location_on</mat-icon> Distrito</span>
-            <span class="campo-valor">{{ actaData.distrito }}</span>
-          </div>
-          <div class="campo">
-            <span class="campo-label"><mat-icon>calendar_today</mat-icon> Fecha de Registro</span>
-            <span class="campo-valor">{{ formatearFecha(actaData.fechaRegistro) }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="form-section">
-      <div class="section-header">
-        <div class="section-icon"><mat-icon>cake</mat-icon></div>
-        <h3 class="section-title">Datos de Nacimiento</h3>
-      </div>
-      <div class="section-body">
-        <div class="grid-3">
-          <div class="campo">
-            <span class="campo-label"><mat-icon>event</mat-icon> Fecha de Nacimiento</span>
-            <span class="campo-valor destacado">{{ formatearFecha(actaData.fechaNacimiento) }}</span>
-          </div>
-          <div class="campo">
-            <span class="campo-label"><mat-icon>schedule</mat-icon> Hora de Nacimiento</span>
-            <span class="campo-valor">{{ actaData.horaNacimiento }} hrs</span>
-          </div>
-          <div class="campo">
-            <span class="campo-label"><mat-icon>map</mat-icon> Entidad de Nacimiento</span>
-            <span class="campo-valor">{{ actaData.entidadNacimiento }}</span>
-          </div>
-          <div class="campo">
-            <span class="campo-label"><mat-icon>location_city</mat-icon> Municipio de Nacimiento</span>
-            <span class="campo-valor">{{ actaData.municipioNacimiento }}</span>
-          </div>
-          <div class="campo">
-            <span class="campo-label"><mat-icon>place</mat-icon> Localidad</span>
-            <span class="campo-valor">{{ actaData.localidad }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="form-section">
-      <div class="section-header">
-        <div class="section-icon"><mat-icon>family_restroom</mat-icon></div>
-        <h3 class="section-title">Datos de los Padres</h3>
-      </div>
-      <div class="section-body">
-
-        <div class="parent-block">
-          <div class="parent-heading">
-            <mat-icon>man</mat-icon>
-            Padre
-          </div>
-          <div class="campo full">
-            <span class="campo-label"><mat-icon>person</mat-icon> Nombre del Padre</span>
-            <span class="campo-valor nombre-grande">{{ actaData.nombrePadre }}</span>
-          </div>
-          <div class="grid-2 mt">
-            <div class="campo">
-              <span class="campo-label"><mat-icon>cake</mat-icon> Edad al momento del registro</span>
-              <span class="campo-valor">{{ actaData.edadPadre }} años</span>
-            </div>
-            <div class="campo">
-              <span class="campo-label"><mat-icon>public</mat-icon> Nacionalidad</span>
-              <span class="campo-valor">{{ actaData.nacionalidadPadre }}</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="parent-divider"></div>
-
-        <div class="parent-block">
-          <div class="parent-heading">
-            <mat-icon>woman</mat-icon>
-            Madre
-          </div>
-          <div class="campo full">
-            <span class="campo-label"><mat-icon>person</mat-icon> Nombre de la Madre</span>
-            <span class="campo-valor nombre-grande">{{ actaData.nombreMadre }}</span>
-          </div>
-          <div class="grid-2 mt">
-            <div class="campo">
-              <span class="campo-label"><mat-icon>cake</mat-icon> Edad al momento del registro</span>
-              <span class="campo-valor">{{ actaData.edadMadre }} años</span>
-            </div>
-            <div class="campo">
-              <span class="campo-label"><mat-icon>public</mat-icon> Nacionalidad</span>
-              <span class="campo-valor">{{ actaData.nacionalidadMadre }}</span>
-            </div>
-          </div>
-        </div>
+        </section>
 
       </div>
-    </div>
-
+    }
   </div>
-  <div class="dialog-footer">
-    <button class="btn-cancelar" (click)="cerrar()">
-      <mat-icon>close</mat-icon>
-      Cancelar
+
+  <footer class="ficha-foot">
+    <button type="button" class="btn btn-ghost" (click)="cerrar()">Cerrar</button>
+    @if (esDialogo()) {
+      <button type="button" class="btn btn-outline" (click)="usarDatos()" [disabled]="!registro()">
+        <mat-icon>edit</mat-icon> Editar
+      </button>
+    }
+    <button type="button" class="btn btn-primary" (click)="generar()" [disabled]="!registro()">
+      <mat-icon>description</mat-icon> Generar certificación
     </button>
-    <button class="btn-generar" (click)="generar()">
-      <mat-icon>download</mat-icon>
-      Generar
-    </button>
-  </div>
+  </footer>
 
 </div>
