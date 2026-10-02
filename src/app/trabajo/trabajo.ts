@@ -1,20 +1,16 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
+import { firstValueFrom } from 'rxjs';
 import { MatIconModule } from '@angular/material/icon';
-import { MatDividerModule } from '@angular/material/divider';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { ReporteBusquedaService } from '../reporte-busqueda/reporte-busqueda';
+import { FoliosRecientesService } from '../folios-recientes';
+import { fechaLocal } from '../registro-nacimiento.mapper';
 
 interface Solicitud {
   id: number;
@@ -37,10 +33,9 @@ interface Catalogo {
 interface Payment {
   id: string;
   fecha: string;
-  monto: string;
-  concepto: string;
-  referencia: string;
-  metodo: string;
+  entrega: string;
+  acto: string;
+  servicio: string;
   anio: number;
   estadoClave: string;
   estadoNombre: string;
@@ -53,6 +48,7 @@ interface Payment {
 
 interface YearRange {
   range: string;
+  label: string;
   desde: number | null;
   hasta: number | null;
   count: number;
@@ -71,13 +67,13 @@ const ULTIMO_ANIO        = new Date().getFullYear();
 
 function buildYearRanges(): Omit<YearRange, 'count'>[] {
   const ranges: Omit<YearRange, 'count'>[] = [
-    { range: 'TODOS', desde: null, hasta: null },
-    { range: `DEL ${PRIMER_ANIO} AL ${BLOQUE_INICIAL_FIN}`, desde: PRIMER_ANIO, hasta: BLOQUE_INICIAL_FIN },
+    { range: 'TODOS', label: 'Todos', desde: null, hasta: null },
+    { range: `DEL ${PRIMER_ANIO} AL ${BLOQUE_INICIAL_FIN}`, label: `${PRIMER_ANIO}–${BLOQUE_INICIAL_FIN}`, desde: PRIMER_ANIO, hasta: BLOQUE_INICIAL_FIN },
   ];
   let inicio = BLOQUE_INICIAL_FIN + 1;
-  while (inicio <= ULTIMO_ANIO + TAMANO_BLOQUE) {
+  while (inicio <= ULTIMO_ANIO) {
     const fin = inicio + TAMANO_BLOQUE - 1;
-    ranges.push({ range: `DEL ${inicio} AL ${fin}`, desde: inicio, hasta: fin });
+    ranges.push({ range: `DEL ${inicio} AL ${fin}`, label: `${inicio}–${fin}`, desde: inicio, hasta: fin });
     inicio += TAMANO_BLOQUE;
   }
   return ranges;
@@ -101,17 +97,10 @@ const SK_BLOQUEADO    = 'hv_bloqueado';
   imports: [
     CommonModule,
     FormsModule,
-    MatCardModule,
-    MatButtonModule,
     MatIconModule,
-    MatDividerModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
     MatProgressSpinnerModule,
-    MatCheckboxModule,
     MatTooltipModule,
+    MatAutocompleteModule,
   ],
   templateUrl: './trabajo.html',
   styleUrls: ['./trabajo.scss']
@@ -125,27 +114,36 @@ export class TrabajoComponent implements OnInit {
     return new HttpHeaders({ Authorization: `Bearer ${token}` });
   }
 
-  filters = [
-    { label: 'BÚSQUEDAS',    value: 'busquedas'    },
-    { label: 'NEGATIVOS',    value: 'negativos'    },
-    { label: 'FOTOCOPIAS',   value: 'fotocopias'   },
-    { label: 'VALIDACIONES', value: 'validaciones' },
-    { label: 'TODOS',        value: 'todos'        },
+  readonly filters = [
+    { label: 'Búsquedas',    value: 'busquedas',    icon: 'travel_explore' },
+    { label: 'Negativos',    value: 'negativos',    icon: 'block' },
+    { label: 'Fotocopias',   value: 'fotocopias',   icon: 'content_copy' },
+    { label: 'Validaciones', value: 'validaciones', icon: 'verified' },
+    { label: 'Todos',        value: 'todos',        icon: 'apps' },
   ];
 
-  currentFilter            = 'todos';
-  fechaPago: Date | null   = null;
+  currentFilter                    = 'todos';
+  fechaPago                        = '';
+  folioBusqueda                    = '';
   folioInput: number | null        = null;
   folioHojaValorada: number | null = null;
 
   yearRanges: YearRange[]          = buildYearRanges().map(r => ({ ...r, count: 0 }));
   selectedYearRange: string | null = null;
-  isLoading  = false;
+  isLoading      = false;
+  busquedaHecha  = false;
+  mensajeError   = '';
   payments:  Payment[] = [];
   private allPayments:       Payment[]  = [];
   private catalogoActos:     Catalogo[] = [];
   private catalogoServicios: Catalogo[] = [];
   private catalogoEstados:   Catalogo[] = [];
+
+  readonly textoFolio = signal('');
+  readonly sugerenciasFolio = computed(() => {
+    const t = this.textoFolio().trim().toUpperCase();
+    return this.folios.lista().filter(f => !t || f.folio.toUpperCase().includes(t)).slice(0, 8);
+  });
 
   private leerUsados(): Set<number> {
     try {
@@ -170,26 +168,24 @@ export class TrabajoComponent implements OnInit {
     sessionStorage.setItem(SK_FOLIO_ACTUAL, String(folio));
     sessionStorage.setItem(SK_BLOQUEADO, '1');
     this.folioHojaValorada = folio;
-    console.log(`[HV] Folio establecido: ${folio}`);
-    console.log(`[HV] Usados en sesión:`, JSON.parse(sessionStorage.getItem(SK_FOLIO_USADOS) ?? '[]'));
   }
 
   private restaurarDesdeSession(): void {
     if (sessionStorage.getItem(SK_BLOQUEADO) !== '1') return;
     const n = this.leerFolioActual();
-    if (n) {
-      this.folioHojaValorada = n;
-      console.log(`[HV] Restaurado desde sessionStorage: folio actual = ${n}`);
-    }
+    if (n) this.folioHojaValorada = n;
   }
 
-  get resultsCount(): string {
-    const n = this.payments.length;
-    return n === 1 ? '1 resultado' : `${n} resultados`;
+  get totalCargados(): number {
+    return this.allPayments.length;
   }
 
   get selectedCount(): number {
     return this.payments.filter(p => p.selected).length;
+  }
+
+  get todosSeleccionados(): boolean {
+    return this.payments.length > 0 && this.payments.every(p => p.selected);
   }
 
   get siguienteFolioEsperado(): number | null {
@@ -198,11 +194,16 @@ export class TrabajoComponent implements OnInit {
     return this.siguienteLibre(actual);
   }
 
+  get filtroActual() {
+    return this.filters.find(f => f.value === this.currentFilter);
+  }
+
   constructor(
     private http:    HttpClient,
     private router:  Router,
     private cdr:     ChangeDetectorRef,
     private reporte: ReporteBusquedaService,
+    public  folios:  FoliosRecientesService,
   ) {}
 
   async ngOnInit() {
@@ -234,23 +235,54 @@ export class TrabajoComponent implements OnInit {
     this.aplicarFiltros();
   }
 
+  onFolioInput(valor: string): void {
+    this.folioBusqueda = valor;
+    this.textoFolio.set(valor);
+  }
+
+  elegirFolio(folio: string): void {
+    this.folioBusqueda = folio;
+    this.textoFolio.set(folio);
+    this.buscarPagos();
+  }
+
+  limpiarBusqueda(): void {
+    this.folioBusqueda = '';
+    this.textoFolio.set('');
+    this.fechaPago = '';
+    this.selectedYearRange = null;
+    this.allPayments = [];
+    this.payments = [];
+    this.busquedaHecha = false;
+    this.mensajeError = '';
+    this.recalcularConteos();
+  }
+
+  onFechaChange(): void {
+    this.aplicarFiltros();
+  }
+
   isYearRangeSelected(range: string): boolean {
     return this.selectedYearRange === range;
   }
 
   selectYearRange(range: string) {
     this.selectedYearRange = this.selectedYearRange === range ? null : range;
-    this.fechaPago = null;
+    this.fechaPago = '';
     this.aplicarFiltros();
+  }
+
+  toggleTodos(marcar: boolean): void {
+    this.payments.forEach(p => p.selected = marcar);
   }
 
   private async obtenerUrlPdf(payment: Payment): Promise<string | null> {
     try {
-      const resp = await this.http
+      const resp = await firstValueFrom(this.http
         .get<ApiResponse<{ url_pdf: string; referencia_pago: string }>>(
           `${this.API}/solicitudes/${payment.rawSolicitud.id}/pago`,
           { headers: this.headers }
-        ).toPromise();
+        ));
       return resp?.ok && resp.data?.url_pdf ? resp.data.url_pdf : null;
     } catch (err: any) {
       console.error(`[PDF] Error obteniendo pago de ${payment.id}:`, err?.error?.error ?? err);
@@ -277,25 +309,45 @@ export class TrabajoComponent implements OnInit {
     }
 
     this.isLoading         = true;
+    this.busquedaHecha     = true;
+    this.mensajeError      = '';
     this.allPayments       = [];
     this.payments          = [];
     this.selectedYearRange = null;
+    this.cdr.detectChanges();
 
     try {
-      const estados    = ESTADOS_POR_FILTRO[this.currentFilter] ?? ESTADOS_POR_FILTRO['todos'];
-      const promesas   = estados.map(clave => this.cargarPorEstado(clave));
-      const resultados = await Promise.all(promesas);
-      const solicitudes = resultados.flat();
+      const folio = this.folioBusqueda.trim().toUpperCase();
+      let solicitudes: Solicitud[];
+
+      if (folio) {
+        solicitudes = await this.cargarPorFolio(folio);
+      } else {
+        const estados    = ESTADOS_POR_FILTRO[this.currentFilter] ?? ESTADOS_POR_FILTRO['todos'];
+        const resultados = await Promise.all(estados.map(clave => this.cargarPorEstado(clave)));
+        solicitudes = resultados.flat();
+      }
 
       this.allPayments = solicitudes.map(s => this.toPayment(s));
       this.recalcularConteos();
       this.aplicarFiltros();
-      setTimeout(() => this.cdr.detectChanges(), 0);
     } catch (err) {
       console.error('Error en buscarPagos:', err);
-      alert('Error al buscar registros. Verifica tu conexión.');
+      this.mensajeError = 'Error al buscar registros. Verifica tu conexión.';
     } finally {
       this.isLoading = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  private async cargarPorFolio(folio: string): Promise<Solicitud[]> {
+    try {
+      const resp = await firstValueFrom(this.http.get<ApiResponse<Solicitud>>(
+        `${this.API}/solicitudes/folio/${encodeURIComponent(folio)}`, { headers: this.headers }));
+      return resp?.ok && resp.data ? [resp.data] : [];
+    } catch (err: any) {
+      if (err?.status === 404) return [];
+      throw err;
     }
   }
 
@@ -308,9 +360,7 @@ export class TrabajoComponent implements OnInit {
     try {
       while (acumulado.length < total) {
         const url  = `${this.API}/solicitudes?estado=${estadoClave}&limit=${LIMIT}&offset=${offset}`;
-        const resp = await this.http
-          .get<ApiResponse<Solicitud[]>>(url, { headers: this.headers })
-          .toPromise();
+        const resp = await firstValueFrom(this.http.get<ApiResponse<Solicitud[]>>(url, { headers: this.headers }));
 
         if (!resp?.ok || !resp.data || resp.data.length === 0) break;
         acumulado.push(...resp.data);
@@ -328,6 +378,12 @@ export class TrabajoComponent implements OnInit {
     return acumulado;
   }
 
+  private fechaCorta(iso: string | null | undefined, soloDia = false): string {
+    if (!iso) return '—';
+    const d = soloDia ? fechaLocal(iso) : new Date(iso);
+    return !d || isNaN(d.getTime()) ? '—' : d.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  }
+
   private toPayment(s: Solicitud): Payment {
     const acto     = this.catalogoActos.find(a => a.id === s.acto_registral_id);
     const servicio = this.catalogoServicios.find(sv => sv.id === s.tipo_servicio_id);
@@ -335,13 +391,10 @@ export class TrabajoComponent implements OnInit {
 
     return {
       id:             s.folio,
-      fecha:          s.fecha_recepcion
-                        ? new Date(s.fecha_recepcion).toLocaleDateString('es-MX')
-                        : '—',
-      monto:          '—',
-      concepto:       `${acto?.nombre ?? 'Acto ' + s.acto_registral_id} — ${servicio?.nombre ?? 'Servicio ' + s.tipo_servicio_id}`,
-      referencia:     s.folio,
-      metodo:         'Línea de Captura',
+      fecha:          this.fechaCorta(s.fecha_recepcion),
+      entrega:        this.fechaCorta(s.fecha_entrega_resultado, true),
+      acto:           acto?.nombre ?? `Acto ${s.acto_registral_id}`,
+      servicio:       servicio?.nombre ?? `Servicio ${s.tipo_servicio_id}`,
       anio:           this.extraerAnio(s),
       estadoClave:    estado?.clave  ?? String(s.estado_id),
       estadoNombre:   estado?.nombre ?? String(s.estado_id),
@@ -372,25 +425,25 @@ export class TrabajoComponent implements OnInit {
     }));
   }
 
+  private fechaLocalISO(iso: string): string {
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return '';
+    return `${d.getFullYear()}-${`${d.getMonth() + 1}`.padStart(2, '0')}-${`${d.getDate()}`.padStart(2, '0')}`;
+  }
+
   private aplicarFiltros() {
     let resultado = [...this.allPayments];
 
     if (this.selectedYearRange && this.selectedYearRange !== 'TODOS') {
       const bloque = this.yearRanges.find(yr => yr.range === this.selectedYearRange);
-      if (bloque?.desde !== null) {
-        resultado = resultado.filter(p => p.anio >= bloque!.desde! && p.anio <= bloque!.hasta!);
+      if (bloque && bloque.desde !== null) {
+        resultado = resultado.filter(p => p.anio >= bloque.desde! && p.anio <= bloque.hasta!);
       }
     }
 
-    if (this.fechaPago instanceof Date && !isNaN(this.fechaPago.getTime())) {
-      const fechaSel = new Date(this.fechaPago);
-      fechaSel.setHours(0, 0, 0, 0);
-      resultado = resultado.filter(p => {
-        if (!p.rawSolicitud.fecha_recepcion) return false;
-        const fs = new Date(p.rawSolicitud.fecha_recepcion);
-        fs.setHours(0, 0, 0, 0);
-        return fs.getTime() === fechaSel.getTime();
-      });
+    if (this.fechaPago) {
+      resultado = resultado.filter(p =>
+        !!p.rawSolicitud.fecha_recepcion && this.fechaLocalISO(p.rawSolicitud.fecha_recepcion) === this.fechaPago);
     }
 
     this.payments = resultado;
@@ -424,10 +477,7 @@ export class TrabajoComponent implements OnInit {
     if (!asignaciones?.size) return;
     asignaciones.forEach((folioHV, folioSolicitud) => {
       const p = this.payments.find(p => p.id === folioSolicitud);
-      if (p) {
-        p.folioHojaUsado = folioHV;
-        console.log(`[HV] UI actualizada: ${folioSolicitud} → hoja valorada ${folioHV}`);
-      }
+      if (p) p.folioHojaUsado = folioHV;
     });
   }
 
@@ -440,9 +490,9 @@ export class TrabajoComponent implements OnInit {
   private async cargarCatalogos() {
     try {
       const [actos, servicios, estados] = await Promise.all([
-        this.http.get<ApiResponse<Catalogo[]>>(`${this.API}/catalogos/actos-registrales`, { headers: this.headers }).toPromise(),
-        this.http.get<ApiResponse<Catalogo[]>>(`${this.API}/catalogos/tipos-servicio`,    { headers: this.headers }).toPromise(),
-        this.http.get<ApiResponse<Catalogo[]>>(`${this.API}/catalogos/estados`,           { headers: this.headers }).toPromise(),
+        firstValueFrom(this.http.get<ApiResponse<Catalogo[]>>(`${this.API}/catalogos/actos-registrales`, { headers: this.headers })),
+        firstValueFrom(this.http.get<ApiResponse<Catalogo[]>>(`${this.API}/catalogos/tipos-servicio`,    { headers: this.headers })),
+        firstValueFrom(this.http.get<ApiResponse<Catalogo[]>>(`${this.API}/catalogos/estados`,           { headers: this.headers })),
       ]);
       this.catalogoActos     = actos?.data     ?? [];
       this.catalogoServicios = servicios?.data ?? [];

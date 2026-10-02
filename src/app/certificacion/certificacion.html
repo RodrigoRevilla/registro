@@ -1,549 +1,334 @@
-<header class="page-header">
-  <div class="header-inner">
-
-    <div class="header-escudo">
-      <img src="/oaxaca.png" alt="Registro Civil" />
+<header class="topbar">
+  <div class="topbar-inner">
+    <img class="topbar-escudo" src="/oaxaca.png" alt="Registro Civil" />
+    <div class="topbar-text">
+      <span class="topbar-sup">Registro Civil del Estado de Oaxaca</span>
+      <h1>Solicitud de certificación</h1>
     </div>
-
-    <div class="header-text">
-      <span class="header-supratitle">Gobierno del Estado de Oaxaca</span>
-      <h1>Registro Civil del Estado</h1>
-      <span class="header-sub">Solicitud de Servicios · Actas de Nacimiento</span>
-    </div>
-
-    <div class="header-actions">
-      <button mat-button class="header-action-btn" (click)="goHome()">
-        <mat-icon>arrow_back</mat-icon>
-        Volver
+    <div class="topbar-actions">
+      <button type="button" class="btn btn-ghost-light" (click)="goHome()">
+        <mat-icon>arrow_back</mat-icon> Volver
       </button>
     </div>
-
   </div>
 </header>
-<div class="header-rule"></div>
 
-<div class="container">
-  <form autocomplete="off">
+<main class="page">
+  <form autocomplete="off" class="page-form">
 
-    <section class="form-section">
-      <div class="section-header">
-        <div class="section-icon"><mat-icon>description</mat-icon></div>
-        <h2 class="section-title">Datos del Acta</h2>
-        <span class="section-num">01 / 06</span>
+    <section class="card">
+      <div class="ficha-head">
+        <div class="avatar">{{ iniciales(nombreRegistrado) }}</div>
+        <div class="who">
+          <span class="sup">Acta de nacimiento · Acta {{ acta || '—' }} · {{ anioActa || '—' }}</span>
+          <h2>{{ nombreRegistrado || 'Sin registrado' }}</h2>
+          <div class="chips">
+            @if (crip) { <span class="chip chip-mono">{{ crip }}</span> }
+            @if (oficialia) { <span class="chip">Oficialía {{ oficialia }}</span> }
+            @if (municipioNombre) { <span class="chip">{{ municipioNombre }}</span> }
+            @if (desdeRegistro) { <span class="chip chip-soft">Datos del acervo</span> }
+          </div>
+        </div>
+        @if (folioGenerado) {
+          <div class="comprobante">
+            <div class="cp-item">
+              <em>Folio</em>
+              <div class="cp-val">
+                <strong class="mono">{{ folioGenerado }}</strong>
+                <button type="button" class="cp-copy" (click)="copiarFolio()" matTooltip="Copiar folio">
+                  <mat-icon>{{ folios.copiado() === folioGenerado ? 'check' : 'content_copy' }}</mat-icon>
+                </button>
+              </div>
+            </div>
+            @if (lineaCaptura) {
+              <div class="cp-item">
+                <em>Línea de captura</em>
+                <div class="cp-val">
+                  <strong class="mono">{{ lineaCaptura }}</strong>
+                  <button type="button" class="cp-copy" (click)="copiarLineaCaptura()" matTooltip="Copiar línea de captura">
+                    <mat-icon>{{ folios.copiado() === lineaCaptura ? 'check' : 'content_copy' }}</mat-icon>
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        }
       </div>
-      <div class="section-body">
-        <div class="fields-grid fields-grid--2">
 
-          <div class="field-wrap">
-            <label class="field-label">Entidad</label>
-            <div class="field-group">
-              <mat-form-field appearance="outline" class="sol-field code-field">
-                <input matInput [(ngModel)]="entidadCodigo" name="entidadCodigo" autocomplete="off" placeholder="Cód.">
-              </mat-form-field>
-              <mat-form-field appearance="outline" class="sol-field" style="flex:1">
-                <input matInput [(ngModel)]="entidadNombre" name="entidadNombre" autocomplete="off"
-                  placeholder="Nombre de la entidad">
-              </mat-form-field>
+      <div class="card-body">
+        <fieldset class="grupo">
+          <legend>Datos del acta</legend>
+          <div class="g12">
+            <div class="f c3">
+              <span>Entidad</span>
+              <div class="par">
+                <input [(ngModel)]="entidadCodigo" name="entidadCodigo" class="cod mono" placeholder="Cód.">
+                <input [(ngModel)]="entidadNombre" name="entidadNombre">
+              </div>
+            </div>
+            <div class="f c3">
+              <span>Distrito</span>
+              <div class="par">
+                <input [(ngModel)]="distritoCodigo" name="distritoCodigo" class="cod mono" placeholder="Cód.">
+                <input [(ngModel)]="distritoNombre" name="distritoNombre">
+              </div>
+            </div>
+            <div class="f c3">
+              <span>Municipio</span>
+              <div class="par">
+                <input [(ngModel)]="municipioCodigo" name="municipioCodigo" class="cod mono" placeholder="Cód.">
+                <input [(ngModel)]="municipioNombre" name="municipioNombre">
+              </div>
+            </div>
+            <div class="f c3">
+              <span>Localidad</span>
+              <div class="par">
+                <input [(ngModel)]="localidadCodigo" name="localidadCodigo" class="cod mono" placeholder="Cód.">
+                <input [(ngModel)]="localidadNombre" name="localidadNombre">
+              </div>
+            </div>
+
+            <label class="f c2">
+              <span>Fecha del acta</span>
+              <input type="date" [(ngModel)]="fechaActa" name="fechaActa">
+            </label>
+            <label class="f c1">
+              <span>Año</span>
+              <input [(ngModel)]="anioActa" name="anioActa" maxlength="4">
+            </label>
+            <label class="f c1">
+              <span>Oficialía</span>
+              <input [(ngModel)]="oficialia" name="oficialia">
+            </label>
+            <label class="f c1">
+              <span>Acta</span>
+              <input [(ngModel)]="acta" name="acta" class="mono">
+            </label>
+            <label class="f c1">
+              <span>Foja</span>
+              <input [(ngModel)]="foja" name="foja">
+            </label>
+            <label class="f c1">
+              <span>EnDoc</span>
+              <input [(ngModel)]="enDoc" name="enDoc">
+            </label>
+            <label class="f c5">
+              <span>CRIP</span>
+              <input [(ngModel)]="crip" name="crip" class="mono">
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset class="grupo">
+          <legend>Registrado</legend>
+          <div class="g12">
+            <label class="f c4">
+              <span>Nombre del registrado</span>
+              <input [(ngModel)]="nombreRegistrado" name="nombreRegistrado">
+            </label>
+            <label class="f c4">
+              <span>Nombre del padre</span>
+              <input [(ngModel)]="padre" name="padre">
+            </label>
+            <label class="f c4">
+              <span>Nombre de la madre</span>
+              <input [(ngModel)]="madre" name="madre">
+            </label>
+
+            <div class="f c3">
+              <span>Entidad nac.</span>
+              <div class="par">
+                <input [(ngModel)]="entidadNacCodigo" name="entidadNacCodigo" class="cod mono" placeholder="Cód.">
+                <input [(ngModel)]="entidadNacNombre" name="entidadNacNombre">
+              </div>
+            </div>
+            <div class="f c3">
+              <span>Distrito nac.</span>
+              <div class="par">
+                <input [(ngModel)]="distritoNacCodigo" name="distritoNacCodigo" class="cod mono" placeholder="Cód.">
+                <input [(ngModel)]="distritoNacNombre" name="distritoNacNombre">
+              </div>
+            </div>
+            <div class="f c3">
+              <span>Municipio nac.</span>
+              <div class="par">
+                <input [(ngModel)]="municipioNacCodigo" name="municipioNacCodigo" class="cod mono" placeholder="Cód.">
+                <input [(ngModel)]="municipioNacNombre" name="municipioNacNombre">
+              </div>
+            </div>
+            <div class="f c3">
+              <span>Localidad nac.</span>
+              <div class="par">
+                <input [(ngModel)]="localidadNacCodigo" name="localidadNacCodigo" class="cod mono" placeholder="Cód.">
+                <input [(ngModel)]="localidadNacNombre" name="localidadNacNombre">
+              </div>
             </div>
           </div>
-
-          <div class="field-wrap">
-            <label class="field-label">Distrito</label>
-            <div class="field-group">
-              <mat-form-field appearance="outline" class="sol-field code-field">
-                <input matInput [(ngModel)]="distritoCodigo" name="distritoCodigo" autocomplete="off" placeholder="Cód.">
-              </mat-form-field>
-              <mat-form-field appearance="outline" class="sol-field" style="flex:1">
-                <input matInput [(ngModel)]="distritoNombre" name="distritoNombre" autocomplete="off"
-                  placeholder="Nombre del distrito">
-              </mat-form-field>
-            </div>
-          </div>
-
-        </div>
-        <div class="fields-grid fields-grid--2">
-
-          <div class="field-wrap">
-            <label class="field-label">Municipio</label>
-            <div class="field-group">
-              <mat-form-field appearance="outline" class="sol-field code-field">
-                <input matInput [(ngModel)]="municipioCodigo" name="municipioCodigo" autocomplete="off" placeholder="Cód.">
-              </mat-form-field>
-              <mat-form-field appearance="outline" class="sol-field" style="flex:1">
-                <input matInput [(ngModel)]="municipioNombre" name="municipioNombre" autocomplete="off"
-                  placeholder="Nombre del municipio">
-              </mat-form-field>
-            </div>
-          </div>
-
-          <div class="field-wrap">
-            <label class="field-label">Localidad</label>
-            <div class="field-group">
-              <mat-form-field appearance="outline" class="sol-field code-field">
-                <input matInput [(ngModel)]="localidadCodigo" name="localidadCodigo" autocomplete="off" placeholder="Cód.">
-              </mat-form-field>
-              <mat-form-field appearance="outline" class="sol-field" style="flex:1">
-                <input matInput [(ngModel)]="localidadNombre" name="localidadNombre" autocomplete="off"
-                  placeholder="Nombre de la localidad">
-              </mat-form-field>
-            </div>
-          </div>
-
-        </div>
-
-        <hr class="sub-divider">
-        <div class="fields-grid fields-grid--4">
-
-          <div class="field-wrap">
-            <label class="field-label">Foja</label>
-            <mat-form-field appearance="outline" class="sol-field">
-              <input matInput [(ngModel)]="foja" name="foja-acta-sol" autocomplete="off">
-            </mat-form-field>
-          </div>
-
-          <div class="field-wrap">
-            <label class="field-label">Oficialía</label>
-            <mat-form-field appearance="outline" class="sol-field">
-              <input matInput [(ngModel)]="oficialia" name="oficialia-sol" autocomplete="off">
-            </mat-form-field>
-          </div>
-
-          <div class="field-wrap">
-            <label class="field-label">Acta</label>
-            <mat-form-field appearance="outline" class="sol-field">
-              <input matInput [(ngModel)]="acta" name="acta-sol" autocomplete="off">
-            </mat-form-field>
-          </div>
-
-          <div class="field-wrap">
-            <label class="field-label">EnDoc</label>
-            <mat-form-field appearance="outline" class="sol-field">
-              <input matInput [(ngModel)]="enDoc" name="enDoc-sol" autocomplete="off">
-            </mat-form-field>
-          </div>
-
-        </div>
-        <div class="fields-grid fields-grid--4">
-
-          <div class="field-wrap span2">
-            <label class="field-label">Fecha del Acta</label>
-            <mat-form-field appearance="outline" class="sol-field">
-              <input matInput [matDatepicker]="pickerActa" [(ngModel)]="fechaActa" name="fecha-acta-sol" autocomplete="off">
-              <mat-datepicker-toggle matIconSuffix [for]="pickerActa"></mat-datepicker-toggle>
-              <mat-datepicker #pickerActa></mat-datepicker>
-            </mat-form-field>
-          </div>
-
-          <div class="field-wrap">
-            <label class="field-label">Año</label>
-            <mat-form-field appearance="outline" class="sol-field">
-              <input matInput [(ngModel)]="anioActa" name="anio-acta-sol" autocomplete="off">
-            </mat-form-field>
-          </div>
-
-        </div>
+        </fieldset>
       </div>
     </section>
 
-    <section class="form-section">
-      <div class="section-header">
-        <div class="section-icon"><mat-icon>person</mat-icon></div>
-        <h2 class="section-title">Datos del Registrado</h2>
-        <span class="section-num">02 / 06</span>
-      </div>
-      <div class="section-body">
+    <div class="dos-col">
 
-        <div class="fields-grid fields-grid--2">
+      <section class="card">
+        <div class="card-bar"><span class="card-title"><mat-icon>tune</mat-icon> Servicio</span></div>
+        <div class="card-body">
+          <div class="g12">
+            <label class="f c8">
+              <span>Tipo de servicio</span>
+              <select [(ngModel)]="tipoServicioId" name="tipoServicioId">
+                @for (ts of (tiposServicio.length ? tiposServicio : tiposServicioRespaldo); track ts.id) {
+                  <option [ngValue]="ts.id">{{ ts.nombre }}</option>
+                }
+              </select>
+            </label>
+            <label class="f c4">
+              <span>Tipo de acta</span>
+              <input value="NACIMIENTO" name="tipoActa" readonly class="ro">
+            </label>
 
-          <div class="field-wrap">
-            <label class="field-label">Nombre(s)</label>
-            <mat-form-field appearance="outline" class="sol-field">
-              <input matInput [(ngModel)]="nombreRegistrado" name="nombreRegistrado" autocomplete="off">
-            </mat-form-field>
+            <label class="f c8">
+              <span>Documento presentado</span>
+              <select [(ngModel)]="documentoPresentado" name="documentoPresentado">
+                <option value="">— Seleccione —</option>
+                <option value="fotocopia">Presentó fotocopia</option>
+                <option value="verbal">Datos verbales</option>
+                <option value="boleta">Boleta de registro</option>
+                <option value="negativo">Certificado negativo</option>
+                <option value="resolucion">Resolución</option>
+              </select>
+            </label>
+            <label class="f c4">
+              <span>Copias</span>
+              <input type="number" min="1" [(ngModel)]="copiasSOlicitadas" name="copiasSOlicitadas">
+            </label>
+
+            <label class="f c3">
+              <span>Años búsqueda</span>
+              <input [(ngModel)]="aniosBusqueda" name="aniosBusqueda">
+            </label>
+            <label class="f c3">
+              <span>Rango</span>
+              <input [(ngModel)]="rangoBusqueda" name="rangoBusqueda">
+            </label>
+            <label class="f c4">
+              <span>Fecha de entrega <i>*</i></span>
+              <input type="date" [min]="today" [(ngModel)]="fechaEntrega" name="fechaEntrega" #inputEntrega
+                     (focus)="autoFechaEntrega(inputEntrega)" (change)="ajustarFechaEntrega(inputEntrega)">
+              @if (avisoFechaEntrega()) { <small class="aviso-fecha">{{ avisoFechaEntrega() }}</small> }
+            </label>
+            <label class="f c2">
+              <span>Hora</span>
+              <input type="time" [(ngModel)]="horaEntrega" name="horaEntrega" (change)="autoHoraEntrega()">
+            </label>
           </div>
-
-          <div class="field-wrap">
-            <label class="field-label">CRIP</label>
-            <mat-form-field appearance="outline" class="sol-field mono-field">
-              <input matInput [(ngModel)]="crip" name="crip" autocomplete="off">
-            </mat-form-field>
-          </div>
-
         </div>
-        <div class="fields-grid fields-grid--2">
+      </section>
 
-          <div class="field-wrap">
-            <label class="field-label">Entidad de Nacimiento</label>
-            <div class="field-group">
-              <mat-form-field appearance="outline" class="sol-field code-field">
-                <input matInput [(ngModel)]="entidadNacCodigo" name="entidadNacCodigo" autocomplete="off" placeholder="Cód.">
-              </mat-form-field>
-              <mat-form-field appearance="outline" class="sol-field" style="flex:1">
-                <input matInput [(ngModel)]="entidadNacNombre" name="entidadNacNombre" autocomplete="off">
-              </mat-form-field>
-            </div>
+      <section class="card">
+        <div class="card-bar"><span class="card-title"><mat-icon>receipt_long</mat-icon> Facturación</span></div>
+        <div class="card-body">
+          <div class="g12">
+            <label class="f c12">
+              <span>
+                Nombre del contribuyente <i>*</i>
+                @if (desdeRegistro) { <em class="lock"><mat-icon>lock</mat-icon> del acervo</em> }
+              </span>
+              <input [(ngModel)]="nombreContribuyente" name="nombreContribuyente"
+                     [readonly]="desdeRegistro" [class.ro]="desdeRegistro">
+            </label>
+
+            <label class="f c6">
+              <span>Uso de CFDI</span>
+              <select [(ngModel)]="usoCfdi" name="usoCfdi">
+                @for (u of usosCfdi; track u.clave) {
+                  <option [value]="u.clave">{{ u.clave }} · {{ u.nombre }}</option>
+                }
+              </select>
+            </label>
+            <label class="f c6">
+              <span>Régimen fiscal</span>
+              <select [(ngModel)]="regimenFiscal" name="regimenFiscal">
+                @for (r of regimenes; track r.clave) {
+                  <option [value]="r.clave">{{ r.clave }} · {{ r.nombre }}</option>
+                }
+              </select>
+            </label>
+
+            <label class="f c4">
+              <span>RFC</span>
+              <input [(ngModel)]="rfc" name="rfc" class="mono" maxlength="13"
+                     (input)="rfc = $any($event.target).value.toUpperCase()">
+            </label>
+            <label class="f c5">
+              <span>Correo electrónico</span>
+              <input type="email" [(ngModel)]="email" name="email" placeholder="Opcional">
+            </label>
+            <label class="f c3">
+              <span>Código postal</span>
+              <input [(ngModel)]="codigoPostal" name="codigoPostal" maxlength="5" inputmode="numeric" class="mono">
+            </label>
           </div>
-
-          <div class="field-wrap">
-            <label class="field-label">Municipio de Nacimiento</label>
-            <div class="field-group">
-              <mat-form-field appearance="outline" class="sol-field code-field">
-                <input matInput [(ngModel)]="municipioNacCodigo" name="municipioNacCodigo" autocomplete="off" placeholder="Cód.">
-              </mat-form-field>
-              <mat-form-field appearance="outline" class="sol-field" style="flex:1">
-                <input matInput [(ngModel)]="municipioNacNombre" name="municipioNacNombre" autocomplete="off">
-              </mat-form-field>
-            </div>
-          </div>
-
         </div>
-        <div class="fields-grid fields-grid--2">
+      </section>
 
-          <div class="field-wrap">
-            <label class="field-label">Distrito de Nacimiento</label>
-            <div class="field-group">
-              <mat-form-field appearance="outline" class="sol-field code-field">
-                <input matInput [(ngModel)]="distritoNacCodigo" name="distritoNacCodigo" autocomplete="off" placeholder="Cód.">
-              </mat-form-field>
-              <mat-form-field appearance="outline" class="sol-field" style="flex:1">
-                <input matInput [(ngModel)]="distritoNacNombre" name="distritoNacNombre" autocomplete="off">
-              </mat-form-field>
-            </div>
-          </div>
-
-          <div class="field-wrap">
-            <label class="field-label">Localidad de Nacimiento</label>
-            <div class="field-group">
-              <mat-form-field appearance="outline" class="sol-field code-field">
-                <input matInput [(ngModel)]="localidadNacCodigo" name="localidadNacCodigo" autocomplete="off" placeholder="Cód.">
-              </mat-form-field>
-              <mat-form-field appearance="outline" class="sol-field" style="flex:1">
-                <input matInput [(ngModel)]="localidadNacNombre" name="localidadNacNombre" autocomplete="off">
-              </mat-form-field>
-            </div>
-          </div>
-
-        </div>
-
-        <div class="fields-grid fields-grid--2">
-
-          <div class="field-wrap">
-            <label class="field-label">Nombre del Padre</label>
-            <mat-form-field appearance="outline" class="sol-field">
-              <input matInput [(ngModel)]="padre" name="padre" autocomplete="off">
-            </mat-form-field>
-          </div>
-
-          <div class="field-wrap">
-            <label class="field-label">Nombre de la Madre</label>
-            <mat-form-field appearance="outline" class="sol-field">
-              <input matInput [(ngModel)]="madre" name="madre" autocomplete="off">
-            </mat-form-field>
-          </div>
-
-        </div>
-
-      </div>
-    </section>
-
-    <section class="form-section">
-      <div class="section-header">
-        <div class="section-icon"><mat-icon>settings</mat-icon></div>
-        <h2 class="section-title">Servicio</h2>
-        <span class="section-num">03 / 06</span>
-      </div>
-      <div class="section-body">
-
-        <div class="fields-grid fields-grid--2">
-
-          <div class="field-wrap">
-            <label class="field-label">Tipo de Servicio</label>
-            <mat-form-field appearance="outline" class="sol-field">
-              <mat-select [(ngModel)]="tipoServicioId" name="tipoServicioId" panelClass="sol-select-panel">
-                <mat-option [value]="0">Seleccione un tipo de servicio</mat-option>
-                <mat-option *ngFor="let ts of tiposServicio" [value]="ts.id">{{ ts.nombre }}</mat-option>
-                <ng-container *ngIf="tiposServicio.length === 0">
-                  <mat-option value="1">C: Certificación de acta</mat-option>
-                  <mat-option value="2">E: Const. Reg. Extem.</mat-option>
-                  <mat-option value="3">F: Fotocopia certificada</mat-option>
-                  <mat-option value="4">G: Anotación y Fotocopia</mat-option>
-                  <mat-option value="5">H: Anotación marginal</mat-option>
-                  <mat-option value="6">I: Fotocopia índice</mat-option>
-                  <mat-option value="7">J: Fotocopia C./Anot. ya pagada</mat-option>
-                  <mat-option value="8">M: Anotación marginal</mat-option>
-                  <mat-option value="9">O: Anotación marginal con certificación</mat-option>
-                  <mat-option value="10">P: Fot. Ant y Post</mat-option>
-                  <mat-option value="11">R: Fot. Ant, Int, Post</mat-option>
-                  <mat-option value="12">V: Fotocopia C/Índice alfabético</mat-option>
-                  <mat-option value="13">W: Fotocopia índice e inter.</mat-option>
-                  <mat-option value="14">X: Validación</mat-option>
-                  <mat-option value="15">Z: Fotocopia con anotación pagada</mat-option>
-                  <mat-option value="16">L: Certificación con anotación pagada</mat-option>
-                </ng-container>
-              </mat-select>
-            </mat-form-field>
-          </div>
-
-          <div class="field-wrap">
-            <label class="field-label">Documento Presentado</label>
-            <mat-form-field appearance="outline" class="sol-field">
-              <mat-select [(ngModel)]="documentoPresentado" name="documentoPresentado" panelClass="sol-select-panel">
-                <mat-option value="">Seleccione uno</mat-option>
-                <mat-option value="fotocopia">Presentó fotocopia</mat-option>
-                <mat-option value="verbal">Datos verbales</mat-option>
-                <mat-option value="boleta">Boleta de registro</mat-option>
-                <mat-option value="negativo">Certificado negativo</mat-option>
-                <mat-option value="resolucion">Resolución</mat-option>
-              </mat-select>
-            </mat-form-field>
-          </div>
-
-        </div>
-
-        <hr class="sub-divider">
-        <div class="fields-grid fields-grid--4">
-
-          <div class="field-wrap">
-            <label class="field-label">Tipo Acta</label>
-            <mat-form-field appearance="outline" class="sol-field readonly-field">
-              <input matInput value="NACIMIENTO" readonly autocomplete="off" name="tipo-acta-sol">
-            </mat-form-field>
-          </div>
-
-          <div class="field-wrap">
-            <label class="field-label">Copias Solicitadas</label>
-            <mat-form-field appearance="outline" class="sol-field">
-              <input matInput type="number" min="1" [(ngModel)]="copiasSOlicitadas" name="copiasSOlicitadas" autocomplete="off">
-            </mat-form-field>
-          </div>
-
-          <div class="field-wrap">
-            <label class="field-label">Años de Búsqueda</label>
-            <mat-form-field appearance="outline" class="sol-field">
-              <input matInput [(ngModel)]="aniosBusqueda" name="anios-busqueda-sol" autocomplete="off">
-            </mat-form-field>
-          </div>
-
-          <div class="field-wrap">
-            <label class="field-label">Rango Búsqueda</label>
-            <mat-form-field appearance="outline" class="sol-field">
-              <input matInput [(ngModel)]="rangoBusqueda" name="rango-busqueda-sol" autocomplete="off">
-            </mat-form-field>
-          </div>
-
-        </div>
-        <div class="fields-grid fields-grid--4">
-
-          <div class="field-wrap span2">
-            <label class="field-label">Fecha de Entrega</label>
-            <mat-form-field appearance="outline" class="sol-field">
-              <input matInput [matDatepicker]="pickerEntrega" [(ngModel)]="fechaEntrega" name="fecha-entrega-sol"
-                autocomplete="off" (dateChange)="autoFechaEntrega()" (blur)="autoFechaEntrega()">
-              <mat-datepicker-toggle matIconSuffix [for]="pickerEntrega"></mat-datepicker-toggle>
-              <mat-datepicker #pickerEntrega></mat-datepicker>
-            </mat-form-field>
-          </div>
-
-          <div class="field-wrap">
-            <label class="field-label">Hora de Entrega</label>
-            <mat-form-field appearance="outline" class="sol-field">
-              <input matInput type="time" [(ngModel)]="horaEntrega" name="hora-entrega-sol" autocomplete="off"
-                (change)="autoHoraEntrega()">
-            </mat-form-field>
-          </div>
-
-        </div>
-
-      </div>
-    </section>
-
-    <section class="form-section">
-      <div class="section-header">
-        <div class="section-icon"><mat-icon>receipt</mat-icon></div>
-        <h2 class="section-title">Facturación</h2>
-        <span class="section-num">04 / 06</span>
-      </div>
-      <div class="section-body">
-
-        <div class="fields-grid fields-grid--3">
-
-          <div class="field-wrap span2">
-            <label class="field-label">Nombre del Contribuyente</label>
-            <mat-form-field appearance="outline" class="sol-field">
-              <input matInput [(ngModel)]="nombreContribuyente" name="nombreContribuyente" autocomplete="off">
-            </mat-form-field>
-          </div>
-
-          <div class="field-wrap">
-            <label class="field-label">RFC</label>
-            <mat-form-field appearance="outline" class="sol-field mono-field">
-              <input matInput [(ngModel)]="rfc" name="rfc" autocomplete="off"
-                (input)="$any($event.target).value = $any($event.target).value.toUpperCase()">
-            </mat-form-field>
-          </div>
-
-        </div>
-
-        <div class="fields-grid fields-grid--2">
-
-          <div class="field-wrap">
-            <label class="field-label">Uso de CFDI</label>
-            <mat-form-field appearance="outline" class="sol-field">
-              <mat-select [(ngModel)]="usoCfdi" name="usoCfdi" panelClass="sol-select-panel">
-                <mat-option value="S01">S01 — Sin efectos fiscales</mat-option>
-                <mat-option value="G01">G01 — Adquisición de mercancías</mat-option>
-                <mat-option value="G03">G03 — Gastos en general</mat-option>
-                <mat-option value="D03">D03 — Gastos funerales</mat-option>
-                <mat-option value="D04">D04 — Donativos</mat-option>
-              </mat-select>
-            </mat-form-field>
-          </div>
-
-          <div class="field-wrap">
-            <label class="field-label">Régimen Fiscal</label>
-            <mat-form-field appearance="outline" class="sol-field">
-              <mat-select [(ngModel)]="regimenFiscal" name="regimenFiscal" panelClass="sol-select-panel">
-                <mat-option value="616">616 — Sin obligaciones fiscales</mat-option>
-                <mat-option value="601">601 — General ley personas morales</mat-option>
-                <mat-option value="603">603 — Personas morales sin fines lucrativos</mat-option>
-                <mat-option value="605">605 — Sueldos y salarios</mat-option>
-                <mat-option value="606">606 — Arrendamiento</mat-option>
-                <mat-option value="607">607 — Enajenación o adquisición de bienes</mat-option>
-                <mat-option value="608">608 — Demás ingresos</mat-option>
-                <mat-option value="612">612 — Personas físicas con act. empresariales</mat-option>
-                <mat-option value="621">621 — Incorporación fiscal</mat-option>
-                <mat-option value="626">626 — Régimen simplificado de confianza</mat-option>
-              </mat-select>
-            </mat-form-field>
-          </div>
-
-        </div>
-
-        <div class="fields-grid fields-grid--4">
-
-          <div class="field-wrap">
-            <label class="field-label">Correo Electrónico</label>
-            <mat-form-field appearance="outline" class="sol-field">
-              <input matInput type="email" [(ngModel)]="email" name="email-fact" autocomplete="off">
-            </mat-form-field>
-          </div>
-
-          <div class="field-wrap">
-            <label class="field-label">Código Postal</label>
-            <mat-form-field appearance="outline" class="sol-field">
-              <input matInput [(ngModel)]="codigoPostal" name="cp-fact" autocomplete="off">
-            </mat-form-field>
-          </div>
-
-        </div>
-
-      </div>
-    </section>
-
-    <section class="form-section">
-      <div class="section-header">
-        <div class="section-icon"><mat-icon>gavel</mat-icon></div>
-        <h2 class="section-title">Servicio Condonado</h2>
-        <span class="section-num">05 / 06</span>
-      </div>
-      <div class="section-body">
-
-        <div class="radio-row">
-          <label class="radio-pill">
-            <input type="radio" name="tipoCondonado" value="no" [(ngModel)]="tipoCondonado">
-            No condonado
-          </label>
-          <label class="radio-pill">
-            <input type="radio" name="tipoCondonado" value="si" [(ngModel)]="tipoCondonado">
-            Condonado
-          </label>
-        </div>
-
-        <div class="fields-grid fields-grid--4 mt">
-
-          <div class="field-wrap">
-            <label class="field-label">No. Oficio</label>
-            <mat-form-field appearance="outline" class="sol-field">
-              <input matInput [(ngModel)]="numeroOficio" name="num-oficio-sol" autocomplete="off">
-            </mat-form-field>
-          </div>
-
-          <div class="field-wrap">
-            <label class="field-label">Fecha del Oficio</label>
-            <mat-form-field appearance="outline" class="sol-field">
-              <input matInput [matDatepicker]="pickerOficio" [(ngModel)]="fechaOficio" name="fecha-oficio-sol" autocomplete="off">
-              <mat-datepicker-toggle matIconSuffix [for]="pickerOficio"></mat-datepicker-toggle>
-              <mat-datepicker #pickerOficio></mat-datepicker>
-            </mat-form-field>
-          </div>
-
-        </div>
-
-        <p class="nota">Anotar en caso de servicio CERTIF. C/ANOT. MARG YA PAGADA</p>
-
-        <div class="fields-grid fields-grid--4">
-
-          <div class="field-wrap">
-            <label class="field-label">Recibo Número</label>
-            <mat-form-field appearance="outline" class="sol-field">
-              <input matInput [(ngModel)]="reciboNumero" name="recibo-num-sol" autocomplete="off">
-            </mat-form-field>
-          </div>
-
-          <div class="field-wrap">
-            <label class="field-label">Fecha de Pago</label>
-            <mat-form-field appearance="outline" class="sol-field">
-              <input matInput [matDatepicker]="pickerPago" [(ngModel)]="fechaPagoRecibo" name="fecha-pago-sol" autocomplete="off">
-              <mat-datepicker-toggle matIconSuffix [for]="pickerPago"></mat-datepicker-toggle>
-              <mat-datepicker #pickerPago></mat-datepicker>
-            </mat-form-field>
-          </div>
-
-        </div>
-
-      </div>
-    </section>
-
-    <section class="form-section">
-      <div class="section-header">
-        <div class="section-icon"><mat-icon>notes</mat-icon></div>
-        <h2 class="section-title">Observaciones</h2>
-        <span class="section-num">06 / 06</span>
-      </div>
-      <div class="section-body">
-        <textarea class="sol-textarea" rows="3" [(ngModel)]="observaciones" name="observaciones" autocomplete="off"
-          placeholder="Anotaciones o información complementaria de la solicitud…"></textarea>
-      </div>
-    </section>
-
-    <div class="resultado-card" *ngIf="folioGenerado">
-      <div class="resultado-row">
-        <span class="resultado-label">Folio</span>
-        <span class="resultado-valor">{{ folioGenerado }}</span>
-        <button type="button" class="btn-copiar" (click)="copiarFolio()">📋 Copiar</button>
-      </div>
-      <div class="resultado-row" *ngIf="lineaCaptura">
-        <span class="resultado-label">Línea de Captura</span>
-        <span class="resultado-valor">{{ lineaCaptura }}</span>
-        <button type="button" class="btn-copiar" (click)="copiarLineaCaptura()">📋 Copiar</button>
-      </div>
     </div>
 
-    <div class="action-bar">
-      <button type="button" class="btn-generar" mat-button (click)="crearNuevaSolicitud()" [disabled]="procesando">
-        <mat-icon>credit_card</mat-icon>
-        {{ procesando ? 'Generando...' : 'Generar Hoja de Pago' }}
-      </button>
-    </div>
+    <section class="card">
+      <div class="card-bar"><span class="card-title"><mat-icon>gavel</mat-icon> Condonación y observaciones</span></div>
+      <div class="card-body">
+        <div class="g12">
+          <div class="f c3">
+            <span>Servicio</span>
+            <div class="seg">
+              <button type="button" [class.on]="tipoCondonado === 'no'" (click)="tipoCondonado = 'no'">No condonado</button>
+              <button type="button" [class.on]="tipoCondonado === 'si'" (click)="tipoCondonado = 'si'">Condonado</button>
+            </div>
+          </div>
+          <label class="f c2">
+            <span>No. oficio</span>
+            <input [(ngModel)]="numeroOficio" name="numeroOficio">
+          </label>
+          <label class="f c2">
+            <span>Fecha oficio</span>
+            <input type="date" [(ngModel)]="fechaOficio" name="fechaOficio">
+          </label>
+          <label class="f c2" matTooltip="Solo para CERTIF. C/ANOT. MARG YA PAGADA">
+            <span>Recibo núm.</span>
+            <input [(ngModel)]="reciboNumero" name="reciboNumero">
+          </label>
+          <label class="f c3" matTooltip="Solo para CERTIF. C/ANOT. MARG YA PAGADA">
+            <span>Fecha de pago del recibo</span>
+            <input type="date" [(ngModel)]="fechaPagoRecibo" name="fechaPagoRecibo">
+          </label>
 
-    <div class="action-bar" *ngIf="mostrarPdf" style="margin-top:12px; border-top:none; padding-top:0">
-      <button type="button" class="btn-imprimir" mat-button (click)="imprimir()">
-        <mat-icon>print</mat-icon>
-        Imprimir Hoja de Pago
-      </button>
+          <label class="f c12">
+            <span>Observaciones</span>
+            <textarea rows="2" [(ngModel)]="observaciones" name="observaciones"
+                      placeholder="Anotaciones o información complementaria de la solicitud…"></textarea>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <div class="card action-bar">
+      @if (folioGenerado) {
+        <span class="hint hint-ok"><mat-icon>check_circle</mat-icon> Hoja generada · el folio también queda en <b>Folios</b> (barra superior)</span>
+      } @else {
+        <span class="hint">Revisa los datos y genera la hoja de pago.</span>
+      }
+      <div class="acciones">
+        @if (mostrarPdf) {
+          <button type="button" class="btn btn-outline" (click)="imprimir()">
+            <mat-icon>print</mat-icon> Imprimir
+          </button>
+        }
+        <button type="button" class="btn btn-primary" (click)="crearNuevaSolicitud()" [disabled]="procesando">
+          @if (procesando) { <mat-spinner diameter="14"></mat-spinner> } @else { <mat-icon>credit_card</mat-icon> }
+          {{ procesando ? 'Generando…' : 'Generar hoja de pago' }}
+        </button>
+      </div>
     </div>
 
   </form>
-</div>
-
-<span class="watermark">Registro Civil</span>
+</main>

@@ -87,7 +87,7 @@
 
   <footer class="ficha-foot">
     <button type="button" class="btn btn-ghost" (click)="cerrar()">Cerrar</button>
-    @if (esDialogo()) {
+    @if (puedeEditar()) {
       <button type="button" class="btn btn-outline" (click)="usarDatos()" [disabled]="!registro()">
         <mat-icon>edit</mat-icon> Editar
       </button>

@@ -1,155 +1,145 @@
-<header class="page-header">
-  <div class="header-inner">
-
-    <div class="header-escudo">
-      <img src="/oaxaca.png" alt="Registro Civil" />
+<header class="topbar">
+  <div class="topbar-inner">
+    <img class="topbar-escudo" src="/oaxaca.png" alt="Registro Civil" />
+    <div class="topbar-text">
+      <span class="topbar-sup">Registro Civil del Estado de Oaxaca</span>
+      <h1>Pago de solicitudes</h1>
     </div>
-
-    <div class="header-text">
-      <span class="header-supratitle">Gobierno del Estado de Oaxaca</span>
-      <h1>Registro Civil del Estado</h1>
-      <span class="header-sub">Actualizar Pago de Solicitud</span>
-    </div>
-
-    <div class="header-actions">
-      <button mat-button class="header-action-btn" (click)="goHome()">
-        <mat-icon>arrow_back</mat-icon>
-        Volver
+    <div class="topbar-actions">
+      <button type="button" class="btn btn-ghost-light" (click)="goHome()">
+        <mat-icon>arrow_back</mat-icon> Inicio
       </button>
     </div>
-
   </div>
 </header>
-<div class="header-rule"></div>
 
-<div class="container">
+<main class="page">
 
-  <div class="search-card">
-    <div class="search-fields">
-
-      <mat-form-field appearance="outline" class="cons-field">
-        <mat-label>Folio</mat-label>
-        <input matInput [(ngModel)]="folioBuscar" (keyup.enter)="buscarFolio()" />
-      </mat-form-field>
-
-      <button class="btn-buscar" (click)="buscarFolio()" [disabled]="procesando$ | async">
-        <mat-icon>search</mat-icon>
-        {{ (procesando$ | async) ? 'Buscando...' : 'Buscar' }}
-      </button>
-
-    </div>
-  </div>
-
-  <ng-container *ngIf="solicitud$ | async as sol">
-
-    <div class="form-section">
-      <div class="section-header">
-        <div class="section-icon"><mat-icon>description</mat-icon></div>
-        <h3 class="section-title">Detalles de la Solicitud</h3>
+  <section class="card search-card">
+    <form class="search-grid" (ngSubmit)="buscarFolio()" autocomplete="off">
+      <label class="f">
+        <span>Folio de solicitud</span>
+        <input class="mono" name="folioBuscar" placeholder="RC-AAAAMMDD-0000"
+               [ngModel]="folioBuscar" (ngModelChange)="onFolioInput($event)"
+               [matAutocomplete]="acFolio">
+        <mat-autocomplete #acFolio="matAutocomplete" (optionSelected)="elegirFolio($event.option.value)">
+          @for (s of sugerenciasFolio(); track s.folio) {
+            <mat-option [value]="s.folio">
+              <span class="opt-folio">{{ s.folio }}</span>
+              <span class="opt-nombre">{{ s.nombre }}</span>
+            </mat-option>
+          }
+        </mat-autocomplete>
+      </label>
+      <div class="search-actions">
+        <button type="submit" class="btn btn-primary" [disabled]="procesando()">
+          @if (procesando()) { <mat-spinner diameter="14"></mat-spinner> } @else { <mat-icon>search</mat-icon> }
+          Buscar
+        </button>
+        <button type="button" class="btn btn-icon" (click)="limpiar()" matTooltip="Limpiar búsqueda">
+          <mat-icon>backspace</mat-icon>
+        </button>
       </div>
-      <div class="section-body">
+    </form>
 
-        <div class="fields-grid fields-grid--3">
+    @if (mensaje()) {
+      <div class="aviso-linea aviso-error"><mat-icon>error_outline</mat-icon> {{ mensaje() }}</div>
+    } @else if (!solicitud() && folios.lista().length) {
+      <div class="recientes">
+        <span class="rec-label">Generados hoy:</span>
+        @for (f of folios.lista().slice(0, 4); track f.folio) {
+          <button type="button" class="rec-chip" (click)="elegirFolio(f.folio)" [matTooltip]="f.nombre">{{ f.folio }}</button>
+        }
+      </div>
+    }
+  </section>
 
-          <div class="field-wrap">
-            <label class="field-label">Años de Búsqueda</label>
-            <input class="campo-input" [value]="sol.aniosBusqueda" readonly />
+  @if (solicitud(); as sol) {
+    <section class="card ficha">
+      <div class="ficha-head">
+        <div class="fh-icon"><mat-icon>receipt_long</mat-icon></div>
+        <div class="fh-txt">
+          <span class="sup">Solicitud</span>
+          <div class="fh-folio">
+            <strong class="mono">{{ sol.solicitud }}</strong>
+            <button type="button" class="fh-copy" (click)="folios.copiar(sol.solicitud)" matTooltip="Copiar folio">
+              <mat-icon>{{ folios.copiado() === sol.solicitud ? 'check' : 'content_copy' }}</mat-icon>
+            </button>
           </div>
-          <div class="field-wrap">
-            <label class="field-label">Solicitud</label>
-            <input class="campo-input" [value]="sol.solicitud" readonly />
+        </div>
+        <span class="fh-estado" [ngClass]="'e-' + sol.status">{{ estadoNombre() }}</span>
+        <div class="fh-linea">
+          <em>Línea de captura</em>
+          <div class="fh-val">
+            <strong class="mono">{{ sol.lineaCaptura || '—' }}</strong>
+            @if (sol.lineaCaptura) {
+              <button type="button" class="fh-copy" (click)="folios.copiar(sol.lineaCaptura)" matTooltip="Copiar línea de captura">
+                <mat-icon>{{ folios.copiado() === sol.lineaCaptura ? 'check' : 'content_copy' }}</mat-icon>
+              </button>
+            }
           </div>
-          <div class="field-wrap">
-            <label class="field-label">Oficialía</label>
-            <input class="campo-input" [value]="sol.oficialia" readonly />
-          </div>
-          <div class="field-wrap">
-            <label class="field-label">Número de Acta</label>
-            <input class="campo-input" [value]="sol.numeroActa" readonly />
-          </div>
-          <div class="field-wrap">
-            <label class="field-label">Número de Foja</label>
-            <input class="campo-input" [value]="sol.numeroFoja" readonly />
-          </div>
-          <div class="field-wrap">
-            <label class="field-label">Fecha de Registro</label>
-            <input class="campo-input" type="date"
-              [value]="sol.fechaRegistro | date:'yyyy-MM-dd'" readonly />
-          </div>
-          <div class="field-wrap">
-            <label class="field-label">Lugar de Registro</label>
-            <input class="campo-input" [value]="sol.lugarRegistro" readonly />
-          </div>
-          <div class="field-wrap">
-            <label class="field-label">Rango de Búsqueda</label>
-            <input class="campo-input" [value]="sol.rangoBusqueda" readonly />
-          </div>
-          <div class="field-wrap">
-            <label class="field-label">Estado Biológico</label>
-            <input class="campo-input" [value]="sol.estadoBiologico" readonly />
-          </div>
-          <div class="field-wrap">
-            <label class="field-label">Estado del Acta</label>
-            <input class="campo-input" [value]="sol.estadoActa" readonly />
-          </div>
-          <div class="field-wrap">
-            <label class="field-label">Documento Presentado</label>
-            <input class="campo-input" [value]="sol.documentoPresentado" readonly />
-          </div>
-          <div class="field-wrap">
-            <label class="field-label">Nombres</label>
-            <input class="campo-input" [value]="sol.nombres" readonly />
-          </div>
-          <div class="field-wrap">
-            <label class="field-label">CRIP</label>
-            <input class="campo-input" [value]="sol.crip" readonly />
-          </div>
-          <div class="field-wrap">
-            <label class="field-label">Sexo</label>
-            <input class="campo-input" [value]="sol.sexo" readonly />
-          </div>
-          <div class="field-wrap">
-            <label class="field-label">Copias Solicitadas</label>
-            <input class="campo-input" [value]="sol.copiasSolicitadas" readonly />
-          </div>
-          <div class="field-wrap">
-            <label class="field-label">Fecha de Entrega</label>
-            <input class="campo-input" type="datetime-local"
-              [value]="sol.fechaEntregaHora ? (sol.fechaEntregaHora | date:'yyyy-MM-ddTHH:mm') : ''"
-              readonly />
-          </div>
-          <div class="field-wrap">
-            <label class="field-label">Fecha de Solicitud</label>
-            <input class="campo-input" type="datetime-local"
-              [value]="sol.fechaSolicitudHora ? (sol.fechaSolicitudHora | date:'yyyy-MM-ddTHH:mm') : ''"
-              readonly />
-          </div>
-          <div class="field-wrap">
-            <label class="field-label">Status</label>
-            <input class="campo-input" [value]="sol.status" readonly />
-          </div>
-          <div class="field-wrap">
-            <label class="field-label">Línea de Captura</label>
-            <input class="campo-input mono" [value]="sol.lineaCaptura" readonly />
-          </div>
-          <div class="field-wrap">
-            <label class="field-label">Tipo de Acta</label>
-            <input class="campo-input" [value]="sol.tipoActa" readonly />
-          </div>
-
         </div>
       </div>
+
+      <div class="aviso" [ngClass]="'aviso-' + tipoAviso()">
+        <mat-icon>{{ tipoAviso() === 'pendiente' ? 'schedule' : (tipoAviso() === 'negativo' ? 'block' : 'check_circle') }}</mat-icon>
+        <span>{{ textoAviso() }}</span>
+      </div>
+
+      <div class="datos">
+        <div class="dato">
+          <em>Acto</em>
+          <span>{{ nombreActo(sol.actoId) }}</span>
+        </div>
+        <div class="dato">
+          <em>Servicio</em>
+          <span>{{ nombreServicio(sol.servicioId) }}</span>
+        </div>
+        <div class="dato">
+          <em>Fecha de solicitud</em>
+          <span>{{ fechaCorta(sol.fechaSolicitudHora) }} <small>{{ horaCorta(sol.fechaSolicitudHora) }}</small></span>
+        </div>
+        <div class="dato">
+          <em>Fecha de entrega</em>
+          <span>{{ fechaCorta(sol.fechaEntregaHora, true) }}</span>
+        </div>
+        @for (d of detalles(); track d.etiqueta) {
+          <div class="dato">
+            <em>{{ d.etiqueta }}</em>
+            <span>{{ d.valor }}</span>
+          </div>
+        }
+      </div>
+    </section>
+
+    <div class="card action-bar">
+      <span class="hint">
+        @if (sol.status === 'PENDIENTE_PAGO') {
+          Verifica el pago con Finanzas y confírmalo.
+        } @else {
+          No hay acciones de pago pendientes para este folio.
+        }
+      </span>
+      <div class="acciones">
+        <button type="button" class="btn btn-outline" (click)="imprimirPago()" [disabled]="!sol.lineaCaptura && !sol.urlPdf">
+          <mat-icon>print</mat-icon> Hoja de pago
+        </button>
+        @if (sol.status === 'PENDIENTE_PAGO') {
+          <button type="button" class="btn btn-primary" (click)="confirmarPagoManual()" [disabled]="confirmando()">
+            @if (confirmando()) { <mat-spinner diameter="14"></mat-spinner> } @else { <mat-icon>payments</mat-icon> }
+            {{ confirmando() ? 'Confirmando…' : 'Confirmar pago' }}
+          </button>
+        }
+      </div>
     </div>
+  } @else if (!procesando() && !mensaje()) {
+    <section class="card vacio-inicial">
+      <mat-icon>payments</mat-icon>
+      <div>
+        <strong>Busca un folio para ver su pago</strong>
+        <span>Verás el estado, la línea de captura y, si está pendiente, podrás confirmar el pago.</span>
+      </div>
+    </section>
+  }
 
-    <div class="action-bar" *ngIf="sol.status === 'PENDIENTE_PAGO'">
-      <button class="btn-confirmar" [disabled]="procesando$ | async" (click)="confirmarPagoManual()">
-        <mat-icon>payments</mat-icon>
-        {{ (procesando$ | async) ? 'Procesando...' : 'Confirmar Pago' }}
-      </button>
-    </div>
-
-  </ng-container>
-
-</div>
-
-<span class="watermark">Registro Civil</span>
+</main>

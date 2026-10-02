@@ -1,134 +1,192 @@
-<header class="page-header">
-  <div class="header-inner">
-
-    <div class="header-escudo">
-      <img src="/oaxaca.png" alt="Registro Civil" />
+<header class="topbar">
+  <div class="topbar-inner">
+    <img class="topbar-escudo" src="/oaxaca.png" alt="Registro Civil" />
+    <div class="topbar-text">
+      <span class="topbar-sup">Registro Civil del Estado de Oaxaca</span>
+      <h1>Búsqueda de solicitudes</h1>
     </div>
-
-    <div class="header-text">
-      <span class="header-supratitle">Gobierno del Estado de Oaxaca</span>
-      <h1>Registro Civil del Estado</h1>
-      <span class="header-sub">Búsqueda de Solicitudes</span>
-    </div>
-
-    <div class="header-actions">
-      <button mat-button class="header-action-btn">
-        <mat-icon>tag</mat-icon>
-        {{ resultsCount }}
-      </button>
-      <button mat-button class="header-action-btn" (click)="goHome()">
-        <mat-icon>arrow_back</mat-icon>
-        Volver
+    <div class="topbar-actions">
+      <button type="button" class="btn btn-ghost-light" (click)="goHome()">
+        <mat-icon>arrow_back</mat-icon> Inicio
       </button>
     </div>
-
   </div>
 </header>
-<div class="header-rule"></div>
 
-<div class="container">
-  <div class="filtros-row">
-    <button *ngFor="let filter of filters" class="filter-chip" [class.active]="currentFilter === filter.value"
-      (click)="setFilter(filter.value)">
-      {{ filter.label }}
-    </button>
-  </div>
+<main class="page">
 
-  <div class="search-card">
-    <div class="search-fields">
-
-      <mat-form-field appearance="outline" class="trab-field">
-        <mat-label>Fecha de recepción</mat-label>
-        <input matInput [matDatepicker]="picker" [(ngModel)]="fechaPago" placeholder="dd/mm/aaaa">
-        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-datepicker #picker></mat-datepicker>
-      </mat-form-field>
-
-      <!-- Folio HV — solo visible en fotocopias -->
-      <div class="folio-hv-wrap" *ngIf="currentFilter === 'fotocopias'">
-        <input class="folio-input" type="number" min="1" [(ngModel)]="folioInput"
-          placeholder="Folio inicial hoja valorada" autocomplete="off" name="folio-hoja-val">
-        <button class="btn-establecer" (click)="establecerFolioInicial()"
-          matTooltip="Establece el folio inicial de hoja valorada para esta sesión.">
-          <mat-icon>check</mat-icon>
-          Establecer
+  <section class="card search-card">
+    <div class="tipos" role="tablist" aria-label="Tipo de trabajo">
+      <span class="tabs-label">Bandeja</span>
+      @for (f of filters; track f.value) {
+        <button type="button" role="tab" class="tipo" [class.on]="currentFilter === f.value"
+                [attr.aria-selected]="currentFilter === f.value" (click)="setFilter(f.value)">
+          <mat-icon>{{ f.icon }}</mat-icon>
+          {{ f.label }}
         </button>
-        <div class="folio-hint" *ngIf="folioHojaValorada !== null">
-          <mat-icon>bookmark</mat-icon>
-          <span>Siguiente: <strong>{{ siguienteFolioEsperado }}</strong></span>
+      }
+    </div>
+
+    <form class="search-grid" [class.con-hv]="currentFilter === 'fotocopias'" (ngSubmit)="buscarPagos()" autocomplete="off">
+      <label class="f">
+        <span>Folio de solicitud</span>
+        <input class="mono" name="folioBusqueda" placeholder="RC-AAAAMMDD-0000"
+               [ngModel]="folioBusqueda" (ngModelChange)="onFolioInput($event)"
+               [matAutocomplete]="acFolio">
+        <mat-autocomplete #acFolio="matAutocomplete" (optionSelected)="elegirFolio($event.option.value)">
+          @for (s of sugerenciasFolio(); track s.folio) {
+            <mat-option [value]="s.folio">
+              <span class="opt-folio">{{ s.folio }}</span>
+              <span class="opt-nombre">{{ s.nombre }}</span>
+            </mat-option>
+          }
+        </mat-autocomplete>
+      </label>
+
+      <label class="f">
+        <span>Fecha de recepción</span>
+        <input type="date" name="fechaPago" [(ngModel)]="fechaPago" (ngModelChange)="onFechaChange()">
+      </label>
+
+      @if (currentFilter === 'fotocopias') {
+        <div class="f">
+          <span>Folio inicial hoja valorada</span>
+          <div class="hv">
+            <input type="number" min="1" name="folioHoja" [(ngModel)]="folioInput"
+                   [placeholder]="folioHojaValorada !== null ? 'Siguiente: ' + siguienteFolioEsperado : 'Ej. 1001'">
+            <button type="button" class="btn btn-outline" (click)="establecerFolioInicial()"
+                    matTooltip="Establece el folio inicial de hoja valorada para esta sesión">
+              <mat-icon>check</mat-icon> Establecer
+            </button>
+          </div>
         </div>
+      }
+
+      <div class="search-actions">
+        <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+          @if (isLoading) { <mat-spinner diameter="14"></mat-spinner> } @else { <mat-icon>search</mat-icon> }
+          Buscar
+        </button>
+        <button type="button" class="btn btn-icon" (click)="limpiarBusqueda()" matTooltip="Limpiar búsqueda">
+          <mat-icon>backspace</mat-icon>
+        </button>
       </div>
+    </form>
 
-      <button class="btn-buscar" (click)="buscarPagos()">
-        <mat-icon>search</mat-icon>
-        Buscar
-      </button>
-
-    </div>
-
-    <div class="year-strip">
-      <button *ngFor="let yr of yearRanges" class="year-chip" [class.active]="isYearRangeSelected(yr.range)"
-        (click)="selectYearRange(yr.range)">
-        <span class="yr-range">{{ yr.range }}</span>
-        <span class="yr-count">{{ yr.count }}</span>
-      </button>
-    </div>
-  </div>
-
-  <div class="acciones-row" *ngIf="payments.length > 0">
-    <button class="btn-pdf btn-sel" (click)="generarReporteSeleccionados()" [disabled]="selectedCount === 0"
-      matTooltip="PDF de seleccionados">
-      <mat-icon>picture_as_pdf</mat-icon>
-      Seleccionados ({{ selectedCount }})
-    </button>
-    <button class="btn-pdf btn-all" (click)="generarReporte()" matTooltip="PDF de todos">
-      <mat-icon>picture_as_pdf</mat-icon>
-      Todos ({{ payments.length }})
-    </button>
-  </div>
-
-  <div class="loading" *ngIf="isLoading">
-    <mat-spinner diameter="32"></mat-spinner>
-    <span>Buscando registros...</span>
-  </div>
-
-  <div class="empty" *ngIf="!isLoading && payments.length === 0">
-    {{ selectedYearRange || currentFilter !== 'todos' || fechaPago
-    ? 'Sin resultados para los criterios seleccionados'
-    : 'Selecciona un filtro y presiona Buscar' }}
-  </div>
-
-  <div class="lista" *ngIf="!isLoading && payments.length > 0">
-    <div class="solicitud-card" *ngFor="let payment of payments" [class.is-selected]="payment.selected"
-      [class.is-impreso]="payment.impreso" [id]="'payment-' + payment.id">
-
-      <div class="s-avatar">{{ payment.id[0] }}</div>
-
-      <div class="s-info">
-        <span class="s-folio">{{ payment.id }}</span>
-        <span class="s-concepto">{{ payment.concepto }}</span>
-        <span class="s-fecha">
-          <mat-icon>calendar_today</mat-icon>
-          {{ payment.fecha }}
+    <div class="pie-busqueda">
+      @if (folioHojaValorada !== null) {
+        <span class="hv-chip" matTooltip="Siguiente folio de hoja valorada disponible">
+          <mat-icon>bookmark</mat-icon> HV siguiente <b>{{ siguienteFolioEsperado }}</b>
         </span>
-      </div>
-
-      <div class="s-chips">
-        <span class="estado-chip" [ngClass]="'estado-' + payment.estadoClave">
-          {{ payment.estadoNombre }}
+      }
+      @if (folios.lista().length) {
+        <span class="recientes">
+          <span class="rec-label">Generados hoy:</span>
+          @for (f of folios.lista().slice(0, 4); track f.folio) {
+            <button type="button" class="rec-chip" (click)="elegirFolio(f.folio)" [matTooltip]="f.nombre">{{ f.folio }}</button>
+          }
         </span>
-        <span class="hoja-chip" *ngIf="payment.folioHojaUsado">
-          HV: {{ payment.folioHojaUsado }}
-        </span>
-      </div>
-
-      <div class="s-acciones">
-        <mat-checkbox [(ngModel)]="payment.selected" color="primary"></mat-checkbox>
-      </div>
-
+      }
     </div>
-  </div>
+  </section>
 
-</div>
+  @if (busquedaHecha) {
+    <section class="card results-card">
+      <div class="card-bar">
+        <span class="card-title">
+          {{ folioBusqueda.trim() ? 'Folio ' + folioBusqueda.trim().toUpperCase() : filtroActual?.label }}
+          <span class="count">{{ payments.length }}</span>
+        </span>
+        @if (payments.length) {
+          <div class="bar-actions">
+            <button type="button" class="btn btn-outline" (click)="generarReporteSeleccionados()" [disabled]="selectedCount === 0">
+              <mat-icon>picture_as_pdf</mat-icon> Seleccionados ({{ selectedCount }})
+            </button>
+            <button type="button" class="btn btn-primary" (click)="generarReporte()">
+              <mat-icon>picture_as_pdf</mat-icon> Todos ({{ payments.length }})
+            </button>
+          </div>
+        }
+      </div>
 
-<span class="watermark">Registro Civil</span>
+      @if (!isLoading && totalCargados > 0) {
+        <div class="anios">
+          <span class="anios-label">Años</span>
+          @for (yr of yearRanges; track yr.range) {
+            <button type="button" class="anio" [class.on]="isYearRangeSelected(yr.range)" [class.vacio]="!yr.count"
+                    (click)="selectYearRange(yr.range)">
+              {{ yr.label }} <b>{{ yr.count }}</b>
+            </button>
+          }
+        </div>
+      }
+
+      @if (isLoading) {
+        <div class="estado"><mat-spinner diameter="22"></mat-spinner> Buscando solicitudes…</div>
+      } @else if (mensajeError) {
+        <div class="estado estado-error"><mat-icon>error_outline</mat-icon> {{ mensajeError }}</div>
+      } @else if (payments.length === 0) {
+        <div class="estado"><mat-icon>search_off</mat-icon>
+          {{ folioBusqueda.trim() ? 'No existe una solicitud con ese folio.' : 'Sin resultados para los criterios seleccionados.' }}
+        </div>
+      } @else {
+        <div class="tabla-wrap">
+          <table class="tabla">
+            <thead>
+              <tr>
+                <th class="chk">
+                  <input type="checkbox" [checked]="todosSeleccionados" (change)="toggleTodos($any($event.target).checked)"
+                         aria-label="Seleccionar todos">
+                </th>
+                <th>Folio</th>
+                <th>Acto</th>
+                <th>Servicio</th>
+                <th>Recepción</th>
+                <th>Entrega</th>
+                <th>Estado</th>
+                <th>HV</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (p of payments; track p.id) {
+                <tr [class.sel]="p.selected" [class.impreso]="p.impreso" (click)="p.selected = !p.selected">
+                  <td class="chk">
+                    <input type="checkbox" [checked]="p.selected" (click)="$event.stopPropagation()"
+                           (change)="p.selected = $any($event.target).checked">
+                  </td>
+                  <td class="mono folio">{{ p.id }}</td>
+                  <td>{{ p.acto }}</td>
+                  <td>{{ p.servicio }}</td>
+                  <td>{{ p.fecha }}</td>
+                  <td>{{ p.entrega }}</td>
+                  <td><span class="estado-chip" [ngClass]="'e-' + p.estadoClave">{{ p.estadoNombre }}</span></td>
+                  <td class="mono">{{ p.folioHojaUsado ?? '—' }}</td>
+                  <td class="acciones">
+                    <button type="button" class="btn btn-icon" matTooltip="Copiar folio"
+                            (click)="$event.stopPropagation(); folios.copiar(p.id)">
+                      <mat-icon>{{ folios.copiado() === p.id ? 'check' : 'content_copy' }}</mat-icon>
+                    </button>
+                    <button type="button" class="btn btn-icon" matTooltip="Ver hoja de pago"
+                            (click)="$event.stopPropagation(); abrirPdf(p)">
+                      <mat-icon>receipt_long</mat-icon>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+  } @else {
+    <section class="card vacio-inicial">
+      <mat-icon>manage_search</mat-icon>
+      <div>
+        <strong>Elige una bandeja y presiona Buscar</strong>
+        <span>O escribe un folio para ir directo a esa solicitud.</span>
+      </div>
+    </section>
+  }
+
+</main>

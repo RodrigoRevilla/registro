@@ -308,6 +308,7 @@ export interface BusquedaNacimiento {
   nombre_madre?: string;
   apellido_paterno_madre?: string;
   apellido_materno_madre?: string;
+  fecha_nacimiento?: string;
   limit?: number;
   offset?: number;
 }

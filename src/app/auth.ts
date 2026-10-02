@@ -1,6 +1,8 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
+export const ROLES_EDICION_NACIMIENTO = ['ADMINISTRADOR', 'VALIDADOR'];
+
 @Injectable({
   providedIn: 'root'
 })
@@ -59,6 +61,15 @@ export class AuthService {
   getRolClave(): string {
     const usuario = this.getUsuario();
     return usuario?.rol?.clave ?? '';
+  }
+
+  tieneRol(...claves: string[]): boolean {
+    const rol = `${this.getRolClave() ?? ''}`.trim().toUpperCase();
+    return !!rol && claves.some(c => c.toUpperCase() === rol);
+  }
+
+  puedeEditarNacimientos(): boolean {
+    return this.isLoggedIn() && this.tieneRol(...ROLES_EDICION_NACIMIENTO);
   }
 
   hasPermiso(clave: string): boolean {

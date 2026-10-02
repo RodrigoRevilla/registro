@@ -1,55 +1,147 @@
-<div class="dialog-wrapper">
-  <div class="dialog-header">
-    <div class="dialog-header-inner">
-      <div class="dialog-title-row">
-        <div class="dialog-escudo">
-          <mat-icon>print</mat-icon>
-        </div>
-        <div>
-          <p class="dialog-super">Registro Civil del Estado</p>
-          <h2 class="dialog-title">Impresión de Certificaciones</h2>
-        </div>
-      </div>
-      <button class="btn-close" (click)="cerrar()">✕</button>
+<div class="dlg">
+  <header class="dlg-head">
+    <div class="dh-icon"><mat-icon>print</mat-icon></div>
+    <div class="dh-txt">
+      <span class="sup">Certificaciones</span>
+      <h2>Imprimir certificación</h2>
     </div>
-    <div class="gold-rule"></div>
-  </div>
+    <button type="button" class="dh-close" (click)="cerrar()" matTooltip="Cerrar">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
 
-  <div class="dialog-body">
-    <div class="search-card">
-      <div class="search-label">
-        <mat-icon>confirmation_number</mat-icon>
-        Ingresa el folio para generar la certificación
-      </div>
-
-      <div class="search-fields">
-        <mat-form-field appearance="outline" class="dial-field">
-          <mat-label>Folio</mat-label>
-          <input matInput [(ngModel)]="folio" placeholder="Ej. RC-20260224-0009" autocomplete="off"
-            (keyup.enter)="buscar()" />
-          <mat-icon matSuffix>confirmation_number</mat-icon>
-        </mat-form-field>
-        <button class="btn-buscar" (click)="buscar()" [disabled]="buscando">
-          <mat-icon>search</mat-icon>
-          {{ buscando ? 'Buscando...' : 'Buscar' }}
+  <div class="dlg-search">
+    <form class="search-grid" (ngSubmit)="buscar()" autocomplete="off">
+      <label class="f">
+        <span>Folio de solicitud</span>
+        <input class="mono" name="folio" placeholder="RC-AAAAMMDD-0000"
+               [ngModel]="folio" (ngModelChange)="onFolioInput($event)"
+               [matAutocomplete]="acFolio">
+        <mat-autocomplete #acFolio="matAutocomplete" (optionSelected)="elegirFolio($event.option.value)">
+          @for (s of sugerenciasFolio(); track s.folio) {
+            <mat-option [value]="s.folio">
+              <span class="opt-folio">{{ s.folio }}</span>
+              <span class="opt-nombre">{{ s.nombre }}</span>
+            </mat-option>
+          }
+        </mat-autocomplete>
+      </label>
+      <div class="search-actions">
+        <button type="submit" class="btn btn-primary" [disabled]="buscando()">
+          @if (buscando()) { <mat-spinner diameter="14"></mat-spinner> } @else { <mat-icon>search</mat-icon> }
+          Buscar
+        </button>
+        <button type="button" class="btn btn-icon" (click)="limpiar()" matTooltip="Limpiar">
+          <mat-icon>backspace</mat-icon>
         </button>
       </div>
+    </form>
 
-      <div class="buscando-msg" *ngIf="buscando">
-        <mat-spinner diameter="16"></mat-spinner>
-        <span>Buscando...</span>
+    @if (!datos() && folios.lista().length) {
+      <div class="recientes">
+        <span class="rec-label">Generados hoy:</span>
+        @for (f of folios.lista().slice(0, 4); track f.folio) {
+          <button type="button" class="rec-chip" (click)="elegirFolio(f.folio)" [matTooltip]="f.nombre">{{ f.folio }}</button>
+        }
       </div>
-
-      <div class="error-msg" *ngIf="error">
-        <mat-icon>warning_amber</mat-icon>
-        {{ error }}
-      </div>
-
-    </div>
+    }
   </div>
 
-  <div class="dialog-footer">
-    <button class="btn-cancelar" (click)="cerrar()">Cancelar</button>
+  <div class="dlg-body">
+    @if (error()) {
+      <div class="msg msg-error"><mat-icon>error_outline</mat-icon> {{ error() }}</div>
+    }
+    @if (exito()) {
+      <div class="msg msg-ok"><mat-icon>check_circle</mat-icon> {{ exito() }}</div>
+    }
+
+    @if (datos(); as d) {
+      <div class="resumen">
+        <span class="res-folio">
+          <b class="mono">{{ d.folio }}</b>
+          <button type="button" class="mini" (click)="folios.copiar(d.folio)" matTooltip="Copiar folio">
+            <mat-icon>{{ folios.copiado() === d.folio ? 'check' : 'content_copy' }}</mat-icon>
+          </button>
+        </span>
+        @if (estadoNombre()) { <span class="estado-chip" [ngClass]="'e-' + estadoClave()">{{ estadoNombre() }}</span> }
+        @if (servicioNombre()) { <span class="kv"><em>Servicio</em> {{ servicioNombre() }}</span> }
+      </div>
+
+      <section class="bloque">
+        <h3>Acta</h3>
+        @if (camposActa().length) {
+          <div class="campos">
+            @for (c of camposActa(); track c.etiqueta) {
+              <div class="campo" [class.ancho]="c.ancho"><em>{{ c.etiqueta }}</em><span>{{ c.valor }}</span></div>
+            }
+          </div>
+        } @else {
+          <p class="sin-datos">La solicitud aún no tiene datos del acta capturados.</p>
+        }
+      </section>
+
+      <section class="bloque">
+        <h3>{{ d.nombreContrayente2 ? 'El contrayente' : 'Registrado' }}</h3>
+        <p class="nombre">{{ d.nombreRegistrado || 'Sin nombre capturado' }}</p>
+        @if (camposPersona1().length) {
+          <div class="campos">
+            @for (c of camposPersona1(); track c.etiqueta) {
+              <div class="campo" [class.ancho]="c.ancho"><em>{{ c.etiqueta }}</em><span>{{ c.valor }}</span></div>
+            }
+          </div>
+        }
+      </section>
+
+      @if (d.nombreContrayente2) {
+        <section class="bloque">
+          <h3>La contrayente</h3>
+          <p class="nombre">{{ d.nombreContrayente2 }}</p>
+          @if (camposPersona2().length) {
+            <div class="campos">
+              @for (c of camposPersona2(); track c.etiqueta) {
+                <div class="campo" [class.ancho]="c.ancho"><em>{{ c.etiqueta }}</em><span>{{ c.valor }}</span></div>
+              }
+            </div>
+          }
+        </section>
+      }
+
+      @if (d.anotaciones) {
+        <section class="bloque">
+          <h3>Anotaciones</h3>
+          <p class="anot">{{ d.anotaciones }}</p>
+        </section>
+      }
+
+      <section class="bloque hv">
+        <h3><mat-icon>bookmark_add</mat-icon> Ligar hoja valorada</h3>
+        <form class="hv-grid" (ngSubmit)="ligar()" autocomplete="off">
+          <label class="f">
+            <span>Folio de hoja valorada <i>*</i></span>
+            <input type="number" min="1" name="folioHV" [(ngModel)]="folioHV" class="mono" placeholder="Ej. 1042">
+          </label>
+          <label class="f">
+            <span>Observaciones</span>
+            <input name="observacionesHV" [(ngModel)]="observacionesHV" placeholder="Opcional">
+          </label>
+        </form>
+        @if (siguienteHV()) {
+          <p class="hv-hint"><mat-icon>bookmark</mat-icon> Siguiente hoja sugerida: <b class="mono">{{ siguienteHV() }}</b></p>
+        }
+      </section>
+    } @else if (!buscando() && !error()) {
+      <div class="vacio">
+        <mat-icon>manage_search</mat-icon>
+        <span>Busca el folio de la solicitud para ver sus datos y ligar la hoja valorada.</span>
+      </div>
+    }
   </div>
 
+  <footer class="dlg-foot">
+    <button type="button" class="btn btn-outline" (click)="cerrar()">Cerrar</button>
+    <button type="button" class="btn btn-primary" (click)="ligar()" [disabled]="!datos() || ligando()">
+      @if (ligando()) { <mat-spinner diameter="14"></mat-spinner> } @else { <mat-icon>link</mat-icon> }
+      Ligar hoja valorada
+    </button>
+  </footer>
 </div>

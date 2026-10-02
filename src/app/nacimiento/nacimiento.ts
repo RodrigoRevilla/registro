@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ElementRef, ViewChild, WritableSignal, computed, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, ElementRef, HostListener, ViewChild, WritableSignal, computed, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -8,9 +8,11 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatIconModule } from '@angular/material/icon';
+import { OverlayModule } from '@angular/cdk/overlay';
 import { Subject, takeUntil } from 'rxjs';
 import { ActaDetalleComponent } from '../acta-detalle/acta-detalle';
 import { ApiService, BusquedaNacimiento, RegistroNacimiento } from '../http';
+import { AuthService } from '../auth';
 import {
   ENTIDADES,
   ENTIDADES_INEGI,
@@ -33,7 +35,8 @@ interface Municipio { id_municipio: number; id_distrito: number; nombre: string;
     MatAutocompleteModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
-    MatIconModule
+    MatIconModule,
+    OverlayModule
   ],
   templateUrl: './nacimiento.html',
   styleUrls: ['./nacimiento.scss'],
@@ -44,6 +47,7 @@ interface Municipio { id_municipio: number; id_distrito: number; nombre: string;
 export class NacimientoComponent implements OnInit, OnDestroy {
 
   @ViewChild('capturaRef') capturaRef?: ElementRef<HTMLElement>;
+  @ViewChild('ayudaInput') ayudaInput?: ElementRef<HTMLInputElement>;
 
   busquedaForm: FormGroup;
   nacimientoForm: FormGroup;
@@ -52,13 +56,19 @@ export class NacimientoComponent implements OnInit, OnDestroy {
 
   readonly entidadDefault = 20;
 
-  modoBusqueda = signal<'registrales' | 'personales'>('registrales');
+  modoBusqueda = signal<'registrales' | 'personales'>('personales');
   incluirPadre = signal(false);
   incluirMadre = signal(false);
   filtroMunicipioBusqueda = signal('');
+  entidadBusqueda = signal(20);
   municipiosBusqueda = computed(() =>
-    this.filtrarPorNombre(this.municipios(), this.filtroMunicipioBusqueda())
+    this.entidadBusqueda() === this.entidadDefault
+      ? this.filtrarMunicipios(this.filtroMunicipioBusqueda()).slice(0, 50)
+      : []
   );
+  ayudaMunicipios = signal(false);
+  filtroAyuda = signal('');
+  municipiosAyuda = computed(() => this.filtrarMunicipios(this.filtroAyuda()));
 
   readonly pageSize = 20;
 
@@ -91,6 +101,8 @@ export class NacimientoComponent implements OnInit, OnDestroy {
     this.filtrarPorNombre(this.municipiosDeDistrito(this.filtroDistritoNac()), this.filtroMunicipioNac())
   );
 
+  readonly puedeEditar = signal(false);
+
   private ultimaBusqueda: BusquedaNacimiento = {};
   private destroy$ = new Subject<void>();
 
@@ -99,6 +111,7 @@ export class NacimientoComponent implements OnInit, OnDestroy {
     private router: Router,
     private dialog: MatDialog,
     private api: ApiService,
+    private auth: AuthService,
   ) {
     this.busquedaForm = this.fb.group({
       entidad: [this.entidadDefault],
@@ -106,10 +119,10 @@ export class NacimientoComponent implements OnInit, OnDestroy {
       oficialia: [''],
       fechaRegistro: [''],
       numeroActa: [''],
-      curp: [''],
       nombre: [''],
       apellidoPaterno: [''],
       apellidoMaterno: [''],
+      fechaNacimiento: [''],
       nombrePadre: [''],
       apellidoPaternoPadre: [''],
       apellidoMaternoPadre: [''],
@@ -120,6 +133,11 @@ export class NacimientoComponent implements OnInit, OnDestroy {
 
     this.busquedaForm.get('municipio')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(v => {
       this.filtroMunicipioBusqueda.set(typeof v === 'string' ? v : '');
+    });
+
+    this.busquedaForm.get('entidad')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(v => {
+      this.entidadBusqueda.set(Number(v) || 0);
+      if (Number(v) !== this.entidadDefault) this.cerrarAyudaMunicipios();
     });
 
     this.nacimientoForm = this.fb.group({
@@ -158,7 +176,6 @@ export class NacimientoComponent implements OnInit, OnDestroy {
       nacionalidadMadre: [''],
     });
 
-    this.aMayusculas(this.busquedaForm, 'curp');
     this.aMayusculas(this.nacimientoForm, 'curp');
     this.aMayusculas(this.nacimientoForm, 'curp_regciv');
 
@@ -174,6 +191,7 @@ export class NacimientoComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.permisoEdicion();
     this.cargarCatalogos();
   }
 
@@ -211,6 +229,49 @@ export class NacimientoComponent implements OnInit, OnDestroy {
     return res.slice(0, 50);
   }
 
+  private filtrarMunicipios(texto: string): Municipio[] {
+    const lista = [...this.municipios()].sort((a, b) => a.id_municipio - b.id_municipio);
+    const q = normalizar(texto);
+    if (!q) return lista;
+    if (/^\d+$/.test(q)) {
+      return lista.filter(m => this.numeroMunicipio(m).startsWith(q) || `${m.id_municipio}`.startsWith(q));
+    }
+    return lista.filter(m => normalizar(m.nombre).includes(q));
+  }
+
+  numeroMunicipio(m: Municipio): string {
+    return `${m.id_municipio}`.padStart(3, '0');
+  }
+
+  abrirAyudaMunicipios(): void {
+    if (this.ayudaMunicipios()) {
+      this.cerrarAyudaMunicipios();
+      return;
+    }
+    this.filtroAyuda.set('');
+    this.ayudaMunicipios.set(true);
+    setTimeout(() => this.ayudaInput?.nativeElement.focus(), 50);
+  }
+
+  cerrarAyudaMunicipios(): void {
+    this.ayudaMunicipios.set(false);
+  }
+
+  elegirMunicipio(m: Municipio): void {
+    this.busquedaForm.patchValue({ municipio: m.nombre });
+    this.cerrarAyudaMunicipios();
+  }
+
+  elegirPrimerMunicipio(): void {
+    const primero = this.municipiosAyuda()[0];
+    if (primero) this.elegirMunicipio(primero);
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (this.ayudaMunicipios()) this.cerrarAyudaMunicipios();
+  }
+
   private municipiosDeDistrito(nombreDistrito: string): Municipio[] {
     const n = normalizar(nombreDistrito);
     if (!n) return this.municipios();
@@ -223,6 +284,7 @@ export class NacimientoComponent implements OnInit, OnDestroy {
   }
 
   cambiarModo(modo: 'registrales' | 'personales'): void {
+    this.cerrarAyudaMunicipios();
     this.modoBusqueda.set(modo);
     this.mensajeError.set('');
   }
@@ -241,11 +303,8 @@ export class NacimientoComponent implements OnInit, OnDestroy {
     }
   }
 
-  usaMunicipiosOaxaca(): boolean {
-    return Number(this.busquedaForm.value.entidad) === this.entidadDefault;
-  }
-
   limpiarBusqueda(): void {
+    this.cerrarAyudaMunicipios();
     this.busquedaForm.reset({ entidad: this.entidadDefault });
     this.incluirPadre.set(false);
     this.incluirMadre.set(false);
@@ -280,10 +339,10 @@ export class NacimientoComponent implements OnInit, OnDestroy {
       };
     } else {
       filtros = {
-        curp: str(f.curp)?.toUpperCase(),
         nombre: str(f.nombre),
         apellido_paterno: str(f.apellidoPaterno),
         apellido_materno: str(f.apellidoMaterno),
+        fecha_nacimiento: str(f.fechaNacimiento),
         nombre_padre: this.incluirPadre() ? str(f.nombrePadre) : undefined,
         apellido_paterno_padre: this.incluirPadre() ? str(f.apellidoPaternoPadre) : undefined,
         apellido_materno_padre: this.incluirPadre() ? str(f.apellidoMaternoPadre) : undefined,
@@ -306,7 +365,7 @@ export class NacimientoComponent implements OnInit, OnDestroy {
       this.mensajeError.set(
         this.modoBusqueda() === 'registrales'
           ? 'Captura al menos municipio, oficialía, fecha de registro o número de acta.'
-          : 'Captura al menos un nombre o apellido del registrado, del padre o de la madre.'
+          : 'Captura al menos nombre, apellido o fecha de nacimiento del registrado, o datos del padre o la madre.'
       );
       this.busquedaHecha.set(true);
       this.resultados.set([]);
@@ -355,11 +414,11 @@ export class NacimientoComponent implements OnInit, OnDestroy {
       maxHeight: '92vh',
       panelClass: 'acta-ficha-dialog',
       autoFocus: false,
-      data: { registro },
+      data: { registro, puedeEditar: this.permisoEdicion() },
     });
 
     dialogRef.afterClosed().pipe(takeUntil(this.destroy$)).subscribe((result?: RegistroNacimiento) => {
-      if (result) this.editarRegistro(result);
+      if (result && this.permisoEdicion()) this.editarRegistro(result);
     });
   }
 
@@ -368,7 +427,21 @@ export class NacimientoComponent implements OnInit, OnDestroy {
     return `${d.getFullYear()}-${`${d.getMonth() + 1}`.padStart(2, '0')}-${`${d.getDate()}`.padStart(2, '0')}`;
   }
 
+  private permisoEdicion(): boolean {
+    const permitido = this.auth.puedeEditarNacimientos();
+    this.puedeEditar.set(permitido);
+    return permitido;
+  }
+
+  private denegarEdicion(): void {
+    this.mostrarCaptura.set(false);
+    this.registroId.set(null);
+    this.nacimientoForm.reset();
+    alert('No tienes permiso para crear o modificar registros de nacimiento. Solo Administrador y Validador pueden hacerlo.');
+  }
+
   editarRegistro(registro: RegistroNacimiento): void {
+    if (!this.permisoEdicion()) { this.denegarEdicion(); return; }
     const datos = registroAFormulario(registro);
     this.nacimientoForm.reset();
     this.nacimientoForm.patchValue(
@@ -382,6 +455,7 @@ export class NacimientoComponent implements OnInit, OnDestroy {
   }
 
   nuevoRegistro(): void {
+    if (!this.permisoEdicion()) { this.denegarEdicion(); return; }
     this.nacimientoForm.reset();
     this.registroId.set(null);
     this.abrirCaptura();
@@ -403,6 +477,7 @@ export class NacimientoComponent implements OnInit, OnDestroy {
   }
 
   guardarRegistro(): void {
+    if (!this.permisoEdicion()) { this.denegarEdicion(); return; }
     const f = this.nacimientoForm.value;
     if (!`${f.nombre ?? ''}`.trim()) {
       alert('El nombre del registrado es obligatorio.');
@@ -431,6 +506,10 @@ export class NacimientoComponent implements OnInit, OnDestroy {
       },
       error: err => {
         this.guardando.set(false);
+        if (err?.status === 401 || err?.status === 403) {
+          this.denegarEdicion();
+          return;
+        }
         alert(err?.error?.error?.message ?? 'No se pudo guardar el registro.');
       },
     });

@@ -1,18 +1,32 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { MatCardModule } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
-import { MatSelectModule } from '@angular/material/select';
-import { MatOptionModule } from '@angular/material/core';
+import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { ApiService } from '../http';
 import { AuthService } from '../auth';
+import { FoliosRecientesService } from '../folios-recientes';
+import { fechaLocal } from '../registro-nacimiento.mapper';
+
+interface Catalogo {
+  id: number;
+  clave?: string;
+  nombre: string;
+}
+
+interface SolicitudDetalle {
+  id: number;
+  folio: string;
+  acto_registral_id: number;
+  tipo_servicio_id: number;
+  estado_id: number;
+  fecha_recepcion: string | null;
+  fecha_entrega_resultado: string | null;
+}
 
 @Component({
   selector: 'app-modificacion',
@@ -21,25 +35,40 @@ import { AuthService } from '../auth';
   styleUrls: ['./modificacion.scss'],
   imports: [
     CommonModule,
-    MatCardModule,
-    MatIconModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
     ReactiveFormsModule,
-    MatSelectModule,
-    MatOptionModule,
-    MatTooltipModule
+    MatIconModule,
+    MatTooltipModule,
+    MatProgressSpinnerModule,
+    MatAutocompleteModule,
   ]
 })
-export class ModificacionComponent {
+export class ModificacionComponent implements OnInit {
 
   private baseUrl = '/api/v1';
 
-  loginForm: FormGroup;
   formulario: FormGroup;
 
-  respuestaBackend: any = null;
+  readonly solicitud = signal<SolicitudDetalle | null>(null);
+  readonly buscando = signal(false);
+  readonly guardando = signal(false);
+  readonly mensaje = signal('');
+  readonly textoFolio = signal('');
+
+  private readonly actos = signal<Catalogo[]>([]);
+  private readonly servicios = signal<Catalogo[]>([]);
+  private readonly estados = signal<Catalogo[]>([]);
+
+  readonly sugerenciasFolio = computed(() => {
+    const t = this.textoFolio().trim().toUpperCase();
+    return this.folios.lista().filter(f => !t || f.folio.toUpperCase().includes(t)).slice(0, 8);
+  });
+
+  readonly estadoActual = computed(() => {
+    const s = this.solicitud();
+    if (!s) return null;
+    const e = this.estados().find(x => x.id === s.estado_id);
+    return { clave: e?.clave ?? String(s.estado_id), nombre: e?.nombre ?? `Estado ${s.estado_id}` };
+  });
 
   readonly opcionesPorRol: Record<string, { value: string; label: string }[]> = {
     ADMINISTRADOR: [
@@ -75,23 +104,19 @@ export class ModificacionComponent {
     ],
   };
 
-  get opcionesEstado(): { value: string; label: string }[] {
-    const clave = this.authService.getRolClave().toUpperCase();
-    const key = Object.keys(this.opcionesPorRol).find(k => clave === k);
-    return key ? this.opcionesPorRol[key] : [];
-  }
-  
+  readonly opcionesEstado: { value: string; label: string }[];
+
   constructor(
     private router: Router,
     private fb: FormBuilder,
     private http: HttpClient,
     private apiService: ApiService,
-    private authService: AuthService
+    private authService: AuthService,
+    public folios: FoliosRecientesService,
   ) {
-    this.loginForm = this.fb.group({
-      username: ['operador1'],
-      password: ['mi_password']
-    });
+    const clave = this.authService.getRolClave().toUpperCase();
+    const key = Object.keys(this.opcionesPorRol).find(k => clave === k);
+    this.opcionesEstado = key ? this.opcionesPorRol[key] : [];
 
     this.formulario = this.fb.group({
       folio: [''],
@@ -115,67 +140,110 @@ export class ModificacionComponent {
       fechaPago: [''],
       observaciones: ['']
     });
+
+    this.formulario.get('folio')!.valueChanges.subscribe(v => this.textoFolio.set(v ?? ''));
+  }
+
+  ngOnInit(): void {
+    this.apiService.getActosRegistrales().subscribe({
+      next: r => { if (r?.ok) this.actos.set(r.data ?? []); },
+      error: () => {},
+    });
+    this.apiService.getTiposServicio().subscribe({
+      next: r => { if (r?.ok) this.servicios.set(r.data ?? []); },
+      error: () => {},
+    });
+    this.apiService.getEstados().subscribe({
+      next: r => { if (r?.ok) this.estados.set(r.data ?? []); },
+      error: () => {},
+    });
   }
 
   private getHeaders(): HttpHeaders | null {
     const token = this.authService.getToken();
-    if (!token) { alert('Primero debes hacer login'); return null; }
+    if (!token) { alert('Primero debes iniciar sesión'); return null; }
     return new HttpHeaders({ Authorization: `Bearer ${token}` });
   }
 
-  login(): void {
-    const { username, password } = this.loginForm.value;
-    this.http.post(`${this.baseUrl}/auth/login`, { username, password }).subscribe({
-      next: (resp: any) => {
-        if (resp.ok) {
-          this.authService.login(resp.data.token, resp.data.usuario);
-          alert('Login correcto');
-        }
-      },
-      error: (err) => { console.error('Error login:', err); alert('Error en login'); }
-    });
+  private fechaISO(iso: string | null | undefined, soloDia = false): string {
+    if (!iso) return '';
+    const d = soloDia ? fechaLocal(iso) : new Date(iso);
+    if (!d || isNaN(d.getTime())) return '';
+    return `${d.getFullYear()}-${`${d.getMonth() + 1}`.padStart(2, '0')}-${`${d.getDate()}`.padStart(2, '0')}`;
+  }
+
+  fechaCorta(iso: string | null | undefined, soloDia = false): string {
+    if (!iso) return '—';
+    const d = soloDia ? fechaLocal(iso) : new Date(iso);
+    return !d || isNaN(d.getTime()) ? '—' : d.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  }
+
+  nombreActo(id: number): string {
+    return this.actos().find(a => a.id === id)?.nombre ?? `Acto ${id}`;
+  }
+
+  nombreServicio(id: number): string {
+    return this.servicios().find(s => s.id === id)?.nombre ?? `Servicio ${id}`;
+  }
+
+  elegirFolio(folio: string): void {
+    this.formulario.patchValue({ folio });
+    this.buscarSolicitud();
   }
 
   buscarSolicitud(): void {
-    const folio = this.formulario.get('folio')?.value?.trim();
-    if (!folio) { alert('Ingresa un folio'); return; }
+    const folio = (this.formulario.get('folio')?.value ?? '').trim().toUpperCase();
+    if (!folio) { this.mensaje.set('Escribe un folio para buscar.'); return; }
     const headers = this.getHeaders();
     if (!headers) return;
 
-    this.http.get(`${this.baseUrl}/solicitudes/folio/${folio}`, { headers })
+    this.formulario.patchValue({ folio }, { emitEvent: false });
+    this.buscando.set(true);
+    this.mensaje.set('');
+    this.solicitud.set(null);
+
+    this.http.get<any>(`${this.baseUrl}/solicitudes/folio/${encodeURIComponent(folio)}`, { headers })
       .subscribe({
-        next: (resp: any) => {
-          this.respuestaBackend = resp;
-          if (resp.ok && resp.data) {
-            const d = resp.data;
-            this.formulario.patchValue({
-              anio: d.fecha_recepcion ? new Date(d.fecha_recepcion).getFullYear() : '',
-              fechaRegistro: d.fecha_recepcion?.split('T')[0] ?? '',
-              fechaEntrega: d.fecha_entrega_resultado?.split('T')[0] ?? '',
-            });
-            this.http.get(`${this.baseUrl}/solicitudes/${d.id}/comentarios`, { headers })
-              .subscribe({
-                next: (respComentarios: any) => {
-                  if (respComentarios.ok && respComentarios.data?.length) {
-                    const ultimo = respComentarios.data.at(-1);
-                    this.formulario.patchValue({ observaciones: ultimo.comentario });
-                  }
-                },
-                error: (err) => console.error('[comentarios]', err)
-              });
-          }
+        next: resp => {
+          this.buscando.set(false);
+          if (!resp?.ok || !resp.data) { this.mensaje.set('No existe una solicitud con ese folio.'); return; }
+          const d: SolicitudDetalle = resp.data;
+          this.solicitud.set(d);
+          this.formulario.patchValue({
+            servicio: this.nombreServicio(d.tipo_servicio_id),
+            tipoActa: this.nombreActo(d.acto_registral_id),
+            anio: d.fecha_recepcion ? new Date(d.fecha_recepcion).getFullYear() : '',
+            fechaRegistro: this.fechaISO(d.fecha_recepcion),
+            fechaSolicitud: this.fechaISO(d.fecha_recepcion),
+            fechaEntrega: this.fechaISO(d.fecha_entrega_resultado, true),
+          });
+          this.cargarComentarios(d.id, headers);
         },
-        error: (err) => {
-          console.error('[buscarSolicitud] error:', err);
-          this.respuestaBackend = err.error;
+        error: err => {
+          this.buscando.set(false);
+          this.mensaje.set(err?.status === 404
+            ? 'No existe una solicitud con ese folio.'
+            : (err?.error?.error?.message ?? 'Error al buscar la solicitud.'));
         }
       });
   }
 
+  private cargarComentarios(id: number, headers: HttpHeaders): void {
+    this.http.get<any>(`${this.baseUrl}/solicitudes/${id}/comentarios`, { headers })
+      .subscribe({
+        next: resp => {
+          if (resp?.ok && resp.data?.length) {
+            this.formulario.patchValue({ observaciones: resp.data.at(-1).comentario });
+          }
+        },
+        error: err => console.error('[comentarios]', err)
+      });
+  }
+
   reImprimir(): void {
-    const id = this.respuestaBackend?.data?.id;
+    const id = this.solicitud()?.id;
     if (!id) { alert('Primero busca una solicitud'); return; }
-    const folioHoja = this.formulario.get('folio')?.value?.trim();
+    const folioHoja = (this.formulario.get('folio')?.value ?? '').trim();
     if (!folioHoja) { alert('No hay folio para reimprimir'); return; }
     const headers = this.getHeaders();
     if (!headers) return;
@@ -183,9 +251,9 @@ export class ModificacionComponent {
     this.http.post(`${this.baseUrl}/solicitudes/${id}/impresion`, { folio_hoja_valorada: folioHoja }, { headers })
       .subscribe({
         next: () => {
-          this.http.get(`${this.baseUrl}/solicitudes/${id}/pago`, { headers })
+          this.http.get<any>(`${this.baseUrl}/solicitudes/${id}/pago`, { headers })
             .subscribe({
-              next: (respPago: any) => {
+              next: respPago => {
                 const url = respPago?.data?.url_pdf;
                 if (url) {
                   const ventana = window.open(url, '_blank', `width=${screen.width},height=${screen.height},top=0,left=0`);
@@ -194,21 +262,26 @@ export class ModificacionComponent {
                   alert('No se encontró URL del PDF');
                 }
               },
-              error: (err) => alert('Error al obtener el PDF: ' + (err.error?.error?.message ?? 'Error desconocido'))
+              error: err => alert('Error al obtener el PDF: ' + (err.error?.error?.message ?? 'Error desconocido'))
             });
         },
-        error: (err) => alert('Error al registrar impresión: ' + (err.error?.error?.message ?? 'Error desconocido'))
+        error: err => alert('Error al registrar impresión: ' + (err.error?.error?.message ?? 'Error desconocido'))
       });
   }
 
   cancelar(): void {
-    this.formulario.reset();
-    this.respuestaBackend = null;
+    this.limpiarRegistro();
   }
 
   limpiarRegistro(): void {
-    this.formulario.reset();
-    this.respuestaBackend = null;
+    this.formulario.reset({
+      folio: '', estadoSeleccionado: '', servicio: '', tipoActa: '', anio: '', aniosBusqueda: '',
+      rangoBusqueda: '', fechaRegistro: '', oficialia: '', noActa: '', noFoja: '', localidad: '',
+      estadoRegistro: '', distrito: '', municipio: '', nombres: '', fechaSolicitud: '', fechaEntrega: '',
+      fechaPago: '', observaciones: '',
+    });
+    this.solicitud.set(null);
+    this.mensaje.set('');
   }
 
   limpiarRegistroSection(): void {
@@ -218,7 +291,7 @@ export class ModificacionComponent {
   guardarCambios(): void {
     const headers = this.getHeaders();
     if (!headers) return;
-    const id = this.respuestaBackend?.data?.id;
+    const id = this.solicitud()?.id;
     if (!id) { alert('Primero busca una solicitud'); return; }
 
     const estadoClave = this.formulario.get('estadoSeleccionado')?.value;
@@ -227,7 +300,7 @@ export class ModificacionComponent {
     const areaId = usuario?.area_id ?? null;
 
     if (!estadoClave && !comentario) {
-      alert('Selecciona un estado o escribe un comentario');
+      alert('Selecciona un resultado o escribe un comentario');
       return;
     }
 
@@ -239,13 +312,17 @@ export class ModificacionComponent {
     const bodyComentario: any = { comentario: textoFinal };
     if (areaId) bodyComentario.area_id = areaId;
 
+    this.guardando.set(true);
     this.http.post(`${this.baseUrl}/solicitudes/${id}/comentarios`, bodyComentario, { headers })
       .subscribe({
-        next: (resp: any) => {
-          this.respuestaBackend = resp;
+        next: () => {
+          this.guardando.set(false);
           alert('Cambios guardados correctamente');
         },
-        error: (err) => alert('Error al guardar: ' + (err.error?.error?.message ?? 'Error desconocido'))
+        error: err => {
+          this.guardando.set(false);
+          alert('Error al guardar: ' + (err.error?.error?.message ?? 'Error desconocido'));
+        }
       });
   }
 

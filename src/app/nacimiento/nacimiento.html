@@ -6,9 +6,11 @@
       <h1>Actas de Nacimiento</h1>
     </div>
     <div class="topbar-actions">
-      <button type="button" class="btn btn-ghost-light" (click)="nuevoRegistro()">
-        <mat-icon>add</mat-icon> Nuevo registro
-      </button>
+      @if (puedeEditar()) {
+        <button type="button" class="btn btn-ghost-light" (click)="nuevoRegistro()">
+          <mat-icon>add</mat-icon> Nuevo registro
+        </button>
+      }
       <button type="button" class="btn btn-ghost-light" (click)="goHome()">
         <mat-icon>arrow_back</mat-icon> Inicio
       </button>
@@ -19,14 +21,25 @@
 <main class="page">
 
   <section class="card search-card">
-    <div class="search-tabs" role="tablist">
-      <button type="button" role="tab" [class.on]="modoBusqueda() === 'registrales'"
-              [attr.aria-selected]="modoBusqueda() === 'registrales'" (click)="cambiarModo('registrales')">
-        <mat-icon>article</mat-icon> Datos registrales
-      </button>
-      <button type="button" role="tab" [class.on]="modoBusqueda() === 'personales'"
+    <div class="search-tabs" role="tablist" aria-label="Tipo de búsqueda">
+      <span class="tabs-label">Buscar por</span>
+      <button type="button" role="tab" class="modo" [class.on]="modoBusqueda() === 'personales'"
               [attr.aria-selected]="modoBusqueda() === 'personales'" (click)="cambiarModo('personales')">
-        <mat-icon>person_search</mat-icon> Datos personales
+        <mat-icon>person_search</mat-icon>
+        <span class="modo-txt">
+          <strong>Datos personales</strong>
+          <small>Nombre, apellidos, fecha de nacimiento, padres</small>
+        </span>
+        @if (modoBusqueda() === 'personales') { <mat-icon class="modo-check">check_circle</mat-icon> }
+      </button>
+      <button type="button" role="tab" class="modo" [class.on]="modoBusqueda() === 'registrales'"
+              [attr.aria-selected]="modoBusqueda() === 'registrales'" (click)="cambiarModo('registrales')">
+        <mat-icon>article</mat-icon>
+        <span class="modo-txt">
+          <strong>Datos registrales</strong>
+          <small>Entidad, municipio, oficialía, fecha y número de acta</small>
+        </span>
+        @if (modoBusqueda() === 'registrales') { <mat-icon class="modo-check">check_circle</mat-icon> }
       </button>
     </div>
 
@@ -42,19 +55,55 @@
               }
             </select>
           </label>
-          <label class="f">
+          <div class="f f-mun">
             <span>Municipio</span>
-            @if (usaMunicipiosOaxaca()) {
-              <input formControlName="municipio" placeholder="Escribe para buscar" [matAutocomplete]="acMunBus">
-              <mat-autocomplete #acMunBus="matAutocomplete">
-                @for (m of municipiosBusqueda(); track m.id_municipio) {
-                  <mat-option [value]="m.nombre">{{ m.nombre }}</mat-option>
-                }
-              </mat-autocomplete>
-            } @else {
-              <input formControlName="municipio" placeholder="Nombre del municipio">
-            }
-          </label>
+            <div class="campo-ayuda" cdkOverlayOrigin #origenMun="cdkOverlayOrigin">
+              <input formControlName="municipio" placeholder="Número o nombre" [matAutocomplete]="acMunBus">
+              <button type="button" class="btn-ayuda" [class.on]="ayudaMunicipios()"
+                      [disabled]="entidadBusqueda() !== entidadDefault"
+                      (click)="abrirAyudaMunicipios()" matTooltip="Ver lista de municipios">
+                <mat-icon>format_list_bulleted</mat-icon>
+              </button>
+            </div>
+            <mat-autocomplete #acMunBus="matAutocomplete">
+              @for (m of municipiosBusqueda(); track m.id_municipio) {
+                <mat-option [value]="m.nombre">
+                  <span class="opt-num">{{ numeroMunicipio(m) }}</span> {{ m.nombre }}
+                </mat-option>
+              }
+            </mat-autocomplete>
+
+            <ng-template cdkConnectedOverlay
+                         [cdkConnectedOverlayOrigin]="origenMun"
+                         [cdkConnectedOverlayOpen]="ayudaMunicipios()"
+                         [cdkConnectedOverlayHasBackdrop]="true"
+                         cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
+                         [cdkConnectedOverlayMinWidth]="340"
+                         [cdkConnectedOverlayOffsetY]="4"
+                         (backdropClick)="cerrarAyudaMunicipios()"
+                         (detach)="cerrarAyudaMunicipios()">
+              <div class="ayuda-panel" role="dialog" aria-label="Lista de municipios">
+                <div class="ayuda-buscar">
+                  <mat-icon>search</mat-icon>
+                  <input #ayudaInput placeholder="Buscar por número o nombre"
+                         [value]="filtroAyuda()"
+                         (input)="filtroAyuda.set($any($event.target).value)"
+                         (keydown.enter)="$event.preventDefault(); elegirPrimerMunicipio()">
+                </div>
+                <div class="ayuda-lista">
+                  @for (m of municipiosAyuda(); track m.id_municipio) {
+                    <button type="button" class="ayuda-item" (click)="elegirMunicipio(m)">
+                      <span class="num">{{ numeroMunicipio(m) }}</span>
+                      <span class="nom">{{ m.nombre }}</span>
+                    </button>
+                  } @empty {
+                    <div class="ayuda-vacio">Sin coincidencias</div>
+                  }
+                </div>
+                <div class="ayuda-pie">{{ municipiosAyuda().length }} de {{ municipios().length }} municipios</div>
+              </div>
+            </ng-template>
+          </div>
           <label class="f">
             <span>Oficialía</span>
             <input formControlName="oficialia" inputmode="numeric">
@@ -93,8 +142,8 @@
             <input formControlName="apellidoMaterno">
           </label>
           <label class="f">
-            <span>CURP</span>
-            <input formControlName="curp" class="mono" maxlength="20">
+            <span>Fecha de nacimiento</span>
+            <input type="date" formControlName="fechaNacimiento">
           </label>
           <div class="search-actions">
             <button type="submit" class="btn btn-primary" [disabled]="buscando()">
@@ -213,10 +262,12 @@
                             (click)="$event.stopPropagation(); verDetalle(r)">
                       <mat-icon>visibility</mat-icon>
                     </button>
-                    <button type="button" class="btn btn-icon" matTooltip="Editar"
-                            (click)="$event.stopPropagation(); editarRegistro(r)">
-                      <mat-icon>edit</mat-icon>
-                    </button>
+                    @if (puedeEditar()) {
+                      <button type="button" class="btn btn-icon" matTooltip="Editar"
+                              (click)="$event.stopPropagation(); editarRegistro(r)">
+                        <mat-icon>edit</mat-icon>
+                      </button>
+                    }
                   </td>
                 </tr>
               }
@@ -227,7 +278,7 @@
     </section>
   }
 
-  @if (mostrarCaptura()) {
+  @if (mostrarCaptura() && puedeEditar()) {
     <section class="card captura-card" #capturaRef>
       <div class="card-bar card-bar--dark">
         <span class="card-title">

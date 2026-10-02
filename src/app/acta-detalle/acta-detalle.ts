@@ -6,6 +6,7 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService, RegistroNacimiento } from '../http';
+import { AuthService } from '../auth';
 import {
   estadoVitalLabel,
   fechaLocal,
@@ -51,6 +52,7 @@ interface ActaData {
 export interface ActaDetalleData {
   registro?: RegistroNacimiento;
   id?: number;
+  puedeEditar?: boolean;
 }
 
 @Component({
@@ -77,8 +79,13 @@ export class ActaDetalleComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private api: ApiService,
+    private auth: AuthService,
     @Optional() @Inject(MAT_DIALOG_DATA) private data: ActaDetalleData | null,
   ) {}
+
+  puedeEditar(): boolean {
+    return !!this.dialogRef && this.data?.puedeEditar === true && this.auth.puedeEditarNacimientos();
+  }
 
   ngOnInit(): void {
     if (this.data?.registro) {
@@ -179,6 +186,7 @@ export class ActaDetalleComponent implements OnInit {
   }
 
   usarDatos(): void {
+    if (!this.puedeEditar()) return;
     this.dialogRef?.close(this.registro());
   }
 

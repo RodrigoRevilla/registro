@@ -8,11 +8,13 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { OverlayModule, ConnectedPosition } from '@angular/cdk/overlay';
+import { FoliosRecientesService } from '../folios-recientes';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatButtonModule, MatIconModule, MatMenuModule, MatDialogModule],
+  imports: [CommonModule, FormsModule, MatButtonModule, MatIconModule, MatMenuModule, MatDialogModule, OverlayModule],
   template: `
     <div *ngIf="auth.isLoggedIn() && !esLogin()" class="top-bar">
       <span class="saludo">
@@ -20,11 +22,84 @@ import { Router } from '@angular/router';
         Bienvenido {{ auth.getNombre() }} &nbsp;·&nbsp; {{ auth.getRol() }}
       </span>
 
-      <button class="btn-salir" [matMenuTriggerFor]="userMenu">
-        <mat-icon>manage_accounts</mat-icon>
-        Cuenta
-        <mat-icon class="chevron">expand_more</mat-icon>
-      </button>
+      <div class="acciones-top">
+        <button class="btn-salir btn-folios" [class.on]="panelFolios"
+                cdkOverlayOrigin #origenFolios="cdkOverlayOrigin"
+                (click)="panelFolios = !panelFolios">
+          <mat-icon>confirmation_number</mat-icon>
+          Folios
+          @if (folios.lista().length) {
+            <span class="badge">{{ folios.lista().length }}</span>
+          }
+        </button>
+
+        <button class="btn-salir" [matMenuTriggerFor]="userMenu">
+          <mat-icon>manage_accounts</mat-icon>
+          Cuenta
+          <mat-icon class="chevron">expand_more</mat-icon>
+        </button>
+      </div>
+
+      <ng-template cdkConnectedOverlay
+                   [cdkConnectedOverlayOrigin]="origenFolios"
+                   [cdkConnectedOverlayOpen]="panelFolios"
+                   [cdkConnectedOverlayPositions]="posicionesFolios"
+                   [cdkConnectedOverlayHasBackdrop]="true"
+                   cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
+                   (backdropClick)="panelFolios = false"
+                   (detach)="panelFolios = false">
+        <div class="folios-panel">
+          <div class="fp-head">
+            <mat-icon>confirmation_number</mat-icon>
+            <span>Folios generados en esta sesión</span>
+          </div>
+
+          <div class="fp-lista">
+            @for (f of folios.lista(); track f.folio) {
+              <div class="fp-item">
+                <div class="fp-top">
+                  <strong>{{ f.nombre || 'Sin nombre' }}</strong>
+                  <span>{{ f.fecha | date:'HH:mm' }}</span>
+                </div>
+                <div class="fp-row">
+                  <em>Folio</em>
+                  <code>{{ f.folio }}</code>
+                  <button type="button" class="fp-copy" (click)="folios.copiar(f.folio)" title="Copiar folio">
+                    <mat-icon>{{ folios.copiado() === f.folio ? 'check' : 'content_copy' }}</mat-icon>
+                  </button>
+                </div>
+                @if (f.lineaCaptura) {
+                  <div class="fp-row">
+                    <em>Línea</em>
+                    <code>{{ f.lineaCaptura }}</code>
+                    <button type="button" class="fp-copy" (click)="folios.copiar(f.lineaCaptura)" title="Copiar línea de captura">
+                      <mat-icon>{{ folios.copiado() === f.lineaCaptura ? 'check' : 'content_copy' }}</mat-icon>
+                    </button>
+                  </div>
+                }
+                <div class="fp-acciones">
+                  @if (f.urlPdf) {
+                    <a [href]="f.urlPdf" target="_blank" rel="noopener">
+                      <mat-icon>picture_as_pdf</mat-icon> Hoja de pago
+                    </a>
+                  }
+                  <button type="button" (click)="folios.quitar(f.folio)">
+                    <mat-icon>close</mat-icon> Quitar
+                  </button>
+                </div>
+              </div>
+            } @empty {
+              <div class="fp-vacio">Aún no has generado hojas de pago en esta sesión.</div>
+            }
+          </div>
+
+          @if (folios.lista().length) {
+            <div class="fp-pie">
+              <button type="button" (click)="folios.limpiar()">Limpiar lista</button>
+            </div>
+          }
+        </div>
+      </ng-template>
 
       <mat-menu #userMenu="matMenu" xPosition="before" class="rc-user-menu">
         <button mat-menu-item (click)="abrirCambioPassword()">
@@ -105,6 +180,11 @@ export class HeaderComponent {
   private readonly API = '/api/v1';
 
   modalAbierto = false;
+  panelFolios  = false;
+
+  readonly posicionesFolios: ConnectedPosition[] = [
+    { originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'top', offsetY: 6 },
+  ];
   guardando    = false;
   pwActual     = '';
   pwNueva      = '';
@@ -124,6 +204,7 @@ export class HeaderComponent {
 
   constructor(
     public  auth: AuthService,
+    public  folios: FoliosRecientesService,
     private router: Router,
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
@@ -134,6 +215,8 @@ export class HeaderComponent {
   }
 
   logout() {
+    this.panelFolios = false;
+    this.folios.limpiar();
     this.auth.logout();
     this.router.navigate(['/login']);
   }

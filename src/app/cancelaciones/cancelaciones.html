@@ -1,179 +1,134 @@
-<div class="dialog-wrapper">
-  <div class="dialog-header">
-    <div class="dialog-header-inner">
-      <div class="dialog-title-row">
-        <mat-icon>cancel</mat-icon>
-        <div class="dialog-title-text">
-          <span class="dialog-super">Registro Civil del Estado</span>
-          <h2 class="dialog-title">Cancelación de Certificaciones</h2>
-        </div>
-      </div>
-      <button class="btn-close" (click)="cerrar()">✕</button>
+<div class="dlg">
+  <header class="dlg-head">
+    <div class="dh-icon"><mat-icon>block</mat-icon></div>
+    <div class="dh-txt">
+      <span class="sup">Certificaciones</span>
+      <h2>Cancelar certificación</h2>
     </div>
-    <div class="dialog-header-rule"></div>
-  </div>
-  <div class="gold-rule"></div>
+    <button type="button" class="dh-close" (click)="cerrar()" matTooltip="Cerrar">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
 
-  <div class="dialog-body">
-    <div class="search-card">
-      <div class="search-fields">
-        <mat-form-field appearance="outline" class="dial-field">
-          <mat-label>Folio</mat-label>
-          <input matInput [(ngModel)]="folio" (keyup.enter)="buscar()" />
-        </mat-form-field>
-        <button class="btn-buscar" (click)="buscar()" [disabled]="buscando">
-          <mat-icon>search</mat-icon>
-          {{ buscando ? 'Buscando...' : 'Buscar' }}
+  <div class="dlg-search">
+    <form class="search-grid" (ngSubmit)="buscar()" autocomplete="off">
+      <label class="f">
+        <span>Folio de solicitud</span>
+        <input class="mono" name="folio" placeholder="RC-AAAAMMDD-0000"
+               [ngModel]="folio" (ngModelChange)="onFolioInput($event)"
+               [matAutocomplete]="acFolio">
+        <mat-autocomplete #acFolio="matAutocomplete" (optionSelected)="elegirFolio($event.option.value)">
+          @for (s of sugerenciasFolio(); track s.folio) {
+            <mat-option [value]="s.folio">
+              <span class="opt-folio">{{ s.folio }}</span>
+              <span class="opt-nombre">{{ s.nombre }}</span>
+            </mat-option>
+          }
+        </mat-autocomplete>
+      </label>
+      <div class="search-actions">
+        <button type="submit" class="btn btn-primary" [disabled]="buscando()">
+          @if (buscando()) { <mat-spinner diameter="14"></mat-spinner> } @else { <mat-icon>search</mat-icon> }
+          Buscar
+        </button>
+        <button type="button" class="btn btn-icon" (click)="limpiar()" matTooltip="Limpiar">
+          <mat-icon>backspace</mat-icon>
         </button>
       </div>
+    </form>
 
-      <div class="info-chips" *ngIf="solicitud">
-        <div class="info-chip">
-          <span class="chip-label">Status</span>
-          <span class="chip-valor" [class]="'status-' + solicitud.status?.toLowerCase()">
-            {{ solicitud.status || '—' }}
-          </span>
-        </div>
-        <div class="info-chip">
-          <span class="chip-label">Servicio</span>
-          <span class="chip-valor">{{ solicitud.servicio || '—' }}</span>
-        </div>
-        <div class="info-chip">
-          <span class="chip-label">Tipo Certificación</span>
-          <span class="chip-valor">{{ solicitud.tipoCertificacion || '—' }}</span>
-        </div>
-        <div class="info-chip">
-          <span class="chip-label">Copias</span>
-          <span class="chip-valor">{{ solicitud.copias ?? '—' }}</span>
-        </div>
+    @if (!solicitud() && folios.lista().length) {
+      <div class="recientes">
+        <span class="rec-label">Generados hoy:</span>
+        @for (f of folios.lista().slice(0, 4); track f.folio) {
+          <button type="button" class="rec-chip" (click)="elegirFolio(f.folio)" [matTooltip]="f.nombre">{{ f.folio }}</button>
+        }
       </div>
-    </div>
-
-    <div class="form-section" *ngIf="solicitud">
-      <div class="section-header">
-        <div class="section-icon"><mat-icon>person</mat-icon></div>
-        <h3 class="section-title">Registrado</h3>
-      </div>
-      <div class="section-body">
-        <div class="grid-2">
-          <div class="campo">
-            <span class="campo-label">Nombre 1</span>
-            <span class="campo-valor">{{ solicitud.nombre1 || '—' }}</span>
-          </div>
-          <div class="campo">
-            <span class="campo-label">Nombre 2</span>
-            <span class="campo-valor">{{ solicitud.nombre2 || '—' }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="tablas-row" *ngIf="solicitud">
-
-      <div class="tabla-card">
-        <div class="tabla-titulo">
-          <mat-icon>print</mat-icon>
-          Hojas Valoradas Impresas
-          <span class="tabla-count">{{ hojasImpresas.length }}</span>
-        </div>
-        <table class="hv-table">
-          <thead>
-            <tr>
-              <th>Folio</th>
-              <th>Hoja Valorada</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let h of hojasImpresas" [class.selected]="hojaSeleccionada?.id === h.id"
-              (click)="seleccionarHoja(h)">
-              <td>{{ h.folio }}</td>
-              <td>{{ h.hojaValorada }}</td>
-            </tr>
-            <tr *ngIf="hojasImpresas.length === 0">
-              <td colspan="2" class="empty-row">Sin registros</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="tabla-card">
-        <div class="tabla-titulo canceladas">
-          <mat-icon>cancel</mat-icon>
-          Hojas Valoradas Canceladas
-          <span class="tabla-count">{{ hojasCanceladas.length }}</span>
-        </div>
-        <table class="hv-table">
-          <thead>
-            <tr>
-              <th>Folio</th>
-              <th>Hoja Valorada</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let h of hojasCanceladas">
-              <td>{{ h.folio }}</td>
-              <td>{{ h.hojaValorada }}</td>
-            </tr>
-            <tr *ngIf="hojasCanceladas.length === 0">
-              <td colspan="2" class="empty-row">Sin registros</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-    </div>
-
-    <div class="form-section" *ngIf="solicitud">
-      <div class="section-header">
-        <div class="section-icon"><mat-icon>tune</mat-icon></div>
-        <h3 class="section-title">Tipo de Cancelación</h3>
-      </div>
-      <div class="section-body">
-        <div class="radio-opciones">
-
-          <label class="radio-opcion" [class.active]="tipoCancelacion === 'PERDIDA'">
-            <input type="radio" name="tipoCancelacion" value="PERDIDA" [(ngModel)]="tipoCancelacion" />
-            <div class="radio-content">
-              <span class="radio-titulo">Hoja Valorada Perdida — Necesita Reimpresión</span>
-              <span class="radio-desc">La hoja valorada se hizo perder. El folio necesita imprimirse en una hoja
-                valorada nueva (se cancela la hoja valorada).</span>
-            </div>
-          </label>
-
-          <label class="radio-opcion" [class.active]="tipoCancelacion === 'LIBERAR'">
-            <input type="radio" name="tipoCancelacion" value="LIBERAR" [(ngModel)]="tipoCancelacion" />
-            <div class="radio-content">
-              <span class="radio-titulo">Liberar Hoja Valorada y Liberar el Folio de la Solicitud</span>
-              <span class="radio-desc">Se puede reimprimir tanto la Hoja Valorada como el folio.</span>
-            </div>
-          </label>
-
-          <label class="radio-opcion" [class.active]="tipoCancelacion === 'CANCELAR'">
-            <input type="radio" name="tipoCancelacion" value="CANCELAR" [(ngModel)]="tipoCancelacion" />
-            <div class="radio-content">
-              <span class="radio-titulo">Cancelar Hoja Valorada</span>
-              <span class="radio-desc">El folio de solicitud no se puede reimprimir.</span>
-            </div>
-          </label>
-
-        </div>
-      </div>
-    </div>
-
-    <div class="error-msg" *ngIf="error">
-      <mat-icon>warning_amber</mat-icon>
-      {{ error }}
-    </div>
-
+    }
   </div>
 
-  <div class="dialog-footer">
-    <button class="btn-cancelar" (click)="cerrar()">Cerrar</button>
-    <button class="btn-accion-destructiva" (click)="cancelarFolio()"
-      [disabled]="!solicitud || !tipoCancelacion || procesando">
-      <mat-icon>delete_forever</mat-icon>
-      {{ procesando ? 'Procesando...' : 'Cancelar Folio' }}
+  <div class="dlg-body">
+    @if (error()) {
+      <div class="msg msg-error"><mat-icon>error_outline</mat-icon> {{ error() }}</div>
+    }
+
+    @if (solicitud(); as s) {
+      <div class="resumen">
+        <span class="res-folio">
+          <b class="mono">{{ s.folio }}</b>
+          <button type="button" class="mini" (click)="folios.copiar(s.folio)" matTooltip="Copiar folio">
+            <mat-icon>{{ folios.copiado() === s.folio ? 'check' : 'content_copy' }}</mat-icon>
+          </button>
+        </span>
+        <span class="estado-chip" [ngClass]="'e-' + estado().clave">{{ estado().nombre }}</span>
+        @if (servicioNombre()) { <span class="kv"><em>Servicio</em> {{ servicioNombre() }}</span> }
+        @if (s.tipoCertificacion) { <span class="kv"><em>Tipo</em> {{ s.tipoCertificacion }}</span> }
+        @if (s.copias) { <span class="kv"><em>Copias</em> {{ s.copias }}</span> }
+      </div>
+
+      @if (s.nombre1 || s.nombre2) {
+        <section class="bloque">
+          <h3>Registrado</h3>
+          <p class="nombre">{{ s.nombre1 }}</p>
+          @if (s.nombre2) { <p class="nombre">{{ s.nombre2 }}</p> }
+        </section>
+      }
+
+      <section class="bloque">
+        <h3><mat-icon>bookmark</mat-icon> Hoja valorada</h3>
+        @if (cargandoHoja()) {
+          <div class="hoja-vacia"><mat-spinner diameter="16"></mat-spinner> Consultando hoja valorada…</div>
+        } @else if (hoja(); as h) {
+          <div class="hoja" [class.inactiva]="!hojaActiva()">
+            <div class="hoja-num">
+              <em>Folio de hoja</em>
+              <strong class="mono">{{ h.folio }}</strong>
+            </div>
+            <span class="hoja-estado" [ngClass]="'h-' + h.estado">{{ h.estado || 'Sin estado' }}</span>
+            @if (h.fecha) { <span class="kv"><em>Asignada</em> {{ fechaCorta(h.fecha) }}</span> }
+            @if (h.observaciones) { <span class="hoja-obs">{{ h.observaciones }}</span> }
+          </div>
+          @if (!hojaActiva()) {
+            <p class="nota">Esta hoja ya fue {{ h.estado === 'LIBERADA' ? 'liberada' : 'anulada' }}; no hay nada que cancelar.</p>
+          }
+        } @else {
+          <div class="hoja-vacia"><mat-icon>info</mat-icon> Esta solicitud no tiene hoja valorada asignada.</div>
+        }
+      </section>
+
+      @if (hojaActiva()) {
+        <section class="bloque">
+          <h3><mat-icon>tune</mat-icon> ¿Qué pasó con la hoja?</h3>
+          <div class="opciones" role="radiogroup">
+            @for (o of opciones; track o.valor) {
+              <button type="button" role="radio" class="opcion" [class.on]="tipo() === o.valor"
+                      [class.peligro]="o.valor !== 'LIBERAR'" [attr.aria-checked]="tipo() === o.valor"
+                      (click)="elegirTipo(o.valor)">
+                <mat-icon class="op-icon">{{ o.icono }}</mat-icon>
+                <span class="op-txt">
+                  <strong>{{ o.titulo }}</strong>
+                  <small>{{ o.desc }}</small>
+                </span>
+                <mat-icon class="op-check">{{ tipo() === o.valor ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
+              </button>
+            }
+          </div>
+        </section>
+      }
+    } @else if (!buscando() && !error()) {
+      <div class="vacio">
+        <mat-icon>manage_search</mat-icon>
+        <span>Busca el folio de la solicitud para ver su hoja valorada y cancelarla o liberarla.</span>
+      </div>
+    }
+  </div>
+
+  <footer class="dlg-foot">
+    <button type="button" class="btn btn-outline" (click)="cerrar()">Cerrar</button>
+    <button type="button" class="btn" [class.btn-danger]="tipo() !== 'LIBERAR'" [class.btn-primary]="tipo() === 'LIBERAR'"
+            (click)="cancelarFolio()" [disabled]="!solicitud() || !hojaActiva() || !tipo() || procesando()">
+      @if (procesando()) { <mat-spinner diameter="14"></mat-spinner> } @else { <mat-icon>{{ opcionActual()?.icono ?? 'block' }}</mat-icon> }
+      {{ procesando() ? 'Procesando…' : (opcionActual()?.boton ?? 'Elige una opción') }}
     </button>
-  </div>
-
+  </footer>
 </div>

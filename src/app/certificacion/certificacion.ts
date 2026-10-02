@@ -1,22 +1,15 @@
-import { Component, OnInit, NgZone, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, NgZone, ChangeDetectorRef, signal } from '@angular/core';
 import { Router } from '@angular/router';
-
-import { ApiService, RegistroNacimiento } from '../http';
-import { fechaLocal, nombreCompleto } from '../registro-nacimiento.mapper';
-import { AuthService } from '../auth';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
-
-
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ApiService, RegistroNacimiento } from '../http';
+import { AuthService } from '../auth';
+import { fechaLocal, nombreCompleto } from '../registro-nacimiento.mapper';
+import { FoliosRecientesService } from '../folios-recientes';
 
 @Component({
   selector: 'app-certificacion',
@@ -24,20 +17,55 @@ import { MatNativeDateModule } from '@angular/material/core';
   imports: [
     CommonModule,
     FormsModule,
-    MatCardModule,
     MatIconModule,
     MatButtonModule,
     MatTooltipModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
+    MatProgressSpinnerModule,
   ],
   templateUrl: './certificacion.html',
   styleUrls: ['./certificacion.scss'],
 })
 export class CertificacionComponent implements OnInit {
+
+  readonly usosCfdi = [
+    { clave: 'S01', nombre: 'Sin efectos fiscales' },
+    { clave: 'G01', nombre: 'Adquisición de mercancías' },
+    { clave: 'G03', nombre: 'Gastos en general' },
+    { clave: 'D03', nombre: 'Gastos funerales' },
+    { clave: 'D04', nombre: 'Donativos' },
+  ];
+
+  readonly regimenes = [
+    { clave: '616', nombre: 'Sin obligaciones fiscales' },
+    { clave: '601', nombre: 'General de ley personas morales' },
+    { clave: '603', nombre: 'Personas morales con fines no lucrativos' },
+    { clave: '605', nombre: 'Sueldos y salarios' },
+    { clave: '606', nombre: 'Arrendamiento' },
+    { clave: '607', nombre: 'Enajenación o adquisición de bienes' },
+    { clave: '608', nombre: 'Demás ingresos' },
+    { clave: '612', nombre: 'Personas físicas con actividades empresariales' },
+    { clave: '621', nombre: 'Incorporación fiscal' },
+    { clave: '626', nombre: 'Régimen simplificado de confianza' },
+  ];
+
+  readonly tiposServicioRespaldo = [
+    { id: 1, nombre: 'C: Certificación de acta' },
+    { id: 2, nombre: 'E: Const. Reg. Extem.' },
+    { id: 3, nombre: 'F: Fotocopia certificada' },
+    { id: 4, nombre: 'G: Anotación y Fotocopia' },
+    { id: 5, nombre: 'H: Anotación marginal' },
+    { id: 6, nombre: 'I: Fotocopia índice' },
+    { id: 7, nombre: 'J: Fotocopia C./Anot. ya pagada' },
+    { id: 8, nombre: 'M: Anotación marginal' },
+    { id: 9, nombre: 'O: Anotación marginal con certificación' },
+    { id: 10, nombre: 'P: Fot. Ant y Post' },
+    { id: 11, nombre: 'R: Fot. Ant, Int, Post' },
+    { id: 12, nombre: 'V: Fotocopia C/Índice alfabético' },
+    { id: 13, nombre: 'W: Fotocopia índice e inter.' },
+    { id: 14, nombre: 'X: Validación' },
+    { id: 15, nombre: 'Z: Fotocopia con anotación pagada' },
+    { id: 16, nombre: 'L: Certificación con anotación pagada' },
+  ];
 
   mostrarPdf = false;
   procesando = false;
@@ -46,12 +74,14 @@ export class CertificacionComponent implements OnInit {
   lineaCaptura: string | null = null;
   actosRegistrales: any[] = [];
   tiposServicio: any[] = [];
+  desdeRegistro = false;
+
   entidadCodigo = ''; entidadNombre = '';
   distritoCodigo = ''; distritoNombre = '';
   municipioCodigo = ''; municipioNombre = '';
   localidadCodigo = ''; localidadNombre = '';
   foja = ''; oficialia = ''; acta = ''; enDoc = '';
-  fechaActa: Date | string = '';
+  fechaActa = '';
   anioActa = '';
   nombreRegistrado = ''; crip = '';
   entidadNacCodigo = ''; entidadNacNombre = '';
@@ -63,17 +93,21 @@ export class CertificacionComponent implements OnInit {
   documentoPresentado = '';
   copiasSOlicitadas = 1;
   aniosBusqueda = ''; rangoBusqueda = '';
-  today: string = new Date().toISOString().split('T')[0];
-  fechaEntrega: Date | string = '';
+  today = this.fechaHoy();
+  fechaEntrega = '';
+  readonly avisoFechaEntrega = signal('');
   horaEntrega = '';
   nombreContribuyente = '';
-  usoCfdi = ''; rfc = ''; regimenFiscal = '';
-  email = ''; codigoPostal = '';
-  tipoCondonado = '';
+  usoCfdi = 'S01';
+  rfc = 'XAXX010101000';
+  regimenFiscal = '616';
+  email = '';
+  codigoPostal = '68050';
+  tipoCondonado = 'no';
   numeroOficio = '';
-  fechaOficio: Date | string = '';
+  fechaOficio = '';
   reciboNumero = '';
-  fechaPagoRecibo: Date | string = '';
+  fechaPagoRecibo = '';
 
   observaciones = '';
 
@@ -83,6 +117,7 @@ export class CertificacionComponent implements OnInit {
     private authService: AuthService,
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
+    public folios: FoliosRecientesService,
   ) { }
 
   ngOnInit(): void {
@@ -102,10 +137,21 @@ export class CertificacionComponent implements OnInit {
     this.precargarRegistro();
   }
 
+  private fechaHoy(): string {
+    const d = new Date();
+    return `${d.getFullYear()}-${`${d.getMonth() + 1}`.padStart(2, '0')}-${`${d.getDate()}`.padStart(2, '0')}`;
+  }
+
+  private aISO(d: Date | null): string {
+    if (!d) return '';
+    return `${d.getFullYear()}-${`${d.getMonth() + 1}`.padStart(2, '0')}-${`${d.getDate()}`.padStart(2, '0')}`;
+  }
+
   private precargarRegistro(): void {
     const r: RegistroNacimiento | undefined = history.state?.registroNacimiento;
     if (!r) return;
     const cod = (v: number | null) => (v != null ? `${v}` : '');
+    this.desdeRegistro = true;
     this.entidadCodigo = cod(r.estado_registro_historico_id);
     this.entidadNombre = r.estado_registro_historico_texto ?? '';
     this.distritoCodigo = cod(r.distrito_registro_historico_id);
@@ -121,7 +167,7 @@ export class CertificacionComponent implements OnInit {
       ?? (r.anio_registro && r.mes_registro && r.dia_registro
         ? new Date(r.anio_registro, r.mes_registro - 1, r.dia_registro)
         : null);
-    this.fechaActa = fReg ?? '';
+    this.fechaActa = this.aISO(fReg);
     this.anioActa = cod(r.anio_registro);
     this.nombreRegistrado = nombreCompleto(r.nombre, r.apellido_paterno, r.apellido_materno);
     this.crip = r.crip_ed ?? r.curp ?? '';
@@ -135,34 +181,38 @@ export class CertificacionComponent implements OnInit {
     this.localidadNacNombre = r.localidad_nacimiento_historica_texto ?? '';
     this.padre = nombreCompleto(r.nombre_padre, r.apellido_paterno_padre, r.apellido_materno_padre);
     this.madre = nombreCompleto(r.nombre_madre, r.apellido_paterno_madre, r.apellido_materno_madre);
+    this.nombreContribuyente = this.nombreRegistrado;
   }
 
   private cargarCatalogos(): void {
     this.apiService.getActosRegistrales().subscribe({
-      next: resp => { if (resp.ok) this.actosRegistrales = resp.data; },
+      next: resp => { if (resp.ok) { this.actosRegistrales = resp.data; this.cdr.detectChanges(); } },
       error: err => console.error('Error actos registrales:', err.status),
     });
     this.apiService.getTiposServicio().subscribe({
-      next: resp => { if (resp.ok) this.tiposServicio = resp.data; },
+      next: resp => { if (resp.ok) { this.tiposServicio = resp.data; this.cdr.detectChanges(); } },
       error: err => console.error('Error tipos de servicio:', err.status),
     });
   }
 
-  private toDateStr(val: Date | string): string {
-    if (!val) return '';
-    if (val instanceof Date) return val.toISOString().split('T')[0];
-    return val;
+  iniciales(nombre: string): string {
+    const partes = (nombre ?? '').trim().split(/\s+/).filter(Boolean);
+    if (!partes.length) return '—';
+    const primera = partes[0][0] ?? '';
+    const segunda = partes.length > 2 ? partes[partes.length - 2][0] : (partes[1]?.[0] ?? '');
+    return `${primera}${segunda}`.toUpperCase();
   }
 
   crearNuevaSolicitud(): void {
+    if (!this.nombreContribuyente.trim()) { alert('Falta el nombre del contribuyente.'); return; }
     if (!this.fechaEntrega) { alert('Falta la Fecha de Entrega.'); return; }
 
-    const fechaStr = this.toDateStr(this.fechaEntrega);
-
-    const [anio, mes, dia] = fechaStr.split('-').map(Number);
-    const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
-    if (new Date(anio, mes - 1, dia) < hoy) {
+    const fechaStr = this.fechaEntrega;
+    if (fechaStr < this.today) {
       alert('La Fecha de Entrega no puede ser anterior a hoy.'); return;
+    }
+    if (this.esFinDeSemana(fechaStr)) {
+      alert('La Fecha de Entrega debe ser de lunes a viernes.'); return;
     }
 
     this.procesando = true;
@@ -176,12 +226,12 @@ export class CertificacionComponent implements OnInit {
       tipo_servicio_id: Number(this.tipoServicioId),
       ventanilla_id: 1,
       fecha_entrega_resultado: `${fechaStr}T00:00:00Z`,
-      nombre_contribuyente: this.nombreContribuyente || '',
-      rfc: this.rfc || '',
-      email: this.email || '',
-      codigo_postal: this.codigoPostal || '',
-      uso_cfdi: this.usoCfdi || '',
-      regimen_fiscal: this.regimenFiscal || '',
+      nombre_contribuyente: this.nombreContribuyente.trim(),
+      rfc: this.rfc.trim().toUpperCase() || 'XAXX010101000',
+      email: this.email.trim(),
+      codigo_postal: this.codigoPostal.trim(),
+      uso_cfdi: this.usoCfdi || 'S01',
+      regimen_fiscal: this.regimenFiscal || '616',
     };
 
     this.apiService.crearSolicitud(payload).subscribe({
@@ -192,6 +242,14 @@ export class CertificacionComponent implements OnInit {
           this.procesando = false;
           this.folioGenerado = response?.data?.solicitud?.folio ?? null;
           this.lineaCaptura = response?.data?.pago?.referencia_pago ?? null;
+          if (this.folioGenerado) {
+            this.folios.agregar({
+              folio: this.folioGenerado,
+              lineaCaptura: this.lineaCaptura ?? '',
+              nombre: this.nombreContribuyente.trim(),
+              urlPdf: url ?? '',
+            });
+          }
 
           setTimeout(() => {
             if (url) {
@@ -221,11 +279,46 @@ export class CertificacionComponent implements OnInit {
     });
   }
 
-  autoFechaEntrega(): void {
+  private desdeISO(iso: string): Date | null {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso ?? '');
+    return m ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])) : null;
+  }
+
+  esFinDeSemana(iso: string): boolean {
+    const d = this.desdeISO(iso);
+    if (!d) return false;
+    const dia = d.getDay();
+    return dia === 0 || dia === 6;
+  }
+
+  private siguienteHabil(iso: string): string {
+    const d = this.desdeISO(iso);
+    if (!d) return iso;
+    while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() + 1);
+    return this.aISO(d);
+  }
+
+  autoFechaEntrega(input: HTMLInputElement): void {
     if (!this.fechaEntrega) {
-      const [anio, mes, dia] = this.today.split('-').map(Number);
-      this.fechaEntrega = new Date(anio, mes - 1, dia); 
+      this.fechaEntrega = this.siguienteHabil(this.today);
+      input.value = this.fechaEntrega;
+      this.avisoFechaEntrega.set('');
     }
+  }
+
+  ajustarFechaEntrega(input: HTMLInputElement): void {
+    const valor = input.value;
+    this.fechaEntrega = valor;
+    this.avisoFechaEntrega.set('');
+    if (!valor || !this.esFinDeSemana(valor)) return;
+    const nombreDia = this.desdeISO(valor)!.getDay() === 6 ? 'sábado' : 'domingo';
+    const habil = this.siguienteHabil(valor);
+    this.fechaEntrega = habil;
+    input.value = habil;
+    const lunes = this.desdeISO(habil)!;
+    this.avisoFechaEntrega.set(
+      `Era ${nombreDia}; se pasó al lunes ${lunes.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit' })}.`
+    );
   }
 
   autoHoraEntrega(): void {
@@ -238,11 +331,11 @@ export class CertificacionComponent implements OnInit {
   }
 
   copiarFolio(): void {
-    if (this.folioGenerado) navigator.clipboard.writeText(this.folioGenerado);
+    if (this.folioGenerado) this.folios.copiar(this.folioGenerado);
   }
 
   copiarLineaCaptura(): void {
-    if (this.lineaCaptura) navigator.clipboard.writeText(this.lineaCaptura);
+    if (this.lineaCaptura) this.folios.copiar(this.lineaCaptura);
   }
 
   imprimir(): void {
