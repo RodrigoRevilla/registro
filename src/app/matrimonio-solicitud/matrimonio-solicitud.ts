@@ -1,4 +1,4 @@
-import { Component, OnInit, NgZone, ChangeDetectorRef, signal } from '@angular/core';
+import { Component, OnInit, NgZone, ChangeDetectorRef, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -8,6 +8,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ApiService } from '../http';
 import { AuthService } from '../auth';
 import { FoliosRecientesService } from '../folios-recientes';
+import { AvisosService } from '../avisos';
 
 @Component({
   selector: 'app-matrimonio-solicitud',
@@ -17,6 +18,7 @@ import { FoliosRecientesService } from '../folios-recientes';
   styleUrls: ['../certificacion/certificacion.scss'],
 })
 export class MatrimonioSolicitudComponent implements OnInit {
+  private readonly avisos = inject(AvisosService);
 
   readonly usosCfdi = [
     { clave: 'S01', nombre: 'Sin efectos fiscales' },
@@ -78,8 +80,8 @@ export class MatrimonioSolicitudComponent implements OnInit {
   curpMat = '';
   status = '';
 
-  nombre1 = ''; apellidoPaterno1 = ''; apellidoMaterno1 = ''; fechaNacimiento1 = '';
-  nombre2 = ''; apellidoPaterno2 = ''; apellidoMaterno2 = ''; fechaNacimiento2 = '';
+  nombre1 = ''; apellidoPaterno1 = ''; apellidoMaterno1 = '';
+  nombre2 = ''; apellidoPaterno2 = ''; apellidoMaterno2 = '';
 
   tipoServicioId = 1;
   documentoPresentado = '';
@@ -144,11 +146,9 @@ export class MatrimonioSolicitudComponent implements OnInit {
     this.nombre1 = v('nombre1');
     this.apellidoPaterno1 = v('apellidoPaterno1');
     this.apellidoMaterno1 = v('apellidoMaterno1');
-    this.fechaNacimiento1 = this.aISODesdeCorta(v('fechaNacimiento1'));
     this.nombre2 = v('nombre2');
     this.apellidoPaterno2 = v('apellidoPaterno2');
     this.apellidoMaterno2 = v('apellidoMaterno2');
-    this.fechaNacimiento2 = this.aISODesdeCorta(v('fechaNacimiento2'));
     this.nombreContribuyente = this.desdeRegistro ? this.contrayente1 : '';
   }
 
@@ -238,15 +238,15 @@ export class MatrimonioSolicitudComponent implements OnInit {
   }
 
   crearNuevaSolicitud(): void {
-    if (!this.nombreContribuyente.trim()) { alert('Falta el nombre del contribuyente.'); return; }
-    if (!this.fechaEntrega) { alert('Falta la Fecha de Entrega.'); return; }
+    if (!this.nombreContribuyente.trim()) { this.avisos.error('Falta el nombre del contribuyente.'); return; }
+    if (!this.fechaEntrega) { this.avisos.error('Falta la Fecha de Entrega.'); return; }
 
     const fechaStr = this.fechaEntrega;
     if (fechaStr < this.today) {
-      alert('La Fecha de Entrega no puede ser anterior a hoy.'); return;
+      this.avisos.error('La Fecha de Entrega no puede ser anterior a hoy.'); return;
     }
     if (this.esFinDeSemana(fechaStr)) {
-      alert('La Fecha de Entrega debe ser de lunes a viernes.'); return;
+      this.avisos.error('La Fecha de Entrega debe ser de lunes a viernes.'); return;
     }
 
     this.procesando = true;
@@ -287,15 +287,21 @@ export class MatrimonioSolicitudComponent implements OnInit {
 
           setTimeout(() => {
             if (url) {
-              this.urlPdf = url;
-              this.mostrarPdf = true;
-              this.cdr.detectChanges();
               const ventana = window.open(url, '_blank', `width=${screen.width},height=${screen.height},top=0,left=0`);
               ventana?.addEventListener('load', () => ventana.print());
             } else {
-              alert('Solicitud creada pero no se recibió URL del PDF. Verifica con Finanzas.');
+              this.avisos.aviso('Solicitud creada pero no se recibió URL del PDF. Verifica con Finanzas.');
             }
-            this.cdr.detectChanges();
+            this.router.navigate(['/matrimonios'], {
+              state: {
+                hojaGenerada: {
+                  folio: this.folioGenerado ?? '',
+                  lineaCaptura: this.lineaCaptura ?? '',
+                  nombre: this.nombreContribuyente.trim(),
+                  urlPdf: url ?? '',
+                },
+              },
+            });
           }, 0);
         });
       },
@@ -305,7 +311,7 @@ export class MatrimonioSolicitudComponent implements OnInit {
           this.procesando = false;
           this.cdr.detectChanges();
           const code = err?.error?.error?.code;
-          alert(code === 'ERROR_FINANZAS'
+          this.avisos.error(code === 'ERROR_FINANZAS'
             ? 'Error de conexión con Finanzas'
             : err?.error?.error?.message ?? 'Error desconocido');
         });

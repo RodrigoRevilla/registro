@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, computed, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, computed, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -11,6 +11,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { ReporteBusquedaService } from '../reporte-busqueda/reporte-busqueda';
 import { FoliosRecientesService } from '../folios-recientes';
 import { fechaLocal } from '../registro-nacimiento.mapper';
+import { AvisosService } from '../avisos';
 
 interface Solicitud {
   id: number;
@@ -110,6 +111,7 @@ const SK_BLOQUEADO    = 'hv_bloqueado';
   styleUrls: ['./trabajo.scss']
 })
 export class TrabajoComponent implements OnInit {
+  private readonly avisos = inject(AvisosService);
 
   private readonly API = '/api/v1';
 
@@ -241,12 +243,12 @@ export class TrabajoComponent implements OnInit {
   establecerFolioInicial(): void {
     const n = Number(this.folioInput);
     if (!n || isNaN(n) || n <= 0 || !Number.isInteger(n)) {
-      alert('El folio debe ser un número entero mayor a 0.');
+      this.avisos.error('El folio debe ser un número entero mayor a 0.');
       return;
     }
 
     if (this.leerUsados().has(n)) {
-      alert(`El folio ${n} ya fue usado en esta sesión.`);
+      this.avisos.error(`El folio ${n} ya fue usado en esta sesión.`);
       return;
     }
 
@@ -325,13 +327,13 @@ export class TrabajoComponent implements OnInit {
       payment.urlPdf  = url;
       this.cdr.detectChanges();
     } else {
-      alert(`No se encontró PDF para el folio ${payment.id}`);
+      this.avisos.error(`No se encontró PDF para el folio ${payment.id}`);
     }
   }
 
   async buscarPagos() {
     if (this.currentFilter === 'fotocopias' && !this.leerFolioActual()) {
-      alert('Es necesario ingresar un folio inicial de hoja valorada antes de buscar en Fotocopias.');
+      this.avisos.error('Es necesario ingresar un folio inicial de hoja valorada antes de buscar en Fotocopias.');
       return;
     }
 
@@ -483,7 +485,7 @@ export class TrabajoComponent implements OnInit {
 
   async generarReporte(): Promise<void> {
     const folios = this.payments.map(p => p.id);
-    if (!folios.length) { alert('No hay registros para generar el reporte'); return; }
+    if (!folios.length) { this.avisos.error('No hay registros para generar el reporte'); return; }
     const ok = confirm(`¿Estás seguro? Se generará el reporte con ${folios.length} solicitud(es) y su estado cambiará a ASIGNADA.`);
     if (!ok) return;
     const asignaciones = await this.reporte.generarReporte(folios);
@@ -495,7 +497,7 @@ export class TrabajoComponent implements OnInit {
 
   async generarReporteSeleccionados(): Promise<void> {
     const folios = this.payments.filter(p => p.selected).map(p => p.id);
-    if (!folios.length) { alert('Selecciona al menos un registro'); return; }
+    if (!folios.length) { this.avisos.error('Selecciona al menos un registro'); return; }
     const ok = confirm(`¿Estás seguro? Se generará el reporte con ${folios.length} solicitud(es) seleccionada(s) y su estado cambiará a ASIGNADA.`);
     if (!ok) return;
     const asignaciones = await this.reporte.generarReporte(folios);

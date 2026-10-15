@@ -14,7 +14,9 @@ import { MatrimonioDetalleComponent } from '../matrimonio-detalle/matrimonio-det
 import { ApiService, BusquedaMatrimonio, RegistroMatrimonio } from '../http';
 import { AuthService } from '../auth';
 import { CatalogoMunicipiosService } from '../catalogo-municipios';
+import { FoliosRecientesService, HojaGenerada, leerHojaGenerada } from '../folios-recientes';
 import { ENTIDADES, ENTIDADES_INEGI, municipioTexto, municipioVisible, normalizar } from '../registro-nacimiento.mapper';
+import { AvisosService } from '../avisos';
 import {
   actaMatrimonio,
   contrayente1,
@@ -49,6 +51,14 @@ const ROLES_EDICION = ['ADMINISTRADOR', 'VALIDADOR'];
   }
 })
 export class MatrimoniosComponent implements OnInit, OnDestroy {
+  private readonly avisos = inject(AvisosService);
+
+  readonly hojaGenerada = signal<HojaGenerada | null>(leerHojaGenerada());
+
+  reimprimirHoja(url: string): void {
+    const ventana = window.open(url, '_blank', `width=${screen.width},height=${screen.height},top=0,left=0`);
+    ventana?.addEventListener('load', () => ventana.print());
+  }
 
   @ViewChild('capturaRef') capturaRef?: ElementRef<HTMLElement>;
   @ViewChild('ayudaInput') ayudaInput?: ElementRef<HTMLInputElement>;
@@ -112,6 +122,7 @@ export class MatrimoniosComponent implements OnInit, OnDestroy {
   totalPaginas = computed(() => Math.max(1, Math.ceil(this.total() / this.pageSize)));
 
   private readonly catMun = inject(CatalogoMunicipiosService);
+  readonly folios = inject(FoliosRecientesService);
 
   distritos = signal<Distrito[]>([]);
   municipios = this.catMun.lista;
@@ -151,11 +162,9 @@ export class MatrimoniosComponent implements OnInit, OnDestroy {
       nombre1: [''],
       apellidoPaterno1: [''],
       apellidoMaterno1: [''],
-      fechaNacimiento1: [''],
       nombre2: [''],
       apellidoPaterno2: [''],
       apellidoMaterno2: [''],
-      fechaNacimiento2: [''],
     });
 
     this.aMayusculas(this.busquedaForm, 'curpMatrimonial');
@@ -456,7 +465,7 @@ export class MatrimoniosComponent implements OnInit, OnDestroy {
   toggleContrayente2(): void {
     this.incluirContrayente2.update(v => !v);
     if (!this.incluirContrayente2()) {
-      this.busquedaForm.patchValue({ nombre2: '', apellidoPaterno2: '', apellidoMaterno2: '', fechaNacimiento2: '' });
+      this.busquedaForm.patchValue({ nombre2: '', apellidoPaterno2: '', apellidoMaterno2: '' });
     }
   }
 
@@ -507,11 +516,9 @@ export class MatrimoniosComponent implements OnInit, OnDestroy {
         nombre_contrayente1: str(f.nombre1),
         apellido_paterno_contrayente1: str(f.apellidoPaterno1),
         apellido_materno_contrayente1: str(f.apellidoMaterno1),
-        fecha_nacimiento_contrayente1: str(f.fechaNacimiento1),
         nombre_contrayente2: dos ? str(f.nombre2) : undefined,
         apellido_paterno_contrayente2: dos ? str(f.apellidoPaterno2) : undefined,
         apellido_materno_contrayente2: dos ? str(f.apellidoMaterno2) : undefined,
-        fecha_nacimiento_contrayente2: dos ? str(f.fechaNacimiento2) : undefined,
       };
     }
 
@@ -528,7 +535,7 @@ export class MatrimoniosComponent implements OnInit, OnDestroy {
       this.mensajeError.set(
         this.modoBusqueda() === 'registrales'
           ? 'Captura al menos distrito, municipio, localidad, oficialía, año, fecha de registro, número de acta o CURP matrimonial.'
-          : 'Captura al menos nombre, apellido o fecha de nacimiento del contrayente o de la contrayente.'
+          : 'Captura al menos nombre o apellido del contrayente o de la contrayente.'
       );
       this.busquedaHecha.set(true);
       this.resultados.set([]);
@@ -604,7 +611,7 @@ export class MatrimoniosComponent implements OnInit, OnDestroy {
     this.mostrarCaptura.set(false);
     this.registroId.set(null);
     this.matrimonioForm.reset();
-    alert('No tienes permiso para crear o modificar registros de matrimonio. Solo Administrador y Validador pueden hacerlo.');
+    this.avisos.aviso('No tienes permiso para crear o modificar registros de matrimonio. Solo Administrador y Validador pueden hacerlo.');
   }
 
   editarRegistro(registro: RegistroMatrimonio): void {
@@ -655,11 +662,11 @@ export class MatrimoniosComponent implements OnInit, OnDestroy {
     if (!this.permisoEdicion()) { this.denegarEdicion(); return; }
     const f = this.matrimonioForm.value;
     if (!`${f.nombre1 ?? ''}`.trim() || !`${f.nombre2 ?? ''}`.trim()) {
-      alert('El nombre del contrayente y de la contrayente es obligatorio.');
+      this.avisos.error('El nombre del contrayente y de la contrayente es obligatorio.');
       return;
     }
     if (!`${f.oficialia ?? ''}`.trim() || isNaN(parseInt(f.oficialia, 10))) {
-      alert('La oficialía es obligatoria y debe ser numérica.');
+      this.avisos.error('La oficialía es obligatoria y debe ser numérica.');
       return;
     }
 
@@ -681,7 +688,7 @@ export class MatrimoniosComponent implements OnInit, OnDestroy {
           this.registroId.set(resp.data.id);
           this.resultados.update(lista => lista.map(r => (r.id === resp.data.id ? resp.data : r)));
         }
-        alert(id ? 'Registro actualizado correctamente.' : `Registro creado correctamente (ID ${resp?.data?.id}).`);
+        this.avisos.exito(id ? 'Registro actualizado correctamente.' : `Registro creado correctamente (ID ${resp?.data?.id}).`);
       },
       error: err => {
         this.guardando.set(false);
@@ -689,7 +696,7 @@ export class MatrimoniosComponent implements OnInit, OnDestroy {
           this.denegarEdicion();
           return;
         }
-        alert(err?.error?.error?.message ?? 'No se pudo guardar el registro.');
+        this.avisos.error(err?.error?.error?.message ?? 'No se pudo guardar el registro.');
       },
     });
   }
@@ -702,7 +709,7 @@ export class MatrimoniosComponent implements OnInit, OnDestroy {
     }
     const m = this.catMun.buscar(num);
     if (!m) {
-      alert(`El municipio número ${num} no existe en el catálogo de municipios.`);
+      this.avisos.error(`El municipio número ${num} no existe en el catálogo de municipios.`);
       return null;
     }
     return { texto: normalizar(m.nombre) };

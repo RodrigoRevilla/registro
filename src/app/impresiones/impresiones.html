@@ -37,6 +37,17 @@
       </div>
     </form>
 
+    <div class="hv-contador" [class.hv-inicial]="!hvBloqueada()">
+      <mat-icon>{{ hvBloqueada() ? 'bookmark' : 'bookmark_border' }}</mat-icon>
+      @if (hvBloqueada()) {
+        <span>Hoja valorada en curso: <b class="mono">{{ siguienteHV() }}</b></span>
+        <small>Se asigna sola y avanza en cada certificación</small>
+      } @else {
+        <span>Sin hoja valorada inicial</span>
+        <small>Captura el número de la primera hoja al ligar; después avanza solo</small>
+      }
+    </div>
+
     @if (!datos() && folios.lista().length) {
       <div class="recientes">
         <span class="rec-label">Generados hoy:</span>
@@ -115,18 +126,29 @@
 
       <section class="bloque hv">
         <h3><mat-icon>bookmark_add</mat-icon> Ligar hoja valorada</h3>
-        <form class="hv-grid" (ngSubmit)="ligar()" autocomplete="off">
-          <label class="f">
-            <span>Folio de hoja valorada <i>*</i></span>
-            <input type="number" min="1" name="folioHV" [(ngModel)]="folioHV" class="mono" placeholder="Ej. 1042">
-          </label>
-          <label class="f">
-            <span>Observaciones</span>
-            <input name="observacionesHV" [(ngModel)]="observacionesHV" placeholder="Opcional">
-          </label>
-        </form>
-        @if (siguienteHV()) {
-          <p class="hv-hint"><mat-icon>bookmark</mat-icon> Siguiente hoja sugerida: <b class="mono">{{ siguienteHV() }}</b></p>
+        @if (pagada()) {
+          <form class="hv-grid" (ngSubmit)="ligar()" autocomplete="off">
+            <label class="f">
+              <span>Folio de hoja valorada <i>*</i></span>
+              @if (hvBloqueada()) {
+                <div class="hv-fijo">
+                  <input class="mono ro" name="folioHV" [value]="siguienteHV()" readonly tabindex="-1">
+                  <mat-icon matTooltip="Se asigna automáticamente">lock</mat-icon>
+                </div>
+              } @else {
+                <input type="number" min="1" name="folioHV" [(ngModel)]="folioHV" class="mono" placeholder="Número de la primera hoja">
+              }
+            </label>
+            <label class="f">
+              <span>Observaciones</span>
+              <input name="observacionesHV" [(ngModel)]="observacionesHV" placeholder="Opcional">
+            </label>
+          </form>
+        } @else {
+          <div class="msg msg-warn">
+            <mat-icon>lock_clock</mat-icon>
+            Esta solicitud aún no está pagada{{ estadoNombre() ? ' (' + estadoNombre() + ')' : '' }}. Podrás ligar la hoja valorada cuando se confirme el pago.
+          </div>
         }
       </section>
     } @else if (!buscando() && !error()) {
@@ -139,7 +161,7 @@
 
   <footer class="dlg-foot">
     <button type="button" class="btn btn-outline" (click)="cerrar()">Cerrar</button>
-    <button type="button" class="btn btn-primary" (click)="ligar()" [disabled]="!datos() || ligando()">
+    <button type="button" class="btn btn-primary" (click)="ligar()" [disabled]="!datos() || !pagada() || ligando()">
       @if (ligando()) { <mat-spinner diameter="14"></mat-spinner> } @else { <mat-icon>link</mat-icon> }
       Ligar hoja valorada
     </button>

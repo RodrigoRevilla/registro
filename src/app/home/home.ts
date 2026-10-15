@@ -1,4 +1,4 @@
-import { Component, OnInit, NgZone, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, NgZone, ChangeDetectorRef, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -19,6 +19,7 @@ import { AuthService } from '../auth';
 import { CancelacionDialogComponent } from '../cancelaciones/cancelaciones';
 import { ImpresionesComponent } from '../impresiones/impresiones';
 import { PdfService } from '../pdf-service';
+import { AvisosService } from '../avisos';
 
 interface Usuario {
   id: number;
@@ -67,6 +68,7 @@ interface Rol {
   styleUrls: ['./home.scss'],
 })
 export class HomeComponent implements OnInit {
+  private readonly avisos = inject(AvisosService);
 
   private readonly API = '/api/v1';
 
@@ -172,7 +174,7 @@ export class HomeComponent implements OnInit {
           LIBERAR: `Hoja valorada liberada correctamente`,
           CANCELAR: `Hoja valorada cancelada correctamente`,
         };
-        alert(mensajes[result.tipo] ?? 'Operación completada');
+        this.avisos.exito(mensajes[result.tipo] ?? 'Operación completada');
       }
     });
   }
@@ -259,10 +261,10 @@ export class HomeComponent implements OnInit {
   guardarNuevo(): void {
     const u = this.nuevoUsuario;
     if (!u.username || !u.password || !u.nombre || !u.apellido_paterno) {
-      alert('Completa los campos obligatorios'); return;
+      this.avisos.error('Completa los campos obligatorios'); return;
     }
     if (u.password.length < 8) {
-      alert('La contraseña debe tener al menos 8 caracteres'); return;
+      this.avisos.error('La contraseña debe tener al menos 8 caracteres'); return;
     }
 
     this.guardandoNuevo = true;
@@ -284,12 +286,12 @@ export class HomeComponent implements OnInit {
           this.guardandoNuevo = false;
           this.mostrarFormNuevo = false;
           if (resp?.ok) { this.cargarUsuarios(); }
-          else { alert('Error al crear usuario'); }
+          else { this.avisos.error('Error al crear usuario'); }
         },
         error: err => {
           this.guardandoNuevo = false;
           const code = err?.error?.error?.code;
-          alert(code === 'USERNAME_DUPLICADO'
+          this.avisos.error(code === 'USERNAME_DUPLICADO'
             ? 'Ese username ya existe'
             : err?.error?.error?.message ?? 'Error');
         }
@@ -310,7 +312,7 @@ export class HomeComponent implements OnInit {
 
   guardarPassword(id: number): void {
     if (!this.nuevaPassword || this.nuevaPassword.length < 8) {
-      alert('La contraseña debe tener al menos 8 caracteres'); return;
+      this.avisos.error('La contraseña debe tener al menos 8 caracteres'); return;
     }
     this.guardandoPassword = true;
     this.http.patch<any>(
@@ -322,11 +324,11 @@ export class HomeComponent implements OnInit {
         this.guardandoPassword = false;
         this.editandoPasswordId = null;
         this.nuevaPassword = '';
-        alert('Contraseña actualizada');
+        this.avisos.exito('Contraseña actualizada');
       },
       error: err => {
         this.guardandoPassword = false;
-        alert(err?.error?.error?.message ?? 'Error al cambiar contraseña');
+        this.avisos.error(err?.error?.error?.message ?? 'Error al cambiar contraseña');
       }
     });
   }
@@ -348,7 +350,7 @@ export class HomeComponent implements OnInit {
 
   guardarEditUsuario(usuario: Usuario): void {
     if (!this.editForm.rol_id || !this.editForm.area_id) {
-      alert('Selecciona rol y área'); return;
+      this.avisos.error('Selecciona rol y área'); return;
     }
     this.guardandoEdicion = true;
     const body: any = {
@@ -370,11 +372,11 @@ export class HomeComponent implements OnInit {
         this.guardandoEdicion = false;
         this.editandoUsuarioId = null;
         if (resp?.ok) { this.cargarUsuarios(); }
-        else { alert('Error al actualizar usuario'); }
+        else { this.avisos.error('Error al actualizar usuario'); }
       },
       error: err => {
         this.guardandoEdicion = false;
-        alert(err?.error?.error?.message ?? 'Error al editar usuario');
+        this.avisos.error(err?.error?.error?.message ?? 'Error al editar usuario');
       }
     });
   }
@@ -388,7 +390,7 @@ export class HomeComponent implements OnInit {
       { headers: this.headers }
     ).subscribe({
       next: () => { this.cargarUsuarios(); },
-      error: err => { alert(err?.error?.error?.message ?? 'Error'); }
+      error: err => { this.avisos.error(err?.error?.error?.message ?? 'Error'); }
     });
   }
 

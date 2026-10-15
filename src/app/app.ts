@@ -4,6 +4,7 @@ import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { HeaderComponent } from './header/header';
+import { AvisosComponent } from './avisos';
 import { filter } from 'rxjs/operators';
 
 @Component({
@@ -13,7 +14,8 @@ import { filter } from 'rxjs/operators';
     RouterOutlet,
     MatToolbarModule,
     MatButtonModule,
-    HeaderComponent
+    HeaderComponent,
+    AvisosComponent
   ],
   templateUrl: './app.html',
 })

@@ -14,6 +14,7 @@ import { fechaLocal } from '../registro-nacimiento.mapper';
 const SK_FOLIO_ACTUAL = 'imp_folio_actual';
 const SK_FOLIO_USADOS = 'imp_folios_usados';
 const SK_BLOQUEADO    = 'imp_bloqueado';
+const NO_PAGADOS: Record<number, string> = { 1: 'RECIBIDA', 2: 'PENDIENTE_PAGO' };
 
 interface Solicitud {
   id: number;
@@ -99,6 +100,7 @@ export class ImpresionesComponent implements OnInit {
   readonly datos = signal<DatosSolicitud | null>(null);
   readonly textoFolio = signal('');
   readonly siguienteHV = signal<number | null>(null);
+  readonly hvBloqueada = computed(() => this.siguienteHV() !== null);
 
   private readonly estados = signal<Catalogo[]>([]);
   private readonly servicios = signal<Catalogo[]>([]);
@@ -117,7 +119,12 @@ export class ImpresionesComponent implements OnInit {
   readonly estadoClave = computed(() => {
     const d = this.datos();
     if (!d) return '';
-    return this.estados().find(e => e.id === d.rawSolicitud.estado_id)?.clave ?? '';
+    return this.estados().find(e => e.id === d.rawSolicitud.estado_id)?.clave ?? NO_PAGADOS[d.rawSolicitud.estado_id] ?? '';
+  });
+
+  readonly pagada = computed(() => {
+    const clave = this.estadoClave();
+    return !!this.datos() && clave !== 'RECIBIDA' && clave !== 'PENDIENTE_PAGO';
   });
 
   readonly servicioNombre = computed(() => {
@@ -319,6 +326,11 @@ export class ImpresionesComponent implements OnInit {
   ligar(): void {
     const d = this.datos();
     if (!d) return;
+    if (!this.pagada()) {
+      this.error.set(`La solicitud ${d.folio} aún no está pagada. No se puede ligar una hoja valorada hasta que se confirme el pago.`);
+      return;
+    }
+    if (this.hvBloqueada()) this.folioHV = this.siguienteHV();
     const folioHV = Number(this.folioHV);
     if (!folioHV || folioHV <= 0 || !Number.isInteger(folioHV)) {
       this.error.set('Escribe un folio de hoja valorada válido (número entero mayor a 0).');

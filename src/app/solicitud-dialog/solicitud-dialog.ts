@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -10,6 +10,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { DatosSolicitud } from '../impresiones/impresiones';
+import { AvisosService } from '../avisos';
 
 @Component({
   selector: 'app-solicitud-dialog',
@@ -30,6 +31,7 @@ import { DatosSolicitud } from '../impresiones/impresiones';
   styleUrls: ['./solicitud-dialog.scss'],
 })
 export class SolicitudDialogComponent {
+  private readonly avisos = inject(AvisosService);
 
   ligando        = false;
   mostrarFormHV  = false;
@@ -57,7 +59,7 @@ export class SolicitudDialogComponent {
 
   confirmarLigar(): void {
     if (!this.folioHV || this.folioHV <= 0) {
-      alert('Ingresa un folio de hoja valorada válido');
+      this.avisos.error('Ingresa un folio de hoja valorada válido');
       return;
     }
     this.ligando = true;

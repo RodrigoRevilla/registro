@@ -3,6 +3,12 @@ import { isPlatformBrowser } from '@angular/common';
 
 export const ROLES_EDICION_NACIMIENTO = ['ADMINISTRADOR', 'VALIDADOR'];
 
+export type Modulo = 'atencion' | 'buscadores' | 'pagos' | 'certificaciones' | 'reimpresion' | 'entrega';
+
+export const MODULOS_POR_ROL: Record<string, Modulo[]> = {
+  OPERADOR_VENTANILLA: ['atencion'],
+};
+
 @Injectable({
   providedIn: 'root'
 })
@@ -70,6 +76,13 @@ export class AuthService {
 
   puedeEditarNacimientos(): boolean {
     return this.isLoggedIn() && this.tieneRol(...ROLES_EDICION_NACIMIENTO);
+  }
+
+  puedeVer(modulo: Modulo): boolean {
+    if (!this.isLoggedIn()) return false;
+    const rol = `${this.getRolClave() ?? ''}`.trim().toUpperCase();
+    const permitidos = MODULOS_POR_ROL[rol];
+    return !permitidos || permitidos.includes(modulo);
   }
 
   hasPermiso(clave: string): boolean {

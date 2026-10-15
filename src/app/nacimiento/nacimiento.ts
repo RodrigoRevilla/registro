@@ -14,6 +14,8 @@ import { ActaDetalleComponent } from '../acta-detalle/acta-detalle';
 import { ApiService, BusquedaNacimiento, RegistroNacimiento } from '../http';
 import { AuthService } from '../auth';
 import { CatalogoMunicipiosService } from '../catalogo-municipios';
+import { FoliosRecientesService, HojaGenerada, leerHojaGenerada } from '../folios-recientes';
+import { AvisosService } from '../avisos';
 import {
   ENTIDADES,
   ENTIDADES_INEGI,
@@ -49,6 +51,14 @@ interface Localidad { clave_edo: number; clave_mun: number; clave_local: number;
   }
 })
 export class NacimientoComponent implements OnInit, OnDestroy {
+  private readonly avisos = inject(AvisosService);
+
+  readonly hojaGenerada = signal<HojaGenerada | null>(leerHojaGenerada());
+
+  reimprimirHoja(url: string): void {
+    const ventana = window.open(url, '_blank', `width=${screen.width},height=${screen.height},top=0,left=0`);
+    ventana?.addEventListener('load', () => ventana.print());
+  }
 
   @ViewChild('capturaRef') capturaRef?: ElementRef<HTMLElement>;
   @ViewChild('ayudaInput') ayudaInput?: ElementRef<HTMLInputElement>;
@@ -103,6 +113,7 @@ export class NacimientoComponent implements OnInit, OnDestroy {
   totalPaginas = computed(() => Math.max(1, Math.ceil(this.total() / this.pageSize)));
 
   private readonly catMun = inject(CatalogoMunicipiosService);
+  readonly folios = inject(FoliosRecientesService);
 
   distritos = signal<Distrito[]>([]);
   municipios = this.catMun.lista;
@@ -604,7 +615,7 @@ export class NacimientoComponent implements OnInit, OnDestroy {
     this.mostrarCaptura.set(false);
     this.registroId.set(null);
     this.nacimientoForm.reset();
-    alert('No tienes permiso para crear o modificar registros de nacimiento. Solo Administrador y Validador pueden hacerlo.');
+    this.avisos.aviso('No tienes permiso para crear o modificar registros de nacimiento. Solo Administrador y Validador pueden hacerlo.');
   }
 
   editarRegistro(registro: RegistroNacimiento): void {
@@ -657,11 +668,11 @@ export class NacimientoComponent implements OnInit, OnDestroy {
     if (!this.permisoEdicion()) { this.denegarEdicion(); return; }
     const f = this.nacimientoForm.value;
     if (!`${f.nombre ?? ''}`.trim()) {
-      alert('El nombre del registrado es obligatorio.');
+      this.avisos.error('El nombre del registrado es obligatorio.');
       return;
     }
     if (!`${f.oficialia ?? ''}`.trim() || isNaN(parseInt(f.oficialia, 10))) {
-      alert('La oficialía es obligatoria y debe ser numérica.');
+      this.avisos.error('La oficialía es obligatoria y debe ser numérica.');
       return;
     }
 
@@ -686,7 +697,7 @@ export class NacimientoComponent implements OnInit, OnDestroy {
           this.registroId.set(resp.data.id);
           this.resultados.update(lista => lista.map(r => (r.id === resp.data.id ? resp.data : r)));
         }
-        alert(id ? 'Registro actualizado correctamente.' : `Registro creado correctamente (ID ${resp?.data?.id}).`);
+        this.avisos.exito(id ? 'Registro actualizado correctamente.' : `Registro creado correctamente (ID ${resp?.data?.id}).`);
       },
       error: err => {
         this.guardando.set(false);
@@ -694,7 +705,7 @@ export class NacimientoComponent implements OnInit, OnDestroy {
           this.denegarEdicion();
           return;
         }
-        alert(err?.error?.error?.message ?? 'No se pudo guardar el registro.');
+        this.avisos.error(err?.error?.error?.message ?? 'No se pudo guardar el registro.');
       },
     });
   }
@@ -711,7 +722,7 @@ export class NacimientoComponent implements OnInit, OnDestroy {
     }
     const m = this.catMun.buscar(num);
     if (!m) {
-      alert(`El municipio ${etiqueta} número ${num} no existe en el catálogo de municipios.`);
+      this.avisos.error(`El municipio ${etiqueta} número ${num} no existe en el catálogo de municipios.`);
       return null;
     }
     return { texto: normalizar(m.nombre) };

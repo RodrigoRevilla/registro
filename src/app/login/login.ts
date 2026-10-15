@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -10,6 +10,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { AvisosService } from '../avisos';
 
 @Component({
   selector: 'app-login',
@@ -29,6 +30,7 @@ import { HttpClientModule, HttpClient } from '@angular/common/http';
   styleUrls: ['./login.scss'],
 })
 export class LoginComponent {
+  private readonly avisos = inject(AvisosService);
   loading = false;
   hidePassword = true;
   loginForm: any;
@@ -47,7 +49,7 @@ export class LoginComponent {
 
   login() {
     if (this.loginForm.invalid) {
-      alert('Por favor completa todos los campos correctamente');
+      this.avisos.error('Por favor completa todos los campos correctamente');
       return;
     }
 
@@ -63,7 +65,7 @@ export class LoginComponent {
           this.authService.login(res.data.token, res.data.usuario);
           this.router.navigate(['/home']);
         } else {
-          alert(res.message || 'Usuario o contraseña incorrectos');
+          this.avisos.error(res.message || 'Usuario o contraseña incorrectos');
           this.loginForm.reset({ username: '', password: '' });
           this.hidePassword = true;
           this.loading = false;
@@ -71,7 +73,7 @@ export class LoginComponent {
       },
       error: (err) => {
         console.error(err);
-        alert(err.status === 404 ? 'Usuario no encontrado' :
+        this.avisos.error(err.status === 404 ? 'Usuario no encontrado' :
           err.status === 401 ? 'Usuario o contraseña incorrectos' :
             'Error de conexión con el servidor');
 

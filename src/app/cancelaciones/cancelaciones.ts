@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatAutocompleteModule, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { firstValueFrom } from 'rxjs';
 import { ApiService } from '../http';
 import { FoliosRecientesService } from '../folios-recientes';
 
@@ -28,6 +29,12 @@ interface SolicitudCancelacion {
   copias: string;
   nombre1: string;
   nombre2: string;
+}
+
+interface Movimiento {
+  estado_anterior_id: number | null;
+  estado_nuevo_id: number;
+  created_at: string;
 }
 
 interface HojaValorada {
@@ -257,23 +264,32 @@ export class CancelacionDialogComponent implements OnInit {
     this.procesando.set(true);
     this.error.set('');
 
+    const motivo = tipo === 'LIBERAR'
+      ? 'Hoja valorada liberada — la hoja física no se usó'
+      : tipo === 'PERDIDA'
+      ? 'Hoja valorada perdida — necesita reimpresión en hoja nueva'
+      : 'Cancelación de hoja valorada — folio no se puede reimprimir';
     const base = `${this.API}/solicitudes/${encodeURIComponent(s.folio)}/hoja-valorada`;
     const peticion = tipo === 'LIBERAR'
       ? this.http.post<any>(`${base}/liberar`, {}, { headers: this.headers })
-      : this.http.post<any>(`${base}/anular`, {
-          motivo: tipo === 'PERDIDA'
-            ? 'Hoja valorada perdida — necesita reimpresión en hoja nueva'
-            : 'Cancelación de hoja valorada — folio no se puede reimprimir',
-        }, { headers: this.headers });
+      : this.http.post<any>(`${base}/anular`, { motivo }, { headers: this.headers });
 
     peticion.subscribe({
-      next: resp => {
-        this.procesando.set(false);
-        if (resp?.ok) {
-          this.dialogRef.close({ accion: 'cancelado', tipo, folio: s.folio });
-        } else {
+      next: async resp => {
+        if (!resp?.ok) {
+          this.procesando.set(false);
           this.error.set('No se pudo completar la operación.');
+          return;
         }
+        const aviso = await this.ajustarEstadoSolicitud(s, tipo, motivo);
+        this.procesando.set(false);
+        if (aviso) {
+          this.hoja.update(h => h ? { ...h, estado: tipo === 'LIBERAR' ? 'LIBERADA' : 'ANULADA' } : h);
+          this.tipo.set(null);
+          this.error.set(aviso);
+          return;
+        }
+        this.dialogRef.close({ accion: 'cancelado', tipo, folio: s.folio });
       },
       error: err => {
         this.procesando.set(false);
@@ -285,7 +301,53 @@ export class CancelacionDialogComponent implements OnInit {
     });
   }
 
+  private async ajustarEstadoSolicitud(s: SolicitudCancelacion, tipo: TipoCancelacion, motivo: string): Promise<string> {
+    const accion = tipo === 'LIBERAR' ? 'liberó' : 'anuló';
+    const opciones = { headers: this.headers };
+    try {
+      const [sol, hist, trans] = await Promise.all([
+        firstValueFrom(this.http.get<any>(`${this.API}/solicitudes/${s.id}`, opciones)),
+        firstValueFrom(this.http.get<any>(`${this.API}/solicitudes/${s.id}/historial`, opciones)),
+        firstValueFrom(this.http.get<any>(`${this.API}/solicitudes/${s.id}/transiciones`, opciones)),
+      ]);
+
+      const actualId: number = sol?.data?.estado_id ?? s.estadoId;
+      const actual = this.estados().find(e => e.id === actualId);
+      const permitidas: Catalogo[] = trans?.data ?? [];
+
+      let destino: Catalogo | undefined;
+      if (tipo === 'CANCELAR') {
+        destino = this.estados().find(e => e.clave === 'CANCELADA') ?? { id: 0, clave: 'CANCELADA', nombre: 'Cancelada' };
+      } else {
+        const desde = new Date(this.hoja()?.fecha ?? 0).getTime() - 60000;
+        const ultimo = (hist?.data ?? [] as Movimiento[])
+          .filter((m: Movimiento) => m.estado_nuevo_id === actualId && m.estado_anterior_id != null)
+          .sort((a: Movimiento, b: Movimiento) => a.created_at.localeCompare(b.created_at))
+          .pop();
+        if (!ultimo || new Date(ultimo.created_at).getTime() < desde) return '';
+        destino = this.estados().find(e => e.id === ultimo.estado_anterior_id);
+        if (!destino) return `La hoja se ${accion}, pero no se pudo identificar el estado al que debe regresar la solicitud ${s.folio}.`;
+      }
+
+      if (actual?.clave === destino.clave) return '';
+      if (!permitidas.some(t => t.clave === destino!.clave)) {
+        return `La hoja se ${accion}, pero la solicitud ${s.folio} sigue en "${actual?.nombre ?? 'su estado actual'}": `
+          + `no está permitida la transición a "${destino.nombre}" para tu rol.`;
+      }
+
+      await firstValueFrom(this.http.post<any>(
+        `${this.API}/solicitudes/${s.id}/cambio-estado`,
+        { estado_destino_clave: destino.clave, comentario: motivo },
+        opciones,
+      ));
+      return '';
+    } catch (err: any) {
+      return `La hoja se ${accion}, pero no se pudo actualizar el estado de la solicitud ${s.folio}: `
+        + (err?.error?.error?.message ?? 'error al cambiar el estado.');
+    }
+  }
+
   cerrar(): void {
     this.dialogRef.close();
   }
-}
+} 

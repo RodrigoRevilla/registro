@@ -805,6 +805,63 @@ $radius: 4px;
   margin-right: 6px;
 }
 
+.aviso-hoja {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  padding: 10px 14px;
+  border-left: 4px solid $green;
+  background: #f3faf3;
+
+  .ah-icon { color: $green; font-size: 26px; width: 26px; height: 26px; }
+
+  .ah-txt {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.25;
+    margin-right: auto;
+
+    strong { color: $ink; font-size: 14.5px; }
+    span { color: $muted; font-size: 12.5px; }
+  }
+
+  .ah-dato {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    em {
+      font-style: normal;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: $muted;
+    }
+
+    b { @include mono; font-size: 14px; color: $ink; }
+    .btn-icon { width: 28px; height: 28px; border-color: transparent; }
+  }
+
+  .ah-acciones {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    .btn { height: 30px; }
+    .btn-icon { width: 30px; }
+  }
+}
+
+.btn-outline {
+  background: #fff;
+  color: $vino;
+  border-color: $vino-line;
+
+  &:hover:not(:disabled) { background: $vino-soft; border-color: $vino; }
+}
+
 ::ng-deep .mat-mdc-autocomplete-panel {
   .mat-mdc-option {
     min-height: 34px !important;

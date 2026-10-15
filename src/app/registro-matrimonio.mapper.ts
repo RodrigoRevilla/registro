@@ -181,11 +181,9 @@ export function estadoSolicitudMatrimonio(r: RegistroMatrimonio, municipioNombre
     nombre1: r.nombre_contrayente1 ?? '',
     apellidoPaterno1: r.apellido_paterno_contrayente1 ?? '',
     apellidoMaterno1: r.apellido_materno_contrayente1 ?? '',
-    fechaNacimiento1: fechaCorta(fechaLocal(r.fecha_nacimiento_contrayente1)),
     nombre2: r.nombre_contrayente2 ?? '',
     apellidoPaterno2: r.apellido_paterno_contrayente2 ?? '',
     apellidoMaterno2: r.apellido_materno_contrayente2 ?? '',
-    fechaNacimiento2: fechaCorta(fechaLocal(r.fecha_nacimiento_contrayente2)),
     status: r.estatus_acervo ?? '',
   };
 }

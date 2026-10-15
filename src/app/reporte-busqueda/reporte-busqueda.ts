@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import jsPDF from 'jspdf';
+import { AvisosService } from '../avisos';
 
 interface DatosSolicitud {
   _id: number;
@@ -38,6 +39,7 @@ const SK_BLOQUEADO    = 'hv_bloqueado';
 
 @Injectable({ providedIn: 'root' })
 export class ReporteBusquedaService {
+  private readonly avisos = inject(AvisosService);
 
   private readonly API = '/api/v1';
 
@@ -280,13 +282,13 @@ export class ReporteBusquedaService {
 
   async generarReporte(folios: string[]): Promise<Map<string, number>> {
     if (sessionStorage.getItem(SK_BLOQUEADO) !== '1') {
-      alert('Es necesario ingresar un folio inicial de hoja valorada antes de generar el reporte.');
+      this.avisos.error('Es necesario ingresar un folio inicial de hoja valorada antes de generar el reporte.');
       return new Map();
     }
 
     let folioHVActual = this.leerFolioActual();
     if (!folioHVActual) {
-      alert('No se encontró el folio de hoja valorada en sesión. Por favor establécelo nuevamente.');
+      this.avisos.error('No se encontró el folio de hoja valorada en sesión. Por favor establécelo nuevamente.');
       return new Map();
     }
 
@@ -297,7 +299,7 @@ export class ReporteBusquedaService {
     const datos = resultados.filter((d): d is DatosSolicitud => d !== null);
 
     if (!datos.length) {
-      alert('No se pudieron obtener datos para generar el reporte');
+      this.avisos.error('No se pudieron obtener datos para generar el reporte');
       return new Map();
     }
 
@@ -353,7 +355,7 @@ export class ReporteBusquedaService {
 
     const datos = await this.obtenerDatos(folio);
     if (!datos) {
-      alert(`No se pudieron obtener datos para el folio ${folio}`);
+      this.avisos.error(`No se pudieron obtener datos para el folio ${folio}`);
       return;
     }
 

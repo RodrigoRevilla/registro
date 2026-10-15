@@ -1,4 +1,4 @@
-import { Component, OnInit, NgZone, ChangeDetectorRef, effect, signal } from '@angular/core';
+import { Component, OnInit, NgZone, ChangeDetectorRef, effect, signal, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -11,6 +11,7 @@ import { AuthService } from '../auth';
 import { fechaLocal, municipioVisible, nombreCompleto, normalizar } from '../registro-nacimiento.mapper';
 import { CatalogoMunicipiosService } from '../catalogo-municipios';
 import { FoliosRecientesService } from '../folios-recientes';
+import { AvisosService } from '../avisos';
 
 @Component({
   selector: 'app-certificacion',
@@ -27,6 +28,7 @@ import { FoliosRecientesService } from '../folios-recientes';
   styleUrls: ['./certificacion.scss'],
 })
 export class CertificacionComponent implements OnInit {
+  private readonly avisos = inject(AvisosService);
 
   readonly usosCfdi = [
     { clave: 'S01', nombre: 'Sin efectos fiscales' },
@@ -225,15 +227,15 @@ export class CertificacionComponent implements OnInit {
   }
 
   crearNuevaSolicitud(): void {
-    if (!this.nombreContribuyente.trim()) { alert('Falta el nombre del contribuyente.'); return; }
-    if (!this.fechaEntrega) { alert('Falta la Fecha de Entrega.'); return; }
+    if (!this.nombreContribuyente.trim()) { this.avisos.error('Falta el nombre del contribuyente.'); return; }
+    if (!this.fechaEntrega) { this.avisos.error('Falta la Fecha de Entrega.'); return; }
 
     const fechaStr = this.fechaEntrega;
     if (fechaStr < this.today) {
-      alert('La Fecha de Entrega no puede ser anterior a hoy.'); return;
+      this.avisos.error('La Fecha de Entrega no puede ser anterior a hoy.'); return;
     }
     if (this.esFinDeSemana(fechaStr)) {
-      alert('La Fecha de Entrega debe ser de lunes a viernes.'); return;
+      this.avisos.error('La Fecha de Entrega debe ser de lunes a viernes.'); return;
     }
 
     this.procesando = true;
@@ -274,15 +276,21 @@ export class CertificacionComponent implements OnInit {
 
           setTimeout(() => {
             if (url) {
-              this.urlPdf = url;
-              this.mostrarPdf = true;
-              this.cdr.detectChanges();
               const ventana = window.open(url, '_blank', `width=${screen.width},height=${screen.height},top=0,left=0`);
               ventana?.addEventListener('load', () => ventana.print());
             } else {
-              alert('Solicitud creada pero no se recibió URL del PDF. Verifica con Finanzas.');
+              this.avisos.aviso('Solicitud creada pero no se recibió URL del PDF. Verifica con Finanzas.');
             }
-            this.cdr.detectChanges();
+            this.router.navigate(['/nacimiento'], {
+              state: {
+                hojaGenerada: {
+                  folio: this.folioGenerado ?? '',
+                  lineaCaptura: this.lineaCaptura ?? '',
+                  nombre: this.nombreContribuyente.trim(),
+                  urlPdf: url ?? '',
+                },
+              },
+            });
           }, 0);
         });
       },
@@ -292,7 +300,7 @@ export class CertificacionComponent implements OnInit {
           this.procesando = false;
           this.cdr.detectChanges();
           const code = err?.error?.error?.code;
-          alert(code === 'ERROR_FINANZAS'
+          this.avisos.error(code === 'ERROR_FINANZAS'
             ? 'Error de conexión con Finanzas'
             : err?.error?.error?.message ?? 'Error desconocido');
         });

@@ -30,9 +30,11 @@
   </header>
 
   <div class="dashboard-content slide-up" *ngIf="vistaActual === 'home'">
-    <button mat-menu-item (click)="generarFotocopia()">
-      <mat-icon>content_copy</mat-icon> Generar PDF
-    </button>
+    @if (authService.puedeVer('certificaciones')) {
+      <button mat-menu-item (click)="generarFotocopia()">
+        <mat-icon>content_copy</mat-icon> Generar PDF
+      </button>
+    }
     <div class="dashboard-header-row">
       <p class="dashboard-subtitle">¿Qué deseas hacer hoy?</p>
       <div class="session-pill">
@@ -58,119 +60,131 @@
           <p class="card-desc">Selecciona el módulo correspondiente al trámite que vas a atender.</p>
 
           <div class="modules-grid">
-            <div class="module-block">
-              <div class="module-label">
-                <mat-icon>groups</mat-icon>
-                Atención al Público
+            @if (authService.puedeVer('atencion')) {
+              <div class="module-block">
+                <div class="module-label">
+                  <mat-icon>groups</mat-icon>
+                  Atención al Público
+                </div>
+                <p class="module-desc">Registro de actos del estado civil</p>
+                <button mat-stroked-button class="action-button primary" [matMenuTriggerFor]="atencionMenu">
+                  <mat-icon>expand_circle_down</mat-icon>
+                  Seleccionar acto
+                </button>
+                <mat-menu #atencionMenu="matMenu" class="rc-menu">
+                  <button mat-menu-item (click)="irANacimiento($event)">
+                    <mat-icon>child_care</mat-icon> Nacimientos
+                  </button>
+                  <button mat-menu-item (click)="irAMatrimonios($event)">
+                    <mat-icon>favorite</mat-icon> Matrimonio
+                  </button>
+                  <button mat-menu-item disabled><mat-icon>sentiment_very_dissatisfied</mat-icon> Defunciones</button>
+                  <button mat-menu-item disabled><mat-icon>how_to_reg</mat-icon> Reconocimientos</button>
+                  <button mat-menu-item disabled><mat-icon>gavel</mat-icon> Divorcios</button>
+                  <button mat-menu-item disabled><mat-icon>child_friendly</mat-icon> Adopciones</button>
+                  <button mat-menu-item disabled><mat-icon>assignment</mat-icon> Inscripción de Sentencias</button>
+                </mat-menu>
               </div>
-              <p class="module-desc">Registro de actos del estado civil</p>
-              <button mat-stroked-button class="action-button primary" [matMenuTriggerFor]="atencionMenu">
-                <mat-icon>expand_circle_down</mat-icon>
-                Seleccionar acto
-              </button>
-              <mat-menu #atencionMenu="matMenu" class="rc-menu">
-                <button mat-menu-item (click)="irANacimiento($event)">
-                  <mat-icon>child_care</mat-icon> Nacimientos
-                </button>
-                <button mat-menu-item (click)="irAMatrimonios($event)">
-                  <mat-icon>favorite</mat-icon> Matrimonio
-                </button>
-                <button mat-menu-item disabled><mat-icon>sentiment_very_dissatisfied</mat-icon> Defunciones</button>
-                <button mat-menu-item disabled><mat-icon>how_to_reg</mat-icon> Reconocimientos</button>
-                <button mat-menu-item disabled><mat-icon>gavel</mat-icon> Divorcios</button>
-                <button mat-menu-item disabled><mat-icon>child_friendly</mat-icon> Adopciones</button>
-                <button mat-menu-item disabled><mat-icon>assignment</mat-icon> Inscripción de Sentencias</button>
-              </mat-menu>
-            </div>
+            }
 
-            <div class="module-block">
-              <div class="module-label">
-                <mat-icon>manage_search</mat-icon>
-                Buscadores
+            @if (authService.puedeVer('buscadores')) {
+              <div class="module-block">
+                <div class="module-label">
+                  <mat-icon>manage_search</mat-icon>
+                  Buscadores
+                </div>
+                <p class="module-desc">Consulta y localización de solicitudes</p>
+                <button mat-stroked-button class="action-button accent" [matMenuTriggerFor]="buscadoresMenu">
+                  <mat-icon>expand_circle_down</mat-icon>
+                  Seleccionar buscador
+                </button>
+                <mat-menu #buscadoresMenu="matMenu" class="rc-menu">
+                  <button mat-menu-item (click)="irATrabajo($event)">
+                    <mat-icon>work</mat-icon> Trabajo
+                  </button>
+                  <button mat-menu-item (click)="irAModificacion($event)">
+                    <mat-icon>edit</mat-icon> Modificación
+                  </button>
+                </mat-menu>
               </div>
-              <p class="module-desc">Consulta y localización de solicitudes</p>
-              <button mat-stroked-button class="action-button accent" [matMenuTriggerFor]="buscadoresMenu">
-                <mat-icon>expand_circle_down</mat-icon>
-                Seleccionar buscador
-              </button>
-              <mat-menu #buscadoresMenu="matMenu" class="rc-menu">
-                <button mat-menu-item (click)="irATrabajo($event)">
-                  <mat-icon>work</mat-icon> Trabajo
-                </button>
-                <button mat-menu-item (click)="irAModificacion($event)">
-                  <mat-icon>edit</mat-icon> Modificación
-                </button>
-              </mat-menu>
-            </div>
+            }
 
-            <div class="module-block">
-              <div class="module-label">
-                <mat-icon>payments</mat-icon>
-                Pagos
+            @if (authService.puedeVer('pagos')) {
+              <div class="module-block">
+                <div class="module-label">
+                  <mat-icon>payments</mat-icon>
+                  Pagos
+                </div>
+                <p class="module-desc">Actualización de pagos pendientes</p>
+                <button mat-stroked-button class="action-button warn" (click)="irAActualizarPago($event)">
+                  <mat-icon>attach_money</mat-icon>
+                  Actualizar pago
+                </button>
               </div>
-              <p class="module-desc">Actualización de pagos pendientes</p>
-              <button mat-stroked-button class="action-button warn" (click)="irAActualizarPago($event)">
-                <mat-icon>attach_money</mat-icon>
-                Actualizar pago
-              </button>
-            </div>
+            }
 
-            <div class="module-block">
-              <div class="module-label">
-                <mat-icon>verified</mat-icon>
-                Certificaciones
+            @if (authService.puedeVer('certificaciones')) {
+              <div class="module-block">
+                <div class="module-label">
+                  <mat-icon>verified</mat-icon>
+                  Certificaciones
+                </div>
+                <p class="module-desc">Certificacion/Cancelacion de hojas valoradas</p>
+                <button mat-stroked-button class="action-button teal" [matMenuTriggerFor]="certificacionmenu">
+                  <mat-icon>expand_circle_down</mat-icon>
+                  Seleccionar acción
+                </button>
+                <mat-menu #certificacionmenu="matMenu" class="rc-menu">
+                  <button mat-menu-item (click)="irAImpresiones($event)">
+                    <mat-icon>print</mat-icon> Imprimir
+                  </button>
+                  <button mat-menu-item (click)="irACancelaciones($event)">
+                    <mat-icon>block</mat-icon> Cancelar certificaciones
+                  </button>
+                </mat-menu>
               </div>
-              <p class="module-desc">Certificacion/Cancelacion de hojas valoradas</p>
-              <button mat-stroked-button class="action-button teal" [matMenuTriggerFor]="certificacionmenu">
-                <mat-icon>expand_circle_down</mat-icon>
-                Seleccionar acción
-              </button>
-              <mat-menu #certificacionmenu="matMenu" class="rc-menu">
-                <button mat-menu-item (click)="irAImpresiones($event)">
-                  <mat-icon>print</mat-icon> Imprimir
-                </button>
-                <button mat-menu-item (click)="irACancelaciones($event)">
-                  <mat-icon>block</mat-icon> Cancelar certificaciones
-                </button>
-              </mat-menu>
-            </div>
+            }
 
-            <div class="module-block">
-              <div class="module-label">
-                <mat-icon>print</mat-icon>
-                Reimpresión
+            @if (authService.puedeVer('reimpresion')) {
+              <div class="module-block">
+                <div class="module-label">
+                  <mat-icon>print</mat-icon>
+                  Reimpresión
+                </div>
+                <p class="module-desc">Reimpresión de certificaciones emitidas</p>
+                <button mat-stroked-button class="action-button accent" [matMenuTriggerFor]="reimpresionMenu">
+                  <mat-icon>expand_circle_down</mat-icon>
+                  Seleccionar tipo
+                </button>
+                <mat-menu #reimpresionMenu="matMenu" class="rc-menu">
+                  <button mat-menu-item (click)="irAReimpresionSolicitudes($event)">
+                    <mat-icon>description</mat-icon> Solicitudes
+                  </button>
+                  <button mat-menu-item (click)="irAReimpresionLineaCaptura($event)">
+                    <mat-icon>qr_code</mat-icon> Con línea de captura
+                  </button>
+                </mat-menu>
               </div>
-              <p class="module-desc">Reimpresión de certificaciones emitidas</p>
-              <button mat-stroked-button class="action-button accent" [matMenuTriggerFor]="reimpresionMenu">
-                <mat-icon>expand_circle_down</mat-icon>
-                Seleccionar tipo
-              </button>
-              <mat-menu #reimpresionMenu="matMenu" class="rc-menu">
-                <button mat-menu-item (click)="irAReimpresionSolicitudes($event)">
-                  <mat-icon>description</mat-icon> Solicitudes
-                </button>
-                <button mat-menu-item (click)="irAReimpresionLineaCaptura($event)">
-                  <mat-icon>qr_code</mat-icon> Con línea de captura
-                </button>
-              </mat-menu>
-            </div>
+            }
 
-            <div class="module-block">
-              <div class="module-label">
-                <mat-icon>inventory_2</mat-icon>
-                Entrega de Documentos
-              </div>
-              <p class="module-desc">Registro y control de entregas a solicitantes</p>
-              <button mat-stroked-button class="action-button primary" [matMenuTriggerFor]="entregaMenu">
-                <mat-icon>expand_circle_down</mat-icon>
-                Seleccionar acción
-              </button>
-              <mat-menu #entregaMenu="matMenu" class="rc-menu">
-                <button mat-menu-item (click)="irAEntrega($event)">
-                  <mat-icon>task_alt</mat-icon> Búsqueda para entrega de documentos
+            @if (authService.puedeVer('entrega')) {
+              <div class="module-block">
+                <div class="module-label">
+                  <mat-icon>inventory_2</mat-icon>
+                  Entrega de Documentos
+                </div>
+                <p class="module-desc">Registro y control de entregas a solicitantes</p>
+                <button mat-stroked-button class="action-button primary" [matMenuTriggerFor]="entregaMenu">
+                  <mat-icon>expand_circle_down</mat-icon>
+                  Seleccionar acción
                 </button>
-              </mat-menu>
-            </div>
+                <mat-menu #entregaMenu="matMenu" class="rc-menu">
+                  <button mat-menu-item (click)="irAEntrega($event)">
+                    <mat-icon>task_alt</mat-icon> Búsqueda para entrega de documentos
+                  </button>
+                </mat-menu>
+              </div>
+            }
 
           </div>
 

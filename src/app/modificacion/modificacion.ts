@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, signal } from '@angular/core';
+import { Component, OnInit, computed, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
@@ -11,6 +11,7 @@ import { ApiService } from '../http';
 import { AuthService } from '../auth';
 import { FoliosRecientesService } from '../folios-recientes';
 import { fechaLocal } from '../registro-nacimiento.mapper';
+import { AvisosService } from '../avisos';
 
 interface Catalogo {
   id: number;
@@ -43,6 +44,7 @@ interface SolicitudDetalle {
   ]
 })
 export class ModificacionComponent implements OnInit {
+  private readonly avisos = inject(AvisosService);
 
   private baseUrl = '/api/v1';
 
@@ -161,7 +163,7 @@ export class ModificacionComponent implements OnInit {
 
   private getHeaders(): HttpHeaders | null {
     const token = this.authService.getToken();
-    if (!token) { alert('Primero debes iniciar sesión'); return null; }
+    if (!token) { this.avisos.error('Primero debes iniciar sesión'); return null; }
     return new HttpHeaders({ Authorization: `Bearer ${token}` });
   }
 
@@ -242,9 +244,9 @@ export class ModificacionComponent implements OnInit {
 
   reImprimir(): void {
     const id = this.solicitud()?.id;
-    if (!id) { alert('Primero busca una solicitud'); return; }
+    if (!id) { this.avisos.error('Primero busca una solicitud'); return; }
     const folioHoja = (this.formulario.get('folio')?.value ?? '').trim();
-    if (!folioHoja) { alert('No hay folio para reimprimir'); return; }
+    if (!folioHoja) { this.avisos.error('No hay folio para reimprimir'); return; }
     const headers = this.getHeaders();
     if (!headers) return;
 
@@ -259,13 +261,13 @@ export class ModificacionComponent implements OnInit {
                   const ventana = window.open(url, '_blank', `width=${screen.width},height=${screen.height},top=0,left=0`);
                   ventana?.addEventListener('load', () => ventana.print());
                 } else {
-                  alert('No se encontró URL del PDF');
+                  this.avisos.error('No se encontró URL del PDF');
                 }
               },
-              error: err => alert('Error al obtener el PDF: ' + (err.error?.error?.message ?? 'Error desconocido'))
+              error: err => this.avisos.error('Error al obtener el PDF: ' + (err.error?.error?.message ?? 'Error desconocido'))
             });
         },
-        error: err => alert('Error al registrar impresión: ' + (err.error?.error?.message ?? 'Error desconocido'))
+        error: err => this.avisos.error('Error al registrar impresión: ' + (err.error?.error?.message ?? 'Error desconocido'))
       });
   }
 
@@ -292,7 +294,7 @@ export class ModificacionComponent implements OnInit {
     const headers = this.getHeaders();
     if (!headers) return;
     const id = this.solicitud()?.id;
-    if (!id) { alert('Primero busca una solicitud'); return; }
+    if (!id) { this.avisos.error('Primero busca una solicitud'); return; }
 
     const estadoClave = this.formulario.get('estadoSeleccionado')?.value;
     const comentario = this.formulario.get('observaciones')?.value ?? '';
@@ -300,7 +302,7 @@ export class ModificacionComponent implements OnInit {
     const areaId = usuario?.area_id ?? null;
 
     if (!estadoClave && !comentario) {
-      alert('Selecciona un resultado o escribe un comentario');
+      this.avisos.error('Selecciona un resultado o escribe un comentario');
       return;
     }
 
@@ -317,11 +319,11 @@ export class ModificacionComponent implements OnInit {
       .subscribe({
         next: () => {
           this.guardando.set(false);
-          alert('Cambios guardados correctamente');
+          this.avisos.exito('Cambios guardados correctamente');
         },
         error: err => {
           this.guardando.set(false);
-          alert('Error al guardar: ' + (err.error?.error?.message ?? 'Error desconocido'));
+          this.avisos.error('Error al guardar: ' + (err.error?.error?.message ?? 'Error desconocido'));
         }
       });
   }

@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
 import { ApiService, RegistroMatrimonio } from '../http';
 import { AuthService } from '../auth';
 import { CatalogoMunicipiosService } from '../catalogo-municipios';
-import { fechaLocal, municipioTexto, municipioVisible, normalizar, sexoLabel } from '../registro-nacimiento.mapper';
+import { municipioTexto, municipioVisible, normalizar, sexoLabel } from '../registro-nacimiento.mapper';
 import {
   actaMatrimonio,
   contrayente1,
@@ -28,7 +28,6 @@ interface Contrayente {
   nombre: string;
   sexo: string;
   edad: number | null;
-  fechaNacimiento: Date | null;
   nacionalidad: string;
 }
 
@@ -115,14 +114,12 @@ export class MatrimonioDetalleComponent implements OnInit {
           nombre: contrayente1(r),
           sexo: sexoLabel(r.sexo_contrayente1),
           edad: r.edad_contrayente1,
-          fechaNacimiento: fechaLocal(r.fecha_nacimiento_contrayente1),
           nacionalidad: r.nacionalidad_contrayente1_texto ?? '',
         }
       : {
           nombre: contrayente2(r),
           sexo: sexoLabel(r.sexo_contrayente2),
           edad: r.edad_contrayente2,
-          fechaNacimiento: fechaLocal(r.fecha_nacimiento_contrayente2),
           nacionalidad: r.nacionalidad_contrayente2_texto ?? '',
         };
   }

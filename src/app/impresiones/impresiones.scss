@@ -196,6 +196,7 @@ $radius: 4px;
 
   &.msg-error { background: rgba($rust, 0.07); color: $rust; border: 1px solid rgba($rust, 0.2); }
   &.msg-ok    { background: rgba($green, 0.07); color: $green; border: 1px solid rgba($green, 0.22); }
+  &.msg-warn  { background: rgba($amber, 0.08); color: $amber; border: 1px solid rgba($amber, 0.25); }
 }
 
 .resumen {
@@ -339,16 +340,52 @@ $radius: 4px;
   @media (max-width: 560px) { grid-template-columns: 1fr; }
 }
 
-.hv-hint {
+.hv-contador {
   display: flex;
   align-items: center;
-  gap: 5px;
-  margin: 8px 0 0;
-  font-size: 12.5px;
-  color: $amber;
-  font-weight: 600;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin-top: 8px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: $vino-soft;
+  border: 1px solid $vino-line;
+  color: $vino;
+  font-size: 13px;
 
-  mat-icon { font-size: 15px; width: 15px; height: 15px; }
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+  b { font-size: 15px; }
+  small { color: $muted; font-size: 12px; margin-left: auto; }
+
+  &.hv-inicial {
+    background: rgba($amber, 0.07);
+    border-color: rgba($amber, 0.25);
+    color: $amber;
+  }
+}
+
+.hv-fijo {
+  position: relative;
+
+  mat-icon {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: $muted;
+  }
+}
+
+.f input.ro {
+  background: #f1eef0;
+  font-weight: 700;
+  color: $vino;
+  cursor: default;
+
+  &:focus { box-shadow: none; border-color: $border; background: #f1eef0; }
 }
 
 .vacio {

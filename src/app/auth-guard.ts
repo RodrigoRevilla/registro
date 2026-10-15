@@ -1,28 +1,28 @@
-import { Injectable } from '@angular/core';
-import { CanActivate, Router } from '@angular/router';
-import { AuthService } from './auth';
+import { Injectable, inject } from '@angular/core';
+import { ActivatedRouteSnapshot, CanActivate, Router } from '@angular/router';
+import { AuthService, Modulo } from './auth';
+import { AvisosService } from './avisos';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthGuard implements CanActivate {
+  private readonly avisos = inject(AvisosService);
   constructor(private auth: AuthService, private router: Router) { }
 
-  canActivate(): boolean {
-    console.log('AUTH GUARD ACTIVADO');
-    console.log('Token desde Guard:', this.auth.getToken());
-    console.log('isLoggedIn desde Guard:', this.auth.isLoggedIn()); 
-    
-    const isLoggedIn = this.auth.isLoggedIn();
-    console.log('¿Usuario autenticado?', isLoggedIn);
-    
-    if (isLoggedIn) {
-      console.log('Acceso permitido');
-      return true;
-    } else {
-      console.log('No autenticado, redirigiendo al login');
+  canActivate(route: ActivatedRouteSnapshot): boolean {
+    if (!this.auth.isLoggedIn()) {
       this.router.navigate(['/login']);
       return false;
     }
+
+    const modulo = route.data?.['modulo'] as Modulo | undefined;
+    if (modulo && !this.auth.puedeVer(modulo)) {
+      this.avisos.aviso('Tu rol no tiene acceso a ese módulo.');
+      this.router.navigate(['/home']);
+      return false;
+    }
+
+    return true;
   }
 }

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, computed, signal, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -10,6 +10,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { ApiService } from '../http';
 import { FoliosRecientesService } from '../folios-recientes';
 import { fechaLocal } from '../registro-nacimiento.mapper';
+import { AvisosService } from '../avisos';
 
 interface Solicitud {
   id: number;
@@ -96,6 +97,7 @@ const TERMINALES_NEGATIVOS = ['CANCELADA', 'RECHAZADA', 'NO_ENCONTRADA'];
   ]
 })
 export class ConsultaPagoComponent implements OnInit, OnDestroy {
+  private readonly avisos = inject(AvisosService);
 
   folioBuscar = '';
   transiciones: any[] = [];
@@ -325,7 +327,7 @@ export class ConsultaPagoComponent implements OnInit, OnDestroy {
     let comentario = '';
     if (transicion.requiere_comentario) {
       comentario = prompt('Ingrese comentario obligatorio') || '';
-      if (!comentario.trim()) { alert('Comentario requerido'); return; }
+      if (!comentario.trim()) { this.avisos.error('Comentario requerido'); return; }
     }
 
     this.procesando.set(true);
@@ -336,18 +338,18 @@ export class ConsultaPagoComponent implements OnInit, OnDestroy {
         if (actual) this.solicitud.set({ ...actual, status: res.data.EstadoNuevo });
         this.procesando.set(false);
         this.cargarTransiciones();
-        alert(`Estado actualizado a ${res.data.EstadoNuevo}`);
+        this.avisos.exito(`Estado actualizado a ${res.data.EstadoNuevo}`);
       },
       error: err => {
         this.procesando.set(false);
-        alert(err.error?.error?.message || 'Error al cambiar estado');
+        this.avisos.error(err.error?.error?.message || 'Error al cambiar estado');
       }
     });
   }
 
   confirmarPagoManual() {
     const actual = this.solicitud();
-    if (!actual?.id) { alert('ID de solicitud inválido.'); return; }
+    if (!actual?.id) { this.avisos.error('ID de solicitud inválido.'); return; }
 
     this.confirmando.set(true);
 
@@ -355,7 +357,7 @@ export class ConsultaPagoComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$),
       switchMap(res => {
         if (!res?.data?.verificado) {
-          alert(`${res?.data?.mensaje ?? 'Pago no verificado'}`);
+          this.avisos.aviso(`${res?.data?.mensaje ?? 'Pago no verificado'}`);
           this.confirmando.set(false);
           return of(null);
         }
@@ -374,7 +376,7 @@ export class ConsultaPagoComponent implements OnInit, OnDestroy {
         }
         this.cargarTransiciones();
         this.confirmando.set(false);
-        alert('Pago confirmado exitosamente');
+        this.avisos.exito('Pago confirmado exitosamente');
       },
       error: err => {
         let mensaje = 'Error desconocido al confirmar el pago.';
@@ -382,7 +384,7 @@ export class ConsultaPagoComponent implements OnInit, OnDestroy {
         else if (err.status === 422) mensaje = 'ID inválido o sin pago asociado';
         else if (err.error?.error?.message) mensaje = err.error.error.message;
         else if (err.error?.message) mensaje = err.error.message;
-        alert(mensaje);
+        this.avisos.error(mensaje);
         this.confirmando.set(false);
       }
     });
@@ -393,7 +395,7 @@ export class ConsultaPagoComponent implements OnInit, OnDestroy {
     if (!s) return;
     const urlPdf = s.urlPdf
       || (s.lineaCaptura ? `https://impresionsiox.finanzasoaxaca.gob.mx:443/jasper/${s.lineaCaptura}.pdf` : '');
-    if (!urlPdf) { alert('Esta solicitud no tiene hoja de pago.'); return; }
+    if (!urlPdf) { this.avisos.error('Esta solicitud no tiene hoja de pago.'); return; }
     const ventana = window.open(urlPdf, '_blank', 'width=900,height=700');
     ventana?.addEventListener('load', () => ventana.print());
   }

@@ -20,6 +20,42 @@
 
 <main class="page">
 
+  @if (hojaGenerada(); as h) {
+    <section class="card aviso-hoja" role="status">
+      <mat-icon class="ah-icon">check_circle</mat-icon>
+      <div class="ah-txt">
+        <strong>Hoja de pago generada</strong>
+        <span>{{ h.nombre || 'Solicitud registrada' }} · lista para la siguiente búsqueda</span>
+      </div>
+      <div class="ah-dato">
+        <em>Folio</em>
+        <b class="mono">{{ h.folio }}</b>
+        <button type="button" class="btn btn-icon" (click)="folios.copiar(h.folio)" matTooltip="Copiar folio">
+          <mat-icon>{{ folios.copiado() === h.folio ? 'check' : 'content_copy' }}</mat-icon>
+        </button>
+      </div>
+      @if (h.lineaCaptura) {
+        <div class="ah-dato">
+          <em>Línea de captura</em>
+          <b class="mono">{{ h.lineaCaptura }}</b>
+          <button type="button" class="btn btn-icon" (click)="folios.copiar(h.lineaCaptura)" matTooltip="Copiar línea de captura">
+            <mat-icon>{{ folios.copiado() === h.lineaCaptura ? 'check' : 'content_copy' }}</mat-icon>
+          </button>
+        </div>
+      }
+      <div class="ah-acciones">
+        @if (h.urlPdf) {
+          <button type="button" class="btn btn-outline" (click)="reimprimirHoja(h.urlPdf)">
+            <mat-icon>print</mat-icon> Imprimir de nuevo
+          </button>
+        }
+        <button type="button" class="btn btn-icon" (click)="hojaGenerada.set(null)" matTooltip="Cerrar aviso">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </section>
+  }
+
   <section class="card search-card">
     <div class="search-tabs" role="tablist" aria-label="Tipo de búsqueda">
       <span class="tabs-label">Buscar por</span>
