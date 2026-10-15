@@ -219,7 +219,7 @@
             </label>
             <label class="f c2">
               <span>Hora</span>
-              <input type="time" [(ngModel)]="horaEntrega" name="horaEntrega" (change)="autoHoraEntrega()">
+              <input type="time" [value]="horaEntrega" readonly class="ro" tabindex="-1">
             </label>
           </div>
         </div>

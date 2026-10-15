@@ -1,257 +1,297 @@
-import { Component, OnInit, NgZone, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, NgZone, ChangeDetectorRef, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
-import { MatButtonModule } from '@angular/material/button';
+import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ApiService } from '../http';
+import { AuthService } from '../auth';
+import { FoliosRecientesService } from '../folios-recientes';
 
 @Component({
   selector: 'app-matrimonio-solicitud',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    MatButtonModule,
-    MatIconModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatTooltipModule,
-  ],
+  imports: [CommonModule, FormsModule, MatIconModule, MatTooltipModule, MatProgressSpinnerModule],
   templateUrl: './matrimonio-solicitud.html',
-  styleUrls:   ['./matrimonio-solicitud.scss'],
+  styleUrls: ['../certificacion/certificacion.scss'],
 })
 export class MatrimonioSolicitudComponent implements OnInit {
-  entidad          = '';
-  municipio        = '';
-  oficialia        = '';
-  distrito         = '';
-  localidad        = '';
-  curpMat          = '';
-  anio             = '';
-  acta             = '';
-  enDoc            = '';
-  fechaRegistro    = '';
-  nombre1          = '';
-  apellidoPaterno1 = '';
-  apellidoMaterno1 = '';
-  crip1            = '';
-  fechaNacimiento1 = '';
-  nombre2          = '';
-  apellidoPaterno2 = '';
-  apellidoMaterno2 = '';
-  crip2            = '';
-  fechaNacimiento2 = '';
-  status           = '';
-  tiposServicio:      any[]            = [];
-  tipoServicioId      = 0;
-  documentoPresentado = '';
-  copiasSolicitadas   = 1;
-  modalidad           = 'automatizado';
-  aniosBusqueda       = '';
-  rangoBusqueda       = '';
-  fechaEntrega: Date | string = '';
-  horaEntrega         = '11:00';
-  observaciones = '';
-  tipoCondonado   = 'no';
-  numeroOficio    = '';
-  fechaOficio: Date | string = '';
-  reciboNumero    = '';
-  fechaPagoRecibo: Date | string = '';
-  nombreContribuyente = '';
-  rfc                 = 'XAXX010101000';
-  usoCfdi             = 'S01';
-  regimenFiscal       = '616';
-  email               = '';
-  codigoPostal        = '68000';
-  procesando     = false;
+
+  readonly usosCfdi = [
+    { clave: 'S01', nombre: 'Sin efectos fiscales' },
+    { clave: 'G01', nombre: 'Adquisición de mercancías' },
+    { clave: 'G03', nombre: 'Gastos en general' },
+    { clave: 'D03', nombre: 'Gastos funerales' },
+    { clave: 'D04', nombre: 'Donativos' },
+  ];
+
+  readonly regimenes = [
+    { clave: '616', nombre: 'Sin obligaciones fiscales' },
+    { clave: '601', nombre: 'General de ley personas morales' },
+    { clave: '603', nombre: 'Personas morales con fines no lucrativos' },
+    { clave: '605', nombre: 'Sueldos y salarios' },
+    { clave: '606', nombre: 'Arrendamiento' },
+    { clave: '607', nombre: 'Enajenación o adquisición de bienes' },
+    { clave: '608', nombre: 'Demás ingresos' },
+    { clave: '612', nombre: 'Personas físicas con actividades empresariales' },
+    { clave: '621', nombre: 'Incorporación fiscal' },
+    { clave: '626', nombre: 'Régimen simplificado de confianza' },
+  ];
+
+  readonly tiposServicioRespaldo = [
+    { id: 1, nombre: 'C: Certificación de acta' },
+    { id: 2, nombre: 'E: Const. Reg. Extem.' },
+    { id: 3, nombre: 'F: Fotocopia certificada' },
+    { id: 4, nombre: 'G: Anotación y Fotocopia' },
+    { id: 5, nombre: 'H: Anotación marginal' },
+    { id: 6, nombre: 'I: Fotocopia índice' },
+    { id: 7, nombre: 'J: Fotocopia C./Anot. ya pagada' },
+    { id: 8, nombre: 'M: Anotación marginal' },
+    { id: 9, nombre: 'O: Anotación marginal con certificación' },
+    { id: 10, nombre: 'P: Fot. Ant y Post' },
+    { id: 11, nombre: 'R: Fot. Ant, Int, Post' },
+    { id: 12, nombre: 'V: Fotocopia C/Índice alfabético' },
+    { id: 13, nombre: 'W: Fotocopia índice e inter.' },
+    { id: 14, nombre: 'X: Validación' },
+    { id: 15, nombre: 'Z: Fotocopia con anotación pagada' },
+    { id: 16, nombre: 'L: Certificación con anotación pagada' },
+  ];
+
+  mostrarPdf = false;
+  procesando = false;
+  urlPdf: string | null = null;
   folioGenerado: string | null = null;
-  lineaCaptura:  string | null = null;
-  urlPdf:        string | null = null;
-  today: string  = (() => {
-    const h = new Date();
-    return `${h.getFullYear()}-${String(h.getMonth()+1).padStart(2,'0')}-${String(h.getDate()).padStart(2,'0')}`;
-  })();
+  lineaCaptura: string | null = null;
+  tiposServicio: any[] = [];
+  desdeRegistro = false;
+
+  entidad = '';
+  distrito = '';
+  municipio = '';
+  localidad = '';
+  oficialia = '';
+  acta = '';
+  anio = '';
+  fechaRegistro = '';
+  enDoc = '';
+  curpMat = '';
+  status = '';
+
+  nombre1 = ''; apellidoPaterno1 = ''; apellidoMaterno1 = ''; fechaNacimiento1 = '';
+  nombre2 = ''; apellidoPaterno2 = ''; apellidoMaterno2 = ''; fechaNacimiento2 = '';
+
+  tipoServicioId = 1;
+  documentoPresentado = '';
+  copiasSolicitadas = 1;
+  aniosBusqueda = ''; rangoBusqueda = '';
+  today = this.fechaHoy();
+  fechaEntrega = '';
+  readonly avisoFechaEntrega = signal('');
+  readonly horaEntrega = '11:00';
+  nombreContribuyente = '';
+  usoCfdi = 'S01';
+  rfc = 'XAXX010101000';
+  regimenFiscal = '616';
+  email = '';
+  codigoPostal = '68050';
+  tipoCondonado = 'no';
+  numeroOficio = '';
+  fechaOficio = '';
+  reciboNumero = '';
+  fechaPagoRecibo = '';
+  observaciones = '';
 
   constructor(
-    private router:     Router,
-    private route:      ActivatedRoute,
+    private router: Router,
     private apiService: ApiService,
-    private ngZone:     NgZone,
-    private cdr:        ChangeDetectorRef,
+    private authService: AuthService,
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef,
+    public folios: FoliosRecientesService,
   ) {}
 
   ngOnInit(): void {
-    const nav   = this.router.getCurrentNavigation();
-    const state = nav?.extras?.state ?? history.state;
-
-    if (!state || Object.keys(state).length === 0) {
+    setTimeout(() => window.scrollTo(0, 0), 50);
+    if (!this.authService.getToken()) {
+      this.router.navigate(['/login']);
+      return;
+    }
+    const state = history.state ?? {};
+    if (!state || (!state['manual'] && !state['nombre1'] && !state['acta'])) {
       this.router.navigate(['/matrimonios']);
       return;
     }
-
-    this.entidad          = state['entidad']          ?? '';
-    this.municipio        = state['municipio']        ?? '';
-    this.oficialia        = state['oficialia']        ?? '';
-    this.distrito         = state['distrito']         ?? '';
-    this.localidad        = state['localidad']        ?? '';
-    this.curpMat          = state['curpMat']          ?? '';
-    this.anio             = state['anio']             ?? '';
-    this.acta             = state['acta']             ?? '';
-    this.enDoc            = state['enDoc']            ?? '';
-    this.fechaRegistro    = state['fechaRegistro']    ?? '';
-    this.nombre1          = state['nombre1']          ?? '';
-    this.apellidoPaterno1 = state['apellidoPaterno1'] ?? '';
-    this.apellidoMaterno1 = state['apellidoMaterno1'] ?? '';
-    this.crip1            = state['crip1']            ?? '';
-    this.fechaNacimiento1 = state['fechaNacimiento1'] ?? '';
-    this.nombre2          = state['nombre2']          ?? '';
-    this.apellidoPaterno2 = state['apellidoPaterno2'] ?? '';
-    this.apellidoMaterno2 = state['apellidoMaterno2'] ?? '';
-    this.crip2            = state['crip2']            ?? '';
-    this.fechaNacimiento2 = state['fechaNacimiento2'] ?? '';
-    this.status           = state['status']           ?? '';
-    this.tiposServicio    = state['tiposServicio']    ?? [];
-
-    this.nombreContribuyente =
-      `${this.nombre1} ${this.apellidoPaterno1} ${this.apellidoMaterno1}`.trim();
+    this.precargar(state);
+    this.cargarCatalogos();
   }
 
-  private toDateStr(val: Date | string | null): string {
-    if (!val) return '';
-    if (val instanceof Date) {
-      const y = val.getFullYear();
-      const m = String(val.getMonth() + 1).padStart(2, '0');
-      const d = String(val.getDate()).padStart(2, '0');
-      return `${y}-${m}-${d}`;
-    }
-    return val;
+  private precargar(s: Record<string, any>): void {
+    const v = (k: string) => `${s[k] ?? ''}`;
+    this.desdeRegistro = !s['manual'];
+    this.tiposServicio = Array.isArray(s['tiposServicio']) ? s['tiposServicio'] : [];
+    this.entidad = v('entidad');
+    this.distrito = v('distrito');
+    this.municipio = v('municipio');
+    this.localidad = v('localidad');
+    this.oficialia = v('oficialia');
+    this.acta = v('acta');
+    this.anio = v('anio');
+    this.fechaRegistro = this.aISODesdeCorta(v('fechaRegistro'));
+    this.enDoc = v('enDoc');
+    this.curpMat = v('curpMat');
+    this.status = v('status');
+    this.nombre1 = v('nombre1');
+    this.apellidoPaterno1 = v('apellidoPaterno1');
+    this.apellidoMaterno1 = v('apellidoMaterno1');
+    this.fechaNacimiento1 = this.aISODesdeCorta(v('fechaNacimiento1'));
+    this.nombre2 = v('nombre2');
+    this.apellidoPaterno2 = v('apellidoPaterno2');
+    this.apellidoMaterno2 = v('apellidoMaterno2');
+    this.fechaNacimiento2 = this.aISODesdeCorta(v('fechaNacimiento2'));
+    this.nombreContribuyente = this.desdeRegistro ? this.contrayente1 : '';
   }
 
-  autoFechaEntrega(): void {
+  private cargarCatalogos(): void {
+    if (this.tiposServicio.length) return;
+    this.apiService.getTiposServicio().subscribe({
+      next: resp => { if (resp?.ok) { this.tiposServicio = resp.data ?? []; this.cdr.detectChanges(); } },
+      error: err => console.error('Error tipos de servicio:', err?.status),
+    });
+  }
+
+  get contrayente1(): string {
+    return [this.nombre1, this.apellidoPaterno1, this.apellidoMaterno1].map(x => x.trim()).filter(Boolean).join(' ');
+  }
+
+  get contrayente2(): string {
+    return [this.nombre2, this.apellidoPaterno2, this.apellidoMaterno2].map(x => x.trim()).filter(Boolean).join(' ');
+  }
+
+  get titulo(): string {
+    const a = this.contrayente1;
+    const b = this.contrayente2;
+    return a && b ? `${a} y ${b}` : (a || b || 'Sin contrayentes');
+  }
+
+  get iniciales(): string {
+    const a = this.nombre1.trim()[0] ?? '';
+    const b = this.nombre2.trim()[0] ?? '';
+    return `${a}${b}`.toUpperCase() || '—';
+  }
+
+  private fechaHoy(): string {
+    return this.aISO(new Date());
+  }
+
+  private aISO(d: Date | null): string {
+    if (!d) return '';
+    return `${d.getFullYear()}-${`${d.getMonth() + 1}`.padStart(2, '0')}-${`${d.getDate()}`.padStart(2, '0')}`;
+  }
+
+  private aISODesdeCorta(txt: string): string {
+    const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(txt.trim());
+    if (m) return `${m[3]}-${m[2]}-${m[1]}`;
+    return /^\d{4}-\d{2}-\d{2}/.test(txt) ? txt.slice(0, 10) : '';
+  }
+
+  private desdeISO(iso: string): Date | null {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso ?? '');
+    return m ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])) : null;
+  }
+
+  esFinDeSemana(iso: string): boolean {
+    const d = this.desdeISO(iso);
+    if (!d) return false;
+    const dia = d.getDay();
+    return dia === 0 || dia === 6;
+  }
+
+  private siguienteHabil(iso: string): string {
+    const d = this.desdeISO(iso);
+    if (!d) return iso;
+    while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() + 1);
+    return this.aISO(d);
+  }
+
+  autoFechaEntrega(input: HTMLInputElement): void {
     if (!this.fechaEntrega) {
-      const [a, m, d] = this.today.split('-').map(Number);
-      this.fechaEntrega = new Date(a, m - 1, d);
+      this.fechaEntrega = this.siguienteHabil(this.today);
+      input.value = this.fechaEntrega;
+      this.avisoFechaEntrega.set('');
     }
   }
 
-  autoHoraEntrega(): void {
-    if (!this.horaEntrega) return;
-    const [h, min] = this.horaEntrega.split(':').map(Number);
-    if (h < 12) {
-      this.horaEntrega =
-        `${String(h + 12).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
-    }
+  ajustarFechaEntrega(input: HTMLInputElement): void {
+    const valor = input.value;
+    this.fechaEntrega = valor;
+    this.avisoFechaEntrega.set('');
+    if (!valor || !this.esFinDeSemana(valor)) return;
+    const nombreDia = this.desdeISO(valor)!.getDay() === 6 ? 'sábado' : 'domingo';
+    const habil = this.siguienteHabil(valor);
+    this.fechaEntrega = habil;
+    input.value = habil;
+    const lunes = this.desdeISO(habil)!;
+    this.avisoFechaEntrega.set(
+      `Era ${nombreDia}; se pasó al lunes ${lunes.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit' })}.`
+    );
   }
 
-  copiar(texto: string): void {
-    navigator.clipboard.writeText(texto);
-  }
+  crearNuevaSolicitud(): void {
+    if (!this.nombreContribuyente.trim()) { alert('Falta el nombre del contribuyente.'); return; }
+    if (!this.fechaEntrega) { alert('Falta la Fecha de Entrega.'); return; }
 
-  imprimir(): void {
-    if (this.urlPdf) {
-      const v = window.open(
-        this.urlPdf, '_blank',
-        `width=${screen.width},height=${screen.height},top=0,left=0`
-      );
-      v?.addEventListener('load', () => v.print());
-    }
-  }
-
-  generar(): void {
-    if (!this.tipoServicioId || this.tipoServicioId === 0) {
-      alert('Selecciona un tipo de servicio.'); return;
-    }
-    if (!this.fechaEntrega) {
-      alert('Falta la Fecha de Entrega.'); return;
-    }
-
-    const fechaStr = this.toDateStr(this.fechaEntrega);
-
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(fechaStr)) {
-      alert('Formato de fecha de entrega inválido.'); return;
-    }
-
-    const [anio, mes, dia] = fechaStr.split('-').map(Number);
-    const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
-    if (new Date(anio, mes - 1, dia) < hoy) {
+    const fechaStr = this.fechaEntrega;
+    if (fechaStr < this.today) {
       alert('La Fecha de Entrega no puede ser anterior a hoy.'); return;
+    }
+    if (this.esFinDeSemana(fechaStr)) {
+      alert('La Fecha de Entrega debe ser de lunes a viernes.'); return;
     }
 
     this.procesando = true;
-
-    const tipoServicioNombre = this.tiposServicio
-      .find(ts => ts.id === Number(this.tipoServicioId))?.nombre ?? '';
-
-    const resultadoBusqueda = {
-      entidad:             this.entidad,
-      municipio:           this.municipio,
-      oficialia:           this.oficialia,
-      distrito:            this.distrito,
-      localidad:           this.localidad,
-      curpMat:             this.curpMat,
-      anio:                this.anio,
-      acta:                this.acta,
-      enDoc:               this.enDoc,
-      fechaRegistro:       this.fechaRegistro,
-      nombre:              `${this.nombre1} ${this.apellidoPaterno1} ${this.apellidoMaterno1}`.trim(),
-      nombreContrayente2:  `${this.nombre2} ${this.apellidoPaterno2} ${this.apellidoMaterno2}`.trim(),
-      crip:                this.crip1,
-      crip2:               this.crip2,
-      fechaNacimiento:     this.fechaNacimiento1,
-      fechaNacimiento2:    this.fechaNacimiento2,
-      status:              this.status,
-      tipoActa:            'MATRIMONIO',
-      servicio:            tipoServicioNombre,
-      copiasSolicitadas:   String(this.copiasSolicitadas),
-      documentoPresentado: this.documentoPresentado,
-      modalidad:           this.modalidad,
-      aniosBusqueda:       this.aniosBusqueda,
-      rangoBusqueda:       this.rangoBusqueda,
-      horaEntrega:         this.horaEntrega,
-      observaciones:       this.observaciones,
-    };
+    this.mostrarPdf = false;
+    this.urlPdf = null;
+    this.folioGenerado = null;
+    this.lineaCaptura = null;
 
     const payload = {
-      acto_registral_id:       2,
-      tipo_servicio_id:        Number(this.tipoServicioId),
-      ventanilla_id:           1,
+      acto_registral_id: 2,
+      tipo_servicio_id: Number(this.tipoServicioId),
+      ventanilla_id: 1,
       fecha_entrega_resultado: `${fechaStr}T00:00:00Z`,
-      nombre_contribuyente:    this.nombreContribuyente || '',
-      rfc:                     this.rfc           || '',
-      email:                   this.email         || '',
-      codigo_postal:           this.codigoPostal  || '',
-      uso_cfdi:                this.usoCfdi       || 'S01',
-      regimen_fiscal:          this.regimenFiscal || '616',
-      //resultado_busqueda:      JSON.stringify(resultadoBusqueda),
+      nombre_contribuyente: this.nombreContribuyente.trim(),
+      rfc: this.rfc.trim().toUpperCase() || 'XAXX010101000',
+      email: this.email.trim(),
+      codigo_postal: this.codigoPostal.trim(),
+      uso_cfdi: this.usoCfdi || 'S01',
+      regimen_fiscal: this.regimenFiscal || '616',
     };
 
     this.apiService.crearSolicitud(payload).subscribe({
       next: response => {
+        const url = response?.data?.linea_pago?.url_pdf;
+
         this.ngZone.run(() => {
-          this.procesando    = false;
-          this.folioGenerado = response?.data?.solicitud?.folio   ?? null;
-          this.lineaCaptura  = response?.data?.pago?.referencia_pago ?? null;
-          const url          = response?.data?.linea_pago?.url_pdf   ?? null;
+          this.procesando = false;
+          this.folioGenerado = response?.data?.solicitud?.folio ?? null;
+          this.lineaCaptura = response?.data?.pago?.referencia_pago ?? null;
+          if (this.folioGenerado) {
+            this.folios.agregar({
+              folio: this.folioGenerado,
+              lineaCaptura: this.lineaCaptura ?? '',
+              nombre: this.nombreContribuyente.trim(),
+              urlPdf: url ?? '',
+            });
+          }
 
           setTimeout(() => {
             if (url) {
               this.urlPdf = url;
+              this.mostrarPdf = true;
               this.cdr.detectChanges();
-              const v = window.open(
-                url, '_blank',
-                `width=${screen.width},height=${screen.height},top=0,left=0`
-              );
-              v?.addEventListener('load', () => v.print());
+              const ventana = window.open(url, '_blank', `width=${screen.width},height=${screen.height},top=0,left=0`);
+              ventana?.addEventListener('load', () => ventana.print());
             } else {
               alert('Solicitud creada pero no se recibió URL del PDF. Verifica con Finanzas.');
             }
@@ -259,21 +299,33 @@ export class MatrimonioSolicitudComponent implements OnInit {
           }, 0);
         });
       },
+
       error: err => {
         this.ngZone.run(() => {
           this.procesando = false;
           this.cdr.detectChanges();
           const code = err?.error?.error?.code;
-          console.error('[matrimonio] error payload:', payload);
-          console.error('[matrimonio] error response:', err?.error);
-          alert(
-            code === 'ERROR_FINANZAS'
-              ? 'Error de conexión con Finanzas'
-              : err?.error?.error?.message ?? 'Error desconocido'
-          );
+          alert(code === 'ERROR_FINANZAS'
+            ? 'Error de conexión con Finanzas'
+            : err?.error?.error?.message ?? 'Error desconocido');
         });
       },
     });
+  }
+
+  copiarFolio(): void {
+    if (this.folioGenerado) this.folios.copiar(this.folioGenerado);
+  }
+
+  copiarLineaCaptura(): void {
+    if (this.lineaCaptura) this.folios.copiar(this.lineaCaptura);
+  }
+
+  imprimir(): void {
+    if (this.urlPdf) {
+      const ventana = window.open(this.urlPdf, '_blank', 'width=900,height=700');
+      ventana?.addEventListener('load', () => ventana.print());
+    }
   }
 
   regresar(): void {

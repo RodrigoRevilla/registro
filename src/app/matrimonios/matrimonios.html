@@ -1,301 +1,484 @@
-<header class="page-header">
-  <div class="header-inner">
-
-    <div class="header-escudo">
-      <img src="/oaxaca.png" alt="Registro Civil" />
+<header class="topbar">
+  <div class="topbar-inner">
+    <img class="topbar-escudo" src="/oaxaca.png" alt="Registro Civil" />
+    <div class="topbar-text">
+      <span class="topbar-sup">Registro Civil del Estado de Oaxaca</span>
+      <h1>Actas de Matrimonio</h1>
     </div>
-
-    <div class="header-text">
-      <span class="header-supratitle">Gobierno del Estado de Oaxaca</span>
-      <h1>Registro Civil del Estado</h1>
-      <span class="header-sub">Formulario · Acta de Matrimonio</span>
-    </div>
-
-    <div class="header-actions">
-      <button mat-button class="header-action-btn" (click)="goHome()">
-        <mat-icon>arrow_back</mat-icon>
-        Inicio
+    <div class="topbar-actions">
+      @if (puedeEditar()) {
+        <button type="button" class="btn btn-ghost-light" (click)="nuevoRegistro()">
+          <mat-icon>add</mat-icon> Nuevo registro
+        </button>
+      }
+      <button type="button" class="btn btn-ghost-light" (click)="solicitudManual()"
+              matTooltip="Generar la solicitud capturando los datos a mano">
+        <mat-icon>edit_note</mat-icon> Solicitud manual
+      </button>
+      <button type="button" class="btn btn-ghost-light" (click)="goHome()">
+        <mat-icon>arrow_back</mat-icon> Inicio
       </button>
     </div>
-
   </div>
 </header>
-<div class="header-rule"></div>
 
-<div class="container">
-  <form [formGroup]="matrimonioForm" autocomplete="off">
-    <section class="form-section">
-      <div class="section-header">
-        <div class="section-icon"><mat-icon>article</mat-icon></div>
-        <h2 class="section-title">Datos del Acta</h2>
-        <span class="section-num">01 / 03</span>
-      </div>
-      <div class="section-body">
+<main class="page">
 
-        <div class="fields-grid fields-grid--4">
-
-          <div class="field-wrap">
-            <label class="field-label">Entidad</label>
-            <mat-form-field appearance="outline" class="nac-field">
-              <mat-select formControlName="entidad" panelClass="nac-select-panel"
-                          placeholder="— Seleccionar —">
-                <mat-option value="">— Seleccionar —</mat-option>
-                <mat-option value="Aguascalientes">Aguascalientes</mat-option>
-                <mat-option value="Baja California">Baja California</mat-option>
-                <mat-option value="Baja California Sur">Baja California Sur</mat-option>
-                <mat-option value="Campeche">Campeche</mat-option>
-                <mat-option value="Chiapas">Chiapas</mat-option>
-                <mat-option value="Chihuahua">Chihuahua</mat-option>
-                <mat-option value="Ciudad de México">Ciudad de México</mat-option>
-                <mat-option value="Coahuila">Coahuila</mat-option>
-                <mat-option value="Colima">Colima</mat-option>
-                <mat-option value="Durango">Durango</mat-option>
-                <mat-option value="Guanajuato">Guanajuato</mat-option>
-                <mat-option value="Guerrero">Guerrero</mat-option>
-                <mat-option value="Hidalgo">Hidalgo</mat-option>
-                <mat-option value="Jalisco">Jalisco</mat-option>
-                <mat-option value="México">México</mat-option>
-                <mat-option value="Michoacán">Michoacán</mat-option>
-                <mat-option value="Morelos">Morelos</mat-option>
-                <mat-option value="Nayarit">Nayarit</mat-option>
-                <mat-option value="Nuevo León">Nuevo León</mat-option>
-                <mat-option value="Oaxaca">Oaxaca</mat-option>
-                <mat-option value="Puebla">Puebla</mat-option>
-                <mat-option value="Querétaro">Querétaro</mat-option>
-                <mat-option value="Quintana Roo">Quintana Roo</mat-option>
-                <mat-option value="San Luis Potosí">San Luis Potosí</mat-option>
-                <mat-option value="Sinaloa">Sinaloa</mat-option>
-                <mat-option value="Sonora">Sonora</mat-option>
-                <mat-option value="Tabasco">Tabasco</mat-option>
-                <mat-option value="Tamaulipas">Tamaulipas</mat-option>
-                <mat-option value="Tlaxcala">Tlaxcala</mat-option>
-                <mat-option value="Veracruz">Veracruz</mat-option>
-                <mat-option value="Yucatán">Yucatán</mat-option>
-                <mat-option value="Zacatecas">Zacatecas</mat-option>
-              </mat-select>
-            </mat-form-field>
-          </div>
-
-          <div class="field-wrap">
-            <label class="field-label">Municipio</label>
-            <mat-form-field appearance="outline" class="nac-field">
-              <input matInput formControlName="municipio">
-            </mat-form-field>
-          </div>
-
-          <div class="field-wrap">
-            <label class="field-label">Oficialía</label>
-            <mat-form-field appearance="outline" class="nac-field">
-              <input matInput formControlName="oficialia" placeholder="Ej. 01">
-            </mat-form-field>
-          </div>
-
-          <div class="field-wrap">
-            <label class="field-label">Distrito</label>
-            <mat-form-field appearance="outline" class="nac-field">
-              <input matInput formControlName="distrito" placeholder="Ej. 03">
-            </mat-form-field>
-          </div>
-
-        </div>
-
-        <div class="fields-grid fields-grid--4 mt">
-
-          <div class="field-wrap span2">
-            <label class="field-label">Localidad</label>
-            <mat-form-field appearance="outline" class="nac-field">
-              <input matInput formControlName="localidad" placeholder="Nombre de la localidad">
-            </mat-form-field>
-          </div>
-
-          <div class="field-wrap span2">
-            <label class="field-label">CURP Matrimonial</label>
-            <mat-form-field appearance="outline" class="nac-field curp-field">
-              <input matInput formControlName="curpMat"
-                     placeholder="CURP del matrimonio"
-                     (input)="$any($event.target).value = $any($event.target).value.toUpperCase()">
-            </mat-form-field>
-          </div>
-
-        </div>
-
-        <hr class="sub-divider">
-
-        <div class="fields-grid fields-grid--4">
-
-          <div class="field-wrap">
-            <label class="field-label">Año</label>
-            <mat-form-field appearance="outline" class="nac-field">
-              <input matInput formControlName="anio" placeholder="AAAA"
-                     name="anio-mat" autocomplete="off">
-            </mat-form-field>
-          </div>
-
-          <div class="field-wrap">
-            <label class="field-label">Acta</label>
-            <mat-form-field appearance="outline" class="nac-field">
-              <input matInput formControlName="acta" placeholder="Núm. de acta">
-            </mat-form-field>
-          </div>
-
-          <div class="field-wrap">
-            <label class="field-label">EnDoc</label>
-            <mat-form-field appearance="outline" class="nac-field">
-              <input matInput formControlName="enDoc">
-            </mat-form-field>
-          </div>
-
-          <div class="field-wrap">
-            <label class="field-label">Fecha de Registro</label>
-            <mat-form-field appearance="outline" class="nac-field">
-              <input matInput [matDatepicker]="pickerReg" formControlName="fechaRegistro"
-                     name="fecha-registro-mat" autocomplete="off">
-              <mat-datepicker-toggle matIconSuffix [for]="pickerReg"></mat-datepicker-toggle>
-              <mat-datepicker #pickerReg></mat-datepicker>
-            </mat-form-field>
-          </div>
-
-        </div>
-
-      </div>
-    </section>
-
-    <section class="form-section">
-      <div class="section-header">
-        <div class="section-icon"><mat-icon>people</mat-icon></div>
-        <h2 class="section-title">Datos de los Contrayentes</h2>
-        <span class="section-num">02 / 03</span>
-      </div>
-      <div class="section-body">
-
-        <div class="contrayentes-grid">
-          <div class="contrayente-card">
-            <span class="contrayente-label">Contrayente 1</span>
-
-            <div class="fields-grid fields-grid--3" style="margin-top: 14px;">
-              <div class="field-wrap">
-                <label class="field-label">Nombre(s)</label>
-                <mat-form-field appearance="outline" class="nac-field">
-                  <input matInput formControlName="nombre1" placeholder="Nombre(s)">
-                </mat-form-field>
-              </div>
-              <div class="field-wrap">
-                <label class="field-label">Apellido Paterno</label>
-                <mat-form-field appearance="outline" class="nac-field">
-                  <input matInput formControlName="apellidoPaterno1">
-                </mat-form-field>
-              </div>
-              <div class="field-wrap">
-                <label class="field-label">Apellido Materno</label>
-                <mat-form-field appearance="outline" class="nac-field">
-                  <input matInput formControlName="apellidoMaterno1">
-                </mat-form-field>
-              </div>
-            </div>
-
-            <div class="fields-grid fields-grid--2 mt">
-              <div class="field-wrap">
-                <label class="field-label">CRIP</label>
-                <mat-form-field appearance="outline" class="nac-field curp-field">
-                  <input matInput formControlName="crip1"
-                         (input)="$any($event.target).value = $any($event.target).value.toUpperCase()">
-                </mat-form-field>
-              </div>
-              <div class="field-wrap">
-                <label class="field-label">Fecha de Nacimiento</label>
-                <mat-form-field appearance="outline" class="nac-field">
-                  <input matInput [matDatepicker]="pickerNac1" formControlName="fechaNacimiento1"
-                         name="fecha-nac-1" autocomplete="off">
-                  <mat-datepicker-toggle matIconSuffix [for]="pickerNac1"></mat-datepicker-toggle>
-                  <mat-datepicker #pickerNac1></mat-datepicker>
-                </mat-form-field>
-              </div>
-            </div>
-
-          </div>
-
-          <div class="contrayente-card">
-            <span class="contrayente-label">Contrayente 2</span>
-
-            <div class="fields-grid fields-grid--3" style="margin-top: 14px;">
-              <div class="field-wrap">
-                <label class="field-label">Nombre(s)</label>
-                <mat-form-field appearance="outline" class="nac-field">
-                  <input matInput formControlName="nombre2" placeholder="Nombre(s)">
-                </mat-form-field>
-              </div>
-              <div class="field-wrap">
-                <label class="field-label">Apellido Paterno</label>
-                <mat-form-field appearance="outline" class="nac-field">
-                  <input matInput formControlName="apellidoPaterno2">
-                </mat-form-field>
-              </div>
-              <div class="field-wrap">
-                <label class="field-label">Apellido Materno</label>
-                <mat-form-field appearance="outline" class="nac-field">
-                  <input matInput formControlName="apellidoMaterno2">
-                </mat-form-field>
-              </div>
-            </div>
-
-            <div class="fields-grid fields-grid--3 mt">
-              <div class="field-wrap">
-                <label class="field-label">CRIP</label>
-                <mat-form-field appearance="outline" class="nac-field curp-field">
-                  <input matInput formControlName="crip2"
-                         (input)="$any($event.target).value = $any($event.target).value.toUpperCase()">
-                </mat-form-field>
-              </div>
-              <div class="field-wrap">
-                <label class="field-label">Fecha de Nacimiento</label>
-                <mat-form-field appearance="outline" class="nac-field">
-                  <input matInput [matDatepicker]="pickerNac2" formControlName="fechaNacimiento2"
-                         name="fecha-nac-2" autocomplete="off">
-                  <mat-datepicker-toggle matIconSuffix [for]="pickerNac2"></mat-datepicker-toggle>
-                  <mat-datepicker #pickerNac2></mat-datepicker>
-                </mat-form-field>
-              </div>
-              <div class="field-wrap">
-                <label class="field-label">Status</label>
-                <mat-form-field appearance="outline" class="nac-field">
-                  <mat-select formControlName="status" panelClass="nac-select-panel">
-                    <mat-option value="">— Seleccionar —</mat-option>
-                    <mat-option value="Vigente">Vigente</mat-option>
-                    <mat-option value="Cancelada">Cancelada</mat-option>
-                    <mat-option value="Rectificada">Rectificada</mat-option>
-                    <mat-option value="Divorciada">Divorciada</mat-option>
-                    <mat-option value="Viuda">Viuda</mat-option>
-                  </mat-select>
-                </mat-form-field>
-              </div>
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-    </section>
-
-    <div class="action-bar">
-      <button mat-button class="btn-search" type="button" (click)="buscarActa()">
-        <mat-icon>search</mat-icon>
-        Buscar Registro
+  <section class="card search-card">
+    <div class="search-tabs" role="tablist" aria-label="Tipo de búsqueda">
+      <span class="tabs-label">Buscar por</span>
+      <button type="button" role="tab" class="modo" [class.on]="modoBusqueda() === 'personales'"
+              [attr.aria-selected]="modoBusqueda() === 'personales'" (click)="cambiarModo('personales')">
+        <mat-icon>person_search</mat-icon>
+        <span class="modo-txt">
+          <strong>Datos personales</strong>
+          <small>Nombre, apellidos y fecha de nacimiento de los contrayentes</small>
+        </span>
+        @if (modoBusqueda() === 'personales') { <mat-icon class="modo-check">check_circle</mat-icon> }
       </button>
-      <button mat-button class="btn-generar" type="button" (click)="generarSolicitud()"
-              [disabled]="procesando">
-        <mat-icon>credit_card</mat-icon>
-        {{ procesando ? 'Generando...' : 'Generar Hoja de Pago' }}
+      <button type="button" role="tab" class="modo" [class.on]="modoBusqueda() === 'registrales'"
+              [attr.aria-selected]="modoBusqueda() === 'registrales'" (click)="cambiarModo('registrales')">
+        <mat-icon>article</mat-icon>
+        <span class="modo-txt">
+          <strong>Datos registrales</strong>
+          <small>Distrito, municipio, localidad, oficialía, año, acta y CURP matrimonial</small>
+        </span>
+        @if (modoBusqueda() === 'registrales') { <mat-icon class="modo-check">check_circle</mat-icon> }
       </button>
     </div>
 
-  </form>
-</div>
+    <form [formGroup]="busquedaForm" (ngSubmit)="buscarActa()" autocomplete="off">
 
-<button mat-button class="btn-clear-fab" type="button" (click)="limpiarFormulario()"
-        title="Limpiar formulario">
-  <mat-icon>delete_sweep</mat-icon>
-  <span class="fab-label">Limpiar</span>
-</button>
+      @if (modoBusqueda() === 'registrales') {
+        <div class="search-grid search-grid--mat">
+          <label class="f">
+            <span>Entidad</span>
+            <select formControlName="entidad">
+              @for (e of entidadesInegi; track e.clave) {
+                <option [ngValue]="e.clave">{{ e.clave.toString().padStart(2, '0') }} · {{ e.nombre }}</option>
+              }
+            </select>
+          </label>
+          <label class="f">
+            <span>Distrito</span>
+            <input formControlName="distrito" placeholder="Nombre del distrito" [matAutocomplete]="acDisBus">
+            <mat-autocomplete #acDisBus="matAutocomplete">
+              @for (d of distritosBusqueda(); track d.id_distrito) {
+                <mat-option [value]="d.nombre">{{ d.nombre }}</mat-option>
+              }
+            </mat-autocomplete>
+          </label>
+          <div class="f f-mun">
+            <span>Municipio</span>
+            <div class="campo-ayuda" cdkOverlayOrigin #origenMun="cdkOverlayOrigin">
+              <input formControlName="municipio" placeholder="Número o nombre" [matAutocomplete]="acMunBus">
+              <button type="button" class="btn-ayuda" [class.on]="ayudaMunicipios()"
+                      [disabled]="entidadBusqueda() !== entidadDefault"
+                      (click)="abrirAyudaMunicipios()" matTooltip="Ver lista de municipios">
+                <mat-icon>format_list_bulleted</mat-icon>
+              </button>
+            </div>
+            <mat-autocomplete #acMunBus="matAutocomplete">
+              @for (m of municipiosBusqueda(); track m.id_municipio) {
+                <mat-option [value]="m.nombre">
+                  <span class="opt-num">{{ numeroMunicipio(m) }}</span> {{ m.nombre }}
+                </mat-option>
+              }
+            </mat-autocomplete>
 
-<span class="watermark">Registro Civil</span>
+            <ng-template cdkConnectedOverlay
+                         [cdkConnectedOverlayOrigin]="origenMun"
+                         [cdkConnectedOverlayOpen]="ayudaMunicipios()"
+                         [cdkConnectedOverlayHasBackdrop]="true"
+                         cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
+                         [cdkConnectedOverlayMinWidth]="340"
+                         [cdkConnectedOverlayOffsetY]="4"
+                         (backdropClick)="cerrarAyudaMunicipios()"
+                         (detach)="cerrarAyudaMunicipios()">
+              <div class="ayuda-panel" role="dialog" aria-label="Lista de municipios">
+                <div class="ayuda-buscar">
+                  <mat-icon>search</mat-icon>
+                  <input #ayudaInput placeholder="Buscar por número o nombre"
+                         [value]="filtroAyuda()"
+                         (input)="filtroAyuda.set($any($event.target).value)"
+                         (keydown.enter)="$event.preventDefault(); elegirPrimerMunicipio()">
+                </div>
+                <div class="ayuda-lista">
+                  @for (m of municipiosAyuda(); track m.id_municipio) {
+                    <button type="button" class="ayuda-item" (click)="elegirMunicipio(m)">
+                      <span class="num">{{ numeroMunicipio(m) }}</span>
+                      <span class="nom">{{ m.nombre }}</span>
+                    </button>
+                  } @empty {
+                    <div class="ayuda-vacio">Sin coincidencias</div>
+                  }
+                </div>
+                <div class="ayuda-pie">{{ municipiosAyuda().length }} de {{ municipios().length }} municipios</div>
+              </div>
+            </ng-template>
+          </div>
+          <div class="f f-mun">
+            <span>Localidad</span>
+            <div class="campo-ayuda" cdkOverlayOrigin #origenLoc="cdkOverlayOrigin">
+              <input formControlName="localidad" [matAutocomplete]="acLocBus"
+                     [placeholder]="municipioElegido() ? (cargandoLocalidades() ? 'Cargando…' : 'Número o nombre') : 'Elige municipio'">
+              <button type="button" class="btn-ayuda" [class.on]="ayudaLocalidades()"
+                      [disabled]="!municipioElegido() || !localidades().length"
+                      (click)="abrirAyudaLocalidades()" matTooltip="Ver lista de localidades">
+                <mat-icon>format_list_bulleted</mat-icon>
+              </button>
+            </div>
+            <mat-autocomplete #acLocBus="matAutocomplete" [panelWidth]="340">
+              @for (l of localidadesBusqueda(); track l.clave_local) {
+                <mat-option [value]="l.descripcion">
+                  <span class="opt-num">{{ numeroLocalidad(l) }}</span> {{ l.descripcion }}
+                </mat-option>
+              }
+            </mat-autocomplete>
+
+            <ng-template cdkConnectedOverlay
+                         [cdkConnectedOverlayOrigin]="origenLoc"
+                         [cdkConnectedOverlayOpen]="ayudaLocalidades()"
+                         [cdkConnectedOverlayHasBackdrop]="true"
+                         cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
+                         [cdkConnectedOverlayMinWidth]="340"
+                         [cdkConnectedOverlayOffsetY]="4"
+                         (backdropClick)="cerrarAyudaLocalidades()"
+                         (detach)="cerrarAyudaLocalidades()">
+              <div class="ayuda-panel" role="dialog" aria-label="Lista de localidades">
+                <div class="ayuda-buscar">
+                  <mat-icon>search</mat-icon>
+                  <input #ayudaLocInput placeholder="Buscar por número o nombre"
+                         [value]="filtroAyudaLoc()"
+                         (input)="filtroAyudaLoc.set($any($event.target).value)"
+                         (keydown.enter)="$event.preventDefault(); elegirPrimeraLocalidad()">
+                </div>
+                <div class="ayuda-lista">
+                  @for (l of localidadesAyuda(); track l.clave_local) {
+                    <button type="button" class="ayuda-item" (click)="elegirLocalidad(l)">
+                      <span class="num num-loc">{{ numeroLocalidad(l) }}</span>
+                      <span class="nom">{{ l.descripcion }}</span>
+                    </button>
+                  } @empty {
+                    <div class="ayuda-vacio">Sin coincidencias</div>
+                  }
+                </div>
+                <div class="ayuda-pie">{{ localidadesAyuda().length }} de {{ localidades().length }} localidades · {{ municipioElegido()?.nombre }}</div>
+              </div>
+            </ng-template>
+          </div>
+          <label class="f">
+            <span>Oficialía</span>
+            <input formControlName="oficialia" inputmode="numeric">
+          </label>
+          <label class="f">
+            <span>Año</span>
+            <input formControlName="anioRegistro" inputmode="numeric" maxlength="4" class="mono">
+          </label>
+          <label class="f">
+            <span>Fecha de registro</span>
+            <input type="date" formControlName="fechaRegistro">
+          </label>
+          <label class="f">
+            <span>Núm. acta</span>
+            <input formControlName="numeroActa" inputmode="numeric" class="mono">
+          </label>
+          <label class="f f-curp">
+            <span>CURP matrimonial</span>
+            <input formControlName="curpMatrimonial" class="mono" maxlength="20">
+          </label>
+          <div class="search-actions">
+            <button type="submit" class="btn btn-primary" [disabled]="buscando()">
+              @if (buscando()) { <mat-spinner diameter="14"></mat-spinner> } @else { <mat-icon>search</mat-icon> }
+              Buscar
+            </button>
+            <button type="button" class="btn btn-icon" (click)="limpiarBusqueda()" matTooltip="Limpiar búsqueda">
+              <mat-icon>backspace</mat-icon>
+            </button>
+          </div>
+        </div>
+      } @else {
+        <div class="search-grid search-grid--per">
+          <span class="tag-row">El contrayente</span>
+          <label class="f">
+            <span>Nombre(s)</span>
+            <input formControlName="nombre1">
+          </label>
+          <label class="f">
+            <span>Apellido paterno</span>
+            <input formControlName="apellidoPaterno1">
+          </label>
+          <label class="f">
+            <span>Apellido materno</span>
+            <input formControlName="apellidoMaterno1">
+          </label>
+          <label class="f">
+            <span>Fecha de nacimiento</span>
+            <input type="date" formControlName="fechaNacimiento1">
+          </label>
+          <div class="search-actions">
+            <button type="submit" class="btn btn-primary" [disabled]="buscando()">
+              @if (buscando()) { <mat-spinner diameter="14"></mat-spinner> } @else { <mat-icon>search</mat-icon> }
+              Buscar
+            </button>
+            <button type="button" class="btn btn-icon" (click)="limpiarBusqueda()" matTooltip="Limpiar búsqueda">
+              <mat-icon>backspace</mat-icon>
+            </button>
+          </div>
+
+          @if (incluirContrayente2()) {
+            <span class="tag-row">La contrayente</span>
+            <label class="f">
+              <span>Nombre(s)</span>
+              <input formControlName="nombre2">
+            </label>
+            <label class="f">
+              <span>Apellido paterno</span>
+              <input formControlName="apellidoPaterno2">
+            </label>
+            <label class="f">
+              <span>Apellido materno</span>
+              <input formControlName="apellidoMaterno2">
+            </label>
+            <label class="f">
+              <span>Fecha de nacimiento</span>
+              <input type="date" formControlName="fechaNacimiento2">
+            </label>
+            <span class="fill"></span>
+          }
+        </div>
+
+        <div class="toggles">
+          <span>Incluir datos de:</span>
+          <button type="button" class="chip-toggle" [class.on]="incluirContrayente2()" (click)="toggleContrayente2()">
+            <mat-icon>{{ incluirContrayente2() ? 'check' : 'add' }}</mat-icon> La contrayente
+          </button>
+        </div>
+      }
+
+    </form>
+  </section>
+
+  @if (busquedaHecha() || buscando()) {
+    <section class="card results-card">
+      <div class="card-bar">
+        <span class="card-title">
+          Resultados
+          <span class="count">{{ total() }}</span>
+        </span>
+        @if (totalPaginas() > 1) {
+          <div class="pager">
+            <button type="button" class="btn btn-icon" (click)="irAPagina(-1)" [disabled]="paginaActual() === 1 || buscando()">
+              <mat-icon>chevron_left</mat-icon>
+            </button>
+            <span>{{ paginaActual() }} / {{ totalPaginas() }}</span>
+            <button type="button" class="btn btn-icon" (click)="irAPagina(1)" [disabled]="paginaActual() === totalPaginas() || buscando()">
+              <mat-icon>chevron_right</mat-icon>
+            </button>
+          </div>
+        }
+      </div>
+
+      @if (buscando()) {
+        <div class="estado"><mat-spinner diameter="22"></mat-spinner> Consultando acervo…</div>
+      } @else if (mensajeError()) {
+        <div class="estado estado-error"><mat-icon>error_outline</mat-icon> {{ mensajeError() }}</div>
+      } @else if (resultados().length === 0) {
+        <div class="estado"><mat-icon>search_off</mat-icon> Sin coincidencias. Prueba con menos criterios.</div>
+      } @else {
+        <div class="tabla-wrap">
+          <table class="tabla">
+            <thead>
+              <tr>
+                <th>El contrayente</th>
+                <th>La contrayente</th>
+                <th class="num">Acta</th>
+                <th class="num">Año</th>
+                <th class="num">Of.</th>
+                <th>Municipio</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (r of resultados(); track r.id) {
+                <tr (click)="verDetalle(r)" [class.activo]="r.id === registroId()">
+                  <td class="nombre">{{ contrayente1De(r) }}</td>
+                  <td class="nombre">{{ contrayente2De(r) }}</td>
+                  <td class="num mono">{{ actaDe(r) }}</td>
+                  <td class="num">{{ r.anio_registro ?? '—' }}</td>
+                  <td class="num">{{ r.oficialia ?? '—' }}</td>
+                  <td>{{ municipioDe(r) }}</td>
+                  <td class="acciones">
+                    <button type="button" class="btn btn-icon" matTooltip="Ver detalle"
+                            (click)="$event.stopPropagation(); verDetalle(r)">
+                      <mat-icon>visibility</mat-icon>
+                    </button>
+                    @if (puedeEditar()) {
+                      <button type="button" class="btn btn-icon" matTooltip="Editar"
+                              (click)="$event.stopPropagation(); editarRegistro(r)">
+                        <mat-icon>edit</mat-icon>
+                      </button>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+  }
+
+  @if (mostrarCaptura() && puedeEditar()) {
+    <section class="card captura-card" #capturaRef>
+      <div class="card-bar card-bar--dark">
+        <span class="card-title">
+          {{ registroId() ? 'Editar registro' : 'Nuevo registro' }}
+          @if (registroId()) { <span class="count">#{{ registroId() }}</span> }
+        </span>
+        <div class="bar-actions">
+          <button type="button" class="btn btn-light" (click)="guardarRegistro()" [disabled]="guardando()">
+            <mat-icon>save</mat-icon>
+            {{ guardando() ? 'Guardando…' : (registroId() ? 'Actualizar' : 'Guardar') }}
+          </button>
+          <button type="button" class="btn btn-icon btn-icon-light" (click)="cerrarCaptura()" matTooltip="Cerrar">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <form [formGroup]="matrimonioForm" autocomplete="off" class="captura">
+
+        <fieldset class="grupo">
+          <legend>Acta</legend>
+          <div class="g12">
+            <label class="f c2">
+              <span>Entidad <i>*</i></span>
+              <select formControlName="entidad">
+                <option value="">—</option>
+                @for (e of entidades; track e) { <option [value]="e">{{ e }}</option> }
+              </select>
+            </label>
+            <label class="f c2">
+              <span>Distrito</span>
+              <input formControlName="distrito" [matAutocomplete]="acDist">
+              <mat-autocomplete #acDist="matAutocomplete">
+                @for (d of distritosFiltrados(); track d.id_distrito) {
+                  <mat-option [value]="d.nombre">{{ d.nombre }}</mat-option>
+                }
+              </mat-autocomplete>
+            </label>
+            <div class="f c3">
+              <span>Municipio <i>*</i></span>
+              <div class="par">
+                <input formControlName="municipioId" class="cod mono" inputmode="numeric" placeholder="Núm."
+                       [matAutocomplete]="acMun" matTooltip="Escribe el número o el nombre y elige de la lista">
+                <input formControlName="municipio" readonly class="ro" placeholder="Del catálogo"
+                       matTooltip="Se llena del catálogo al cambiar el número">
+              </div>
+              <mat-autocomplete #acMun="matAutocomplete">
+                @for (m of municipiosFiltrados(); track m.id_municipio) {
+                  <mat-option [value]="'' + m.id_municipio">
+                    <span class="opt-num">{{ numeroMunicipio(m) }}</span> {{ m.nombre }}
+                  </mat-option>
+                }
+              </mat-autocomplete>
+            </div>
+            <label class="f c1">
+              <span>Oficialía <i>*</i></span>
+              <input formControlName="oficialia" inputmode="numeric">
+            </label>
+            <label class="f c2">
+              <span>Acta <i>*</i></span>
+              <input formControlName="numeroActa" class="mono">
+            </label>
+            <label class="f c1">
+              <span>Foja</span>
+              <input formControlName="foja">
+            </label>
+            <label class="f c1">
+              <span>Libro</span>
+              <input formControlName="libro">
+            </label>
+
+            <label class="f c2">
+              <span>Localidad</span>
+              <input formControlName="localidad">
+            </label>
+            <label class="f c2">
+              <span>Fecha de registro</span>
+              <input type="date" formControlName="fechaRegistro">
+            </label>
+            <label class="f c1">
+              <span>Año</span>
+              <input formControlName="anioRegistro" maxlength="4">
+            </label>
+            <label class="f c3">
+              <span>CURP matrimonial</span>
+              <input formControlName="curpMatrimonial" class="mono" maxlength="20">
+            </label>
+            <label class="f c2">
+              <span>Régimen</span>
+              <select formControlName="regimen">
+                <option value="">—</option>
+                <option value="SOCIEDAD CONYUGAL">Sociedad conyugal</option>
+                <option value="SEPARACION DE BIENES">Separación de bienes</option>
+              </select>
+            </label>
+            <label class="f c2">
+              <span>Estatus</span>
+              <select formControlName="status">
+                <option value="">—</option>
+                <option value="VIGENTE">Vigente</option>
+                <option value="CANCELADA">Cancelada</option>
+                <option value="RECTIFICADA">Rectificada</option>
+              </select>
+            </label>
+          </div>
+        </fieldset>
+
+        @for (n of ['1', '2']; track n) {
+          <fieldset class="grupo">
+            <legend>{{ n === '1' ? 'El contrayente' : 'La contrayente' }}</legend>
+            <div class="g12">
+              <label class="f c3">
+                <span>Nombre(s) <i>*</i></span>
+                <input [formControlName]="'nombre' + n">
+              </label>
+              <label class="f c3">
+                <span>Apellido paterno <i>*</i></span>
+                <input [formControlName]="'apellidoPaterno' + n">
+              </label>
+              <label class="f c3">
+                <span>Apellido materno</span>
+                <input [formControlName]="'apellidoMaterno' + n">
+              </label>
+              <div class="f c3">
+                <span>Sexo</span>
+                <div class="seg">
+                  <button type="button" [class.on]="matrimonioForm.value['sexo' + n] === 'M'" (click)="setSexo($any('sexo' + n), 'M')">Masculino</button>
+                  <button type="button" [class.on]="matrimonioForm.value['sexo' + n] === 'F'" (click)="setSexo($any('sexo' + n), 'F')">Femenino</button>
+                </div>
+              </div>
+
+              <label class="f c2">
+                <span>Fecha de nacimiento</span>
+                <input type="date" [formControlName]="'fechaNacimiento' + n">
+              </label>
+              <label class="f c1">
+                <span>Edad</span>
+                <input type="number" [formControlName]="'edad' + n" min="0" max="120">
+              </label>
+              <label class="f c3">
+                <span>Nacionalidad</span>
+                <input [formControlName]="'nacionalidad' + n">
+              </label>
+            </div>
+          </fieldset>
+        }
+
+      </form>
+    </section>
+  }
+
+</main>

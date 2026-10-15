@@ -1,4 +1,4 @@
-import { Component, OnInit, NgZone, ChangeDetectorRef, signal } from '@angular/core';
+import { Component, OnInit, NgZone, ChangeDetectorRef, effect, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -8,7 +8,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ApiService, RegistroNacimiento } from '../http';
 import { AuthService } from '../auth';
-import { fechaLocal, nombreCompleto } from '../registro-nacimiento.mapper';
+import { fechaLocal, municipioVisible, nombreCompleto, normalizar } from '../registro-nacimiento.mapper';
+import { CatalogoMunicipiosService } from '../catalogo-municipios';
 import { FoliosRecientesService } from '../folios-recientes';
 
 @Component({
@@ -96,7 +97,7 @@ export class CertificacionComponent implements OnInit {
   today = this.fechaHoy();
   fechaEntrega = '';
   readonly avisoFechaEntrega = signal('');
-  horaEntrega = '';
+  readonly horaEntrega = '11:00';
   nombreContribuyente = '';
   usoCfdi = 'S01';
   rfc = 'XAXX010101000';
@@ -118,7 +119,24 @@ export class CertificacionComponent implements OnInit {
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
     public folios: FoliosRecientesService,
-  ) { }
+    private catMun: CatalogoMunicipiosService,
+  ) {
+    effect(() => {
+      if (this.catMun.cargado()) this.aplicarMunicipios();
+    });
+  }
+
+  private registroOrigen: RegistroNacimiento | null = null;
+
+  private aplicarMunicipios(): void {
+    const r = this.registroOrigen;
+    if (!r) return;
+    const reg = municipioVisible(r.origen, r.municipio_registro_historico_id, r.municipio_registro_historico_texto, id => this.catMun.nombre(id));
+    const nac = municipioVisible(r.origen, r.municipio_nacimiento_historico_id, r.municipio_nacimiento_historico_texto, id => this.catMun.nombre(id));
+    this.municipioNombre = normalizar(reg.nombre);
+    this.municipioNacNombre = normalizar(nac.nombre);
+    this.cdr.markForCheck();
+  }
 
   ngOnInit(): void {
     document.documentElement.style.setProperty('--disable-anim', '1');
@@ -182,6 +200,9 @@ export class CertificacionComponent implements OnInit {
     this.padre = nombreCompleto(r.nombre_padre, r.apellido_paterno_padre, r.apellido_materno_padre);
     this.madre = nombreCompleto(r.nombre_madre, r.apellido_paterno_madre, r.apellido_materno_madre);
     this.nombreContribuyente = this.nombreRegistrado;
+    this.registroOrigen = r;
+    this.catMun.cargar();
+    this.aplicarMunicipios();
   }
 
   private cargarCatalogos(): void {
@@ -319,15 +340,6 @@ export class CertificacionComponent implements OnInit {
     this.avisoFechaEntrega.set(
       `Era ${nombreDia}; se pasó al lunes ${lunes.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit' })}.`
     );
-  }
-
-  autoHoraEntrega(): void {
-    if (!this.horaEntrega) return;
-    const [horas, minutos] = this.horaEntrega.split(':').map(Number);
-    if (horas < 12) {
-      const pm = horas + 12;
-      this.horaEntrega = `${pm.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}`;
-    }
   }
 
   copiarFolio(): void {

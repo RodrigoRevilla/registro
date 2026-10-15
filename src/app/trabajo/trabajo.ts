@@ -87,6 +87,10 @@ const ESTADOS_POR_FILTRO: Record<string, string[]> = {
   todos:        ['PENDIENTE_ASIGNACION'],
 };
 
+const ESTADOS_PAGADOS = [...new Set(Object.values(ESTADOS_POR_FILTRO).flat())];
+
+const NO_PAGADOS: Record<number, string> = { 1: 'RECIBIDA', 2: 'PENDIENTE_PAGO' };
+
 const SK_FOLIO_ACTUAL = 'hv_folio_actual';
 const SK_FOLIO_USADOS = 'hv_folios_usados';
 const SK_BLOQUEADO    = 'hv_bloqueado';
@@ -140,9 +144,11 @@ export class TrabajoComponent implements OnInit {
   private catalogoEstados:   Catalogo[] = [];
 
   readonly textoFolio = signal('');
+  private readonly foliosPagados = signal<{ folio: string; nombre: string }[]>([]);
   readonly sugerenciasFolio = computed(() => {
     const t = this.textoFolio().trim().toUpperCase();
-    return this.folios.lista().filter(f => !t || f.folio.toUpperCase().includes(t)).slice(0, 8);
+    if (!t) return [];
+    return this.foliosPagados().filter(f => f.folio.toUpperCase().includes(t)).slice(0, 8);
   });
 
   private leerUsados(): Set<number> {
@@ -209,6 +215,27 @@ export class TrabajoComponent implements OnInit {
   async ngOnInit() {
     this.restaurarDesdeSession();
     await this.cargarCatalogos();
+    this.cargarSugerencias();
+  }
+
+  private async cargarSugerencias(): Promise<void> {
+    const resultados = await Promise.all(ESTADOS_PAGADOS.map(clave => this.cargarPorEstado(clave)));
+    const vistos = new Set<string>();
+    const lista: { folio: string; nombre: string }[] = [];
+    for (const s of resultados.flat()) {
+      if (!this.estaPagada(s) || vistos.has(s.folio)) continue;
+      vistos.add(s.folio);
+      const acto = this.catalogoActos.find(a => a.id === s.acto_registral_id)?.nombre ?? '';
+      const estado = this.catalogoEstados.find(e => e.id === s.estado_id)?.nombre ?? '';
+      lista.push({ folio: s.folio, nombre: [acto, estado].filter(Boolean).join(' · ') });
+    }
+    lista.sort((a, b) => b.folio.localeCompare(a.folio));
+    this.foliosPagados.set(lista);
+  }
+
+  private estaPagada(s: Solicitud): boolean {
+    const clave = this.catalogoEstados.find(e => e.id === s.estado_id)?.clave ?? NO_PAGADOS[s.estado_id] ?? '';
+    return clave !== 'RECIBIDA' && clave !== 'PENDIENTE_PAGO';
   }
 
   establecerFolioInicial(): void {
@@ -328,7 +355,12 @@ export class TrabajoComponent implements OnInit {
         solicitudes = resultados.flat();
       }
 
-      this.allPayments = solicitudes.map(s => this.toPayment(s));
+      const pagadas = solicitudes.filter(s => this.estaPagada(s));
+      if (folio && solicitudes.length && !pagadas.length) {
+        this.mensajeError = `El folio ${folio} aún no está pagado. Aparecerá aquí cuando se confirme el pago.`;
+      }
+
+      this.allPayments = pagadas.map(s => this.toPayment(s));
       this.recalcularConteos();
       this.aplicarFiltros();
     } catch (err) {

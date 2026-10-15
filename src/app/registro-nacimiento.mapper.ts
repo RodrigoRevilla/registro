@@ -45,6 +45,7 @@ export const ENTIDADES_INEGI: { clave: number; nombre: string }[] = [
 
 export interface ActaForm {
   entidad: string;
+  municipioId: string;
   municipio: string;
   oficialia: string;
   distrito: string;
@@ -57,6 +58,7 @@ export interface ActaForm {
   curp_regciv: string;
   libro: string;
   entidadNacimiento: string;
+  municipioNacimientoId: string;
   municipioNacimiento: string;
   distritoNacimiento: string;
   localidadNacimiento: string;
@@ -77,6 +79,34 @@ export interface ActaForm {
   apellidoMaternoMadre: string;
   edadMadre: number | null;
   nacionalidadMadre: string;
+}
+
+export function esSiac(origen: string | null | undefined): boolean {
+  return normalizar(origen) === 'SIAC';
+}
+
+export interface MunicipioVisible {
+  numero: string;
+  nombre: string;
+}
+
+export function municipioVisible(
+  origen: string | null | undefined,
+  id: number | null | undefined,
+  texto: string | null | undefined,
+  nombreCatalogo: (id: number) => string,
+): MunicipioVisible {
+  const numero = id != null ? `${id}` : '';
+  const delCatalogo = id != null ? normalizar(nombreCatalogo(id)) : '';
+  const nombre = esSiac(origen)
+    ? delCatalogo
+    : ((texto ?? '').trim() || delCatalogo);
+  return { numero, nombre };
+}
+
+export function municipioTexto(m: MunicipioVisible): string {
+  if (m.numero && m.nombre) return `${m.numero.padStart(3, '0')} · ${m.nombre}`;
+  return m.nombre || (m.numero ? m.numero.padStart(3, '0') : '');
 }
 
 export function normalizar(txt: string | null | undefined): string {
@@ -136,6 +166,7 @@ export function registroAFormulario(r: RegistroNacimiento): ActaForm {
   const fechaNac = fechaDesdePartes(r.anio_nacimiento, r.mes_nacimiento, r.dia_nacimiento);
   return {
     entidad: entidadDesdeTexto(r.estado_registro_historico_texto),
+    municipioId: r.municipio_registro_historico_id != null ? `${r.municipio_registro_historico_id}` : '',
     municipio: r.municipio_registro_historico_texto ?? '',
     oficialia: r.oficialia != null ? `${r.oficialia}` : '',
     distrito: r.distrito_registro_historico_texto ?? '',
@@ -148,6 +179,7 @@ export function registroAFormulario(r: RegistroNacimiento): ActaForm {
     curp_regciv: r.crip_ed ?? '',
     libro: '',
     entidadNacimiento: entidadDesdeTexto(r.estado_nacimiento_historico_texto),
+    municipioNacimientoId: r.municipio_nacimiento_historico_id != null ? `${r.municipio_nacimiento_historico_id}` : '',
     municipioNacimiento: r.municipio_nacimiento_historico_texto ?? '',
     distritoNacimiento: r.distrito_nacimiento_historico_texto ?? '',
     localidadNacimiento: r.localidad_nacimiento_historica_texto ?? '',
@@ -204,6 +236,7 @@ export function formularioARegistro(f: any): Partial<RegistroNacimiento> {
     curp: txt(f.curp),
     crip_ed: txt(f.curp_regciv),
     estado_registro_historico_texto: txt(f.entidad),
+    municipio_registro_historico_id: entero(f.municipioId),
     municipio_registro_historico_texto: txt(f.municipio),
     distrito_registro_historico_texto: txt(f.distrito),
     localidad_registro_historica_texto: txt(f.localidad),
@@ -223,6 +256,7 @@ export function formularioARegistro(f: any): Partial<RegistroNacimiento> {
     anio_nacimiento: fNac ? fNac.getFullYear() : null,
     hora_nacimiento: hora ? (hora.length === 5 ? `${hora}:00` : hora) : null,
     estado_nacimiento_historico_texto: txt(f.entidadNacimiento),
+    municipio_nacimiento_historico_id: entero(f.municipioNacimientoId),
     municipio_nacimiento_historico_texto: txt(f.municipioNacimiento),
     distrito_nacimiento_historico_texto: txt(f.distritoNacimiento),
     localidad_nacimiento_historica_texto: txt(f.localidadNacimiento),

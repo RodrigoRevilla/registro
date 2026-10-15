@@ -7,9 +7,12 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService, RegistroNacimiento } from '../http';
 import { AuthService } from '../auth';
+import { CatalogoMunicipiosService } from '../catalogo-municipios';
 import {
   estadoVitalLabel,
   fechaLocal,
+  municipioTexto,
+  municipioVisible,
   nombreCompleto,
   sexoLabel,
 } from '../registro-nacimiento.mapper';
@@ -80,14 +83,32 @@ export class ActaDetalleComponent implements OnInit {
     private route: ActivatedRoute,
     private api: ApiService,
     private auth: AuthService,
+    private catMun: CatalogoMunicipiosService,
     @Optional() @Inject(MAT_DIALOG_DATA) private data: ActaDetalleData | null,
   ) {}
+
+  municipioRegistro(): string {
+    const r = this.registro();
+    if (!r) return '—';
+    return municipioTexto(municipioVisible(
+      r.origen, r.municipio_registro_historico_id, r.municipio_registro_historico_texto, id => this.catMun.nombre(id)
+    )) || '—';
+  }
+
+  municipioNacimiento(): string {
+    const r = this.registro();
+    if (!r) return '—';
+    return municipioTexto(municipioVisible(
+      r.origen, r.municipio_nacimiento_historico_id, r.municipio_nacimiento_historico_texto, id => this.catMun.nombre(id)
+    )) || '—';
+  }
 
   puedeEditar(): boolean {
     return !!this.dialogRef && this.data?.puedeEditar === true && this.auth.puedeEditarNacimientos();
   }
 
   ngOnInit(): void {
+    this.catMun.cargar();
     if (this.data?.registro) {
       this.asignar(this.data.registro);
     } else if (this.data?.id) {

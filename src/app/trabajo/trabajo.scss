@@ -231,35 +231,6 @@ $radius: 4px;
   mat-icon { font-size: 15px; width: 15px; height: 15px; }
 }
 
-.recientes {
-  display: inline-flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.rec-label {
-  font-size: 12.5px;
-  color: $muted;
-}
-
-.rec-chip {
-  height: 26px;
-  min-height: 0;
-  width: auto;
-  padding: 0 10px;
-  border-radius: 13px;
-  border: 1px dashed $vino-line;
-  background: transparent;
-  @include mono;
-  font-size: 12.5px;
-  font-weight: 600;
-  color: $vino;
-  cursor: pointer;
-
-  &:hover { background: $vino-soft; border-style: solid; }
-}
-
 .f {
   display: flex;
   flex-direction: column;

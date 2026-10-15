@@ -75,14 +75,14 @@ export class ApiService {
       );
   }
 
-  confirmarPago(solicitudId: number): Observable<any> {
-    console.log('Request confirmarPago:', { solicitudId, url: `TU_URL/${solicitudId}` });
-    return this.http.post<any>(
-      `${this.baseUrl}/pagos/confirmar`,
-      { solicitud_id: solicitudId },
-      { headers: this.getHeaders() }
-    );
-  }
+    confirmarPago(solicitudId: number): Observable<any> {
+      console.log('Request confirmarPago:', { solicitudId, url: `TU_URL/${solicitudId}` });
+      return this.http.post<any>(
+        `${this.baseUrl}/pagos/confirmar`,
+        { solicitud_id: solicitudId },
+        { headers: this.getHeaders() }
+      );
+    }
 
   getActosRegistrales(): Observable<any> {
     return this.http
@@ -281,6 +281,31 @@ export class ApiService {
       headers: this.getHeaders(),
     });
   }
+
+  buscarRegistrosMatrimonio(filtros: BusquedaMatrimonio): Observable<ApiResp<RegistroMatrimonio[]>> {
+    return this.http.get<ApiResp<RegistroMatrimonio[]>>(`${this.baseUrl}/registros-matrimonio`, {
+      headers: this.getHeaders(),
+      params: this.toParams(filtros as Record<string, any>),
+    });
+  }
+
+  getRegistroMatrimonio(id: number): Observable<ApiResp<RegistroMatrimonio>> {
+    return this.http.get<ApiResp<RegistroMatrimonio>>(`${this.baseUrl}/registros-matrimonio/${id}`, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  crearRegistroMatrimonio(registro: Partial<RegistroMatrimonio>): Observable<ApiResp<RegistroMatrimonio>> {
+    return this.http.post<ApiResp<RegistroMatrimonio>>(`${this.baseUrl}/registros-matrimonio`, registro, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  actualizarRegistroMatrimonio(id: number, registro: Partial<RegistroMatrimonio>): Observable<ApiResp<RegistroMatrimonio>> {
+    return this.http.put<ApiResp<RegistroMatrimonio>>(`${this.baseUrl}/registros-matrimonio/${id}`, registro, {
+      headers: this.getHeaders(),
+    });
+  }
 }
 
 export interface ApiResp<T> {
@@ -297,10 +322,13 @@ export interface BusquedaNacimiento {
   apellido_paterno?: string;
   apellido_materno?: string;
   numero_acta?: number;
+  numero_acta_original?: string;
   anio_registro?: number;
   oficialia?: number;
   estado_registro_historico_id?: number;
+  municipio_registro_historico_id?: number;
   municipio?: string;
+  localidad?: string;
   fecha_registro?: string;
   nombre_padre?: string;
   apellido_paterno_padre?: string;
@@ -368,6 +396,73 @@ export interface RegistroNacimiento {
   nombre_presento: string | null;
   parentesco: string | null;
   edad_presento: number | null;
+  estatus_acervo: string | null;
+  fecha_migracion: string | null;
+}
+
+export interface BusquedaMatrimonio {
+  curp_matrimonial?: string;
+  id_satys?: number;
+  nombre_contrayente1?: string;
+  apellido_paterno_contrayente1?: string;
+  apellido_materno_contrayente1?: string;
+  fecha_nacimiento_contrayente1?: string;
+  nombre_contrayente2?: string;
+  apellido_paterno_contrayente2?: string;
+  apellido_materno_contrayente2?: string;
+  fecha_nacimiento_contrayente2?: string;
+  numero_acta?: number;
+  numero_acta_original?: string;
+  anio_registro?: number;
+  oficialia?: number;
+  estado_registro_historico_id?: number;
+  municipio_registro_historico_id?: number;
+  municipio?: string;
+  distrito_registro_historico_id?: number;
+  distrito?: string;
+  localidad?: string;
+  fecha_registro?: string;
+  limit?: number;
+  offset?: number;
+}
+
+export interface RegistroMatrimonio {
+  id: number;
+  origen: string | null;
+  id_satys: number | null;
+  curp_matrimonial: string | null;
+  estado_registro_historico_id: number | null;
+  estado_registro_historico_texto: string | null;
+  municipio_registro_historico_id: number | null;
+  municipio_registro_historico_texto: string | null;
+  distrito_registro_historico_id: number | null;
+  distrito_registro_historico_texto: string | null;
+  oficialia: number | null;
+  localidad_registro_historica_id: number | null;
+  localidad_registro_historica_texto: string | null;
+  dia_registro: number | null;
+  mes_registro: number | null;
+  anio_registro: number | null;
+  fecha_registro: string | null;
+  numero_acta: number | null;
+  numero_acta_original: string | null;
+  foja: string | number | null;
+  libro: string | null;
+  regimen_matrimonial: string | null;
+  nombre_contrayente1: string | null;
+  apellido_paterno_contrayente1: string | null;
+  apellido_materno_contrayente1: string | null;
+  sexo_contrayente1: string | null;
+  edad_contrayente1: number | null;
+  fecha_nacimiento_contrayente1: string | null;
+  nacionalidad_contrayente1_texto: string | null;
+  nombre_contrayente2: string | null;
+  apellido_paterno_contrayente2: string | null;
+  apellido_materno_contrayente2: string | null;
+  sexo_contrayente2: string | null;
+  edad_contrayente2: number | null;
+  fecha_nacimiento_contrayente2: string | null;
+  nacionalidad_contrayente2_texto: string | null;
   estatus_acervo: string | null;
   fecha_migracion: string | null;
 }

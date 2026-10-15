@@ -73,21 +73,13 @@
       </div>
     </form>
 
-    <div class="pie-busqueda">
-      @if (folioHojaValorada !== null) {
+    @if (folioHojaValorada !== null) {
+      <div class="pie-busqueda">
         <span class="hv-chip" matTooltip="Siguiente folio de hoja valorada disponible">
           <mat-icon>bookmark</mat-icon> HV siguiente <b>{{ siguienteFolioEsperado }}</b>
         </span>
-      }
-      @if (folios.lista().length) {
-        <span class="recientes">
-          <span class="rec-label">Generados hoy:</span>
-          @for (f of folios.lista().slice(0, 4); track f.folio) {
-            <button type="button" class="rec-chip" (click)="elegirFolio(f.folio)" [matTooltip]="f.nombre">{{ f.folio }}</button>
-          }
-        </span>
-      }
-    </div>
+      </div>
+    }
   </section>
 
   @if (busquedaHecha) {

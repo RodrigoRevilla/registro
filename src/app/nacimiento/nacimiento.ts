@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ElementRef, HostListener, ViewChild, WritableSignal, computed, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, ElementRef, HostListener, ViewChild, WritableSignal, computed, effect, inject, signal, untracked } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -13,10 +13,13 @@ import { Subject, takeUntil } from 'rxjs';
 import { ActaDetalleComponent } from '../acta-detalle/acta-detalle';
 import { ApiService, BusquedaNacimiento, RegistroNacimiento } from '../http';
 import { AuthService } from '../auth';
+import { CatalogoMunicipiosService } from '../catalogo-municipios';
 import {
   ENTIDADES,
   ENTIDADES_INEGI,
   formularioARegistro,
+  municipioTexto,
+  municipioVisible,
   nombreCompleto,
   normalizar,
   registroAFormulario,
@@ -24,6 +27,7 @@ import {
 
 interface Distrito { id_distrito: number; id_region: number; nombre: string; }
 interface Municipio { id_municipio: number; id_distrito: number; nombre: string; }
+interface Localidad { clave_edo: number; clave_mun: number; clave_local: number; descripcion: string; }
 
 @Component({
   selector: 'app-nacimiento',
@@ -48,6 +52,7 @@ export class NacimientoComponent implements OnInit, OnDestroy {
 
   @ViewChild('capturaRef') capturaRef?: ElementRef<HTMLElement>;
   @ViewChild('ayudaInput') ayudaInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('ayudaLocInput') ayudaLocInput?: ElementRef<HTMLInputElement>;
 
   busquedaForm: FormGroup;
   nacimientoForm: FormGroup;
@@ -70,6 +75,18 @@ export class NacimientoComponent implements OnInit, OnDestroy {
   filtroAyuda = signal('');
   municipiosAyuda = computed(() => this.filtrarMunicipios(this.filtroAyuda()));
 
+  municipioElegido = computed(() =>
+    this.entidadBusqueda() === this.entidadDefault ? this.resolverMunicipioBusqueda(this.filtroMunicipioBusqueda()) : null
+  );
+  localidades = signal<Localidad[]>([]);
+  cargandoLocalidades = signal(false);
+  filtroLocalidadBusqueda = signal('');
+  localidadesBusqueda = computed(() => this.filtrarLocalidades(this.filtroLocalidadBusqueda()).slice(0, 50));
+  ayudaLocalidades = signal(false);
+  filtroAyudaLoc = signal('');
+  localidadesAyuda = computed(() => this.filtrarLocalidades(this.filtroAyudaLoc()));
+  private municipioLocalidades: number | null = null;
+
   readonly pageSize = 20;
 
   resultados = signal<RegistroNacimiento[]>([]);
@@ -85,8 +102,10 @@ export class NacimientoComponent implements OnInit, OnDestroy {
   paginaActual = computed(() => Math.floor(this.offset() / this.pageSize) + 1);
   totalPaginas = computed(() => Math.max(1, Math.ceil(this.total() / this.pageSize)));
 
+  private readonly catMun = inject(CatalogoMunicipiosService);
+
   distritos = signal<Distrito[]>([]);
-  municipios = signal<Municipio[]>([]);
+  municipios = this.catMun.lista;
   filtroDistrito = signal('');
   filtroMunicipio = signal('');
   filtroDistritoNac = signal('');
@@ -95,11 +114,14 @@ export class NacimientoComponent implements OnInit, OnDestroy {
   distritosFiltrados = computed(() => this.filtrarPorNombre(this.distritos(), this.filtroDistrito()));
   distritosNacFiltrados = computed(() => this.filtrarPorNombre(this.distritos(), this.filtroDistritoNac()));
   municipiosFiltrados = computed(() =>
-    this.filtrarPorNombre(this.municipiosDeDistrito(this.filtroDistrito()), this.filtroMunicipio())
+    this.filtrarPorNumeroONombre(this.municipiosDeDistrito(this.filtroDistrito()), this.filtroMunicipio())
   );
   municipiosNacFiltrados = computed(() =>
-    this.filtrarPorNombre(this.municipiosDeDistrito(this.filtroDistritoNac()), this.filtroMunicipioNac())
+    this.filtrarPorNumeroONombre(this.municipiosDeDistrito(this.filtroDistritoNac()), this.filtroMunicipioNac())
   );
+
+  private originalMunicipio = { id: '', texto: '' };
+  private originalMunicipioNac = { id: '', texto: '' };
 
   readonly puedeEditar = signal(false);
 
@@ -116,7 +138,9 @@ export class NacimientoComponent implements OnInit, OnDestroy {
     this.busquedaForm = this.fb.group({
       entidad: [this.entidadDefault],
       municipio: [''],
+      localidad: [''],
       oficialia: [''],
+      anioRegistro: [''],
       fechaRegistro: [''],
       numeroActa: [''],
       nombre: [''],
@@ -135,13 +159,31 @@ export class NacimientoComponent implements OnInit, OnDestroy {
       this.filtroMunicipioBusqueda.set(typeof v === 'string' ? v : '');
     });
 
+    effect(() => {
+      this.municipioElegido();
+      untracked(() => this.actualizarLocalidades());
+    });
+
+    this.busquedaForm.get('localidad')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(v => {
+      this.filtroLocalidadBusqueda.set(typeof v === 'string' ? v : '');
+    });
+
+    this.busquedaForm.get('fechaRegistro')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((fecha: string) => {
+      const anio = /^(\d{4})-/.exec(fecha ?? '')?.[1];
+      if (anio) this.busquedaForm.patchValue({ anioRegistro: anio }, { emitEvent: false });
+    });
+
     this.busquedaForm.get('entidad')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(v => {
       this.entidadBusqueda.set(Number(v) || 0);
-      if (Number(v) !== this.entidadDefault) this.cerrarAyudaMunicipios();
+      if (Number(v) !== this.entidadDefault) {
+        this.cerrarAyudaMunicipios();
+        this.cerrarAyudaLocalidades();
+      }
     });
 
     this.nacimientoForm = this.fb.group({
       entidad: [''],
+      municipioId: [''],
       municipio: [''],
       oficialia: [''],
       distrito: [''],
@@ -152,6 +194,7 @@ export class NacimientoComponent implements OnInit, OnDestroy {
       curp: [''],
       curp_regciv: [''],
       entidadNacimiento: [''],
+      municipioNacimientoId: [''],
       municipioNacimiento: [''],
       distritoNacimiento: [''],
       localidad: [''],
@@ -185,9 +228,12 @@ export class NacimientoComponent implements OnInit, OnDestroy {
     });
 
     this.enlazarFiltro('distrito', this.filtroDistrito);
-    this.enlazarFiltro('municipio', this.filtroMunicipio);
+    this.enlazarFiltro('municipioId', this.filtroMunicipio);
     this.enlazarFiltro('distritoNacimiento', this.filtroDistritoNac);
-    this.enlazarFiltro('municipioNacimiento', this.filtroMunicipioNac);
+    this.enlazarFiltro('municipioNacimientoId', this.filtroMunicipioNac);
+
+    this.sincronizarMunicipio('municipioId', 'municipio');
+    this.sincronizarMunicipio('municipioNacimientoId', 'municipioNacimiento');
   }
 
   ngOnInit(): void {
@@ -217,10 +263,34 @@ export class NacimientoComponent implements OnInit, OnDestroy {
       next: resp => this.distritos.set(resp?.data ?? []),
       error: err => console.error('Error catálogo distritos:', err?.status),
     });
-    this.api.getMunicipios().pipe(takeUntil(this.destroy$)).subscribe({
-      next: resp => this.municipios.set(resp?.data ?? []),
-      error: err => console.error('Error catálogo municipios:', err?.status),
+    this.catMun.cargar();
+  }
+
+  private sincronizarMunicipio(controlNumero: string, controlTexto: string): void {
+    this.nacimientoForm.get(controlNumero)?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(v => {
+      const limpio = `${v ?? ''}`.replace(/\D/g, '');
+      if (limpio !== `${v ?? ''}`) {
+        this.nacimientoForm.get(controlNumero)?.setValue(limpio, { emitEvent: false });
+      }
+      const m = this.catMun.buscar(limpio);
+      this.nacimientoForm.get(controlTexto)?.setValue(m ? normalizar(m.nombre) : '', { emitEvent: false });
     });
+  }
+
+  private filtrarPorNumeroONombre(lista: Municipio[], texto: string): Municipio[] {
+    const q = normalizar(texto);
+    const orden = [...lista].sort((a, b) => a.id_municipio - b.id_municipio);
+    if (!q) return orden.slice(0, 50);
+    if (/^\d+$/.test(q)) {
+      return orden.filter(m => this.numeroMunicipio(m).startsWith(q) || `${m.id_municipio}`.startsWith(q)).slice(0, 50);
+    }
+    return orden.filter(m => normalizar(m.nombre).includes(q)).slice(0, 50);
+  }
+
+  municipioDe(r: RegistroNacimiento): string {
+    return municipioTexto(municipioVisible(
+      r.origen, r.municipio_registro_historico_id, r.municipio_registro_historico_texto, id => this.catMun.nombre(id)
+    )) || '—';
   }
 
   private filtrarPorNombre<T extends { nombre: string }>(lista: T[], texto: string): T[] {
@@ -248,6 +318,7 @@ export class NacimientoComponent implements OnInit, OnDestroy {
       this.cerrarAyudaMunicipios();
       return;
     }
+    this.cerrarAyudaLocalidades();
     this.filtroAyuda.set('');
     this.ayudaMunicipios.set(true);
     setTimeout(() => this.ayudaInput?.nativeElement.focus(), 50);
@@ -267,9 +338,100 @@ export class NacimientoComponent implements OnInit, OnDestroy {
     if (primero) this.elegirMunicipio(primero);
   }
 
+  private resolverMunicipioBusqueda(texto: string): Municipio | null {
+    const q = normalizar(texto);
+    if (!q) return null;
+    const lista = this.municipios();
+    if (/^\d+$/.test(q)) return lista.find(m => m.id_municipio === Number(q)) ?? null;
+    return lista.find(m => normalizar(m.nombre) === q) ?? null;
+  }
+
+  private actualizarLocalidades(): void {
+    const m = this.municipioElegido();
+    const id = m?.id_municipio ?? null;
+    if (id === this.municipioLocalidades) return;
+    if (this.municipioLocalidades !== null) this.busquedaForm.patchValue({ localidad: '' });
+    this.municipioLocalidades = id;
+    this.localidades.set([]);
+    this.cerrarAyudaLocalidades();
+    if (id !== null) this.cargarLocalidades(id, 0, []);
+  }
+
+  private cargarLocalidades(idMunicipio: number, offset: number, acumulado: Localidad[]): void {
+    this.cargandoLocalidades.set(true);
+    this.api.getLocalidades({ clave_edo: this.entidadDefault, clave_mun: idMunicipio, limit: 100, offset })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: resp => {
+          if (this.municipioLocalidades !== idMunicipio) return;
+          const data: Localidad[] = (resp?.data ?? []).map((l: Localidad) => this.completarLocalidad(l));
+          const lista = acumulado.concat(data);
+          const total = resp?.meta?.total ?? lista.length;
+          if (data.length && lista.length < total) {
+            this.localidades.set(lista);
+            this.cargarLocalidades(idMunicipio, offset + data.length, lista);
+            return;
+          }
+          this.localidades.set(lista);
+          this.cargandoLocalidades.set(false);
+        },
+        error: err => {
+          this.cargandoLocalidades.set(false);
+          console.error('Error catálogo localidades:', err?.status);
+        },
+      });
+  }
+
+  private completarLocalidad(l: Localidad): Localidad {
+    const nombre = `${l.descripcion ?? ''}`.trim();
+    if (nombre) return { ...l, descripcion: nombre };
+    const cabecera = Number(l.clave_local) === 1 ? `${this.municipioElegido()?.nombre ?? ''}`.trim().toUpperCase() : '';
+    return { ...l, descripcion: cabecera || `LOCALIDAD ${this.numeroLocalidad(l)}` };
+  }
+
+  private filtrarLocalidades(texto: string): Localidad[] {
+    const lista = [...this.localidades()].sort((a, b) => a.clave_local - b.clave_local);
+    const q = normalizar(texto);
+    if (!q) return lista;
+    if (/^\d+$/.test(q)) {
+      return lista.filter(l => this.numeroLocalidad(l).startsWith(q) || `${l.clave_local}`.startsWith(q));
+    }
+    return lista.filter(l => normalizar(l.descripcion).includes(q));
+  }
+
+  numeroLocalidad(l: Localidad): string {
+    return `${l.clave_local}`.padStart(4, '0');
+  }
+
+  abrirAyudaLocalidades(): void {
+    if (this.ayudaLocalidades()) {
+      this.cerrarAyudaLocalidades();
+      return;
+    }
+    this.cerrarAyudaMunicipios();
+    this.filtroAyudaLoc.set('');
+    this.ayudaLocalidades.set(true);
+    setTimeout(() => this.ayudaLocInput?.nativeElement.focus(), 50);
+  }
+
+  cerrarAyudaLocalidades(): void {
+    this.ayudaLocalidades.set(false);
+  }
+
+  elegirLocalidad(l: Localidad): void {
+    this.busquedaForm.patchValue({ localidad: l.descripcion });
+    this.cerrarAyudaLocalidades();
+  }
+
+  elegirPrimeraLocalidad(): void {
+    const primera = this.localidadesAyuda()[0];
+    if (primera) this.elegirLocalidad(primera);
+  }
+
   @HostListener('document:keydown.escape')
   onEscape(): void {
     if (this.ayudaMunicipios()) this.cerrarAyudaMunicipios();
+    if (this.ayudaLocalidades()) this.cerrarAyudaLocalidades();
   }
 
   private municipiosDeDistrito(nombreDistrito: string): Municipio[] {
@@ -285,6 +447,7 @@ export class NacimientoComponent implements OnInit, OnDestroy {
 
   cambiarModo(modo: 'registrales' | 'personales'): void {
     this.cerrarAyudaMunicipios();
+    this.cerrarAyudaLocalidades();
     this.modoBusqueda.set(modo);
     this.mensajeError.set('');
   }
@@ -305,6 +468,7 @@ export class NacimientoComponent implements OnInit, OnDestroy {
 
   limpiarBusqueda(): void {
     this.cerrarAyudaMunicipios();
+    this.cerrarAyudaLocalidades();
     this.busquedaForm.reset({ entidad: this.entidadDefault });
     this.incluirPadre.set(false);
     this.incluirMadre.set(false);
@@ -329,13 +493,16 @@ export class NacimientoComponent implements OnInit, OnDestroy {
     let filtros: BusquedaNacimiento;
     if (this.modoBusqueda() === 'registrales') {
       const fecha = str(f.fechaRegistro);
+      const mun = this.municipioElegido();
       filtros = {
         estado_registro_historico_id: num(f.entidad),
-        municipio: str(f.municipio) ? normalizar(f.municipio) : undefined,
+        municipio_registro_historico_id: mun ? mun.id_municipio : undefined,
+        municipio: !mun && str(f.municipio) ? normalizar(f.municipio) : undefined,
+        localidad: str(f.localidad) ? normalizar(f.localidad) : undefined,
         oficialia: num(f.oficialia),
         fecha_registro: fecha,
-        anio_registro: fecha ? num(fecha.slice(0, 4)) : undefined,
-        numero_acta: num(f.numeroActa),
+        anio_registro: num(f.anioRegistro) ?? (fecha ? num(fecha.slice(0, 4)) : undefined),
+        numero_acta_original: str(f.numeroActa),
       };
     } else {
       filtros = {
@@ -364,7 +531,7 @@ export class NacimientoComponent implements OnInit, OnDestroy {
     if (criterios.length === 0) {
       this.mensajeError.set(
         this.modoBusqueda() === 'registrales'
-          ? 'Captura al menos municipio, oficialía, fecha de registro o número de acta.'
+          ? 'Captura al menos municipio, localidad, oficialía, año, fecha de registro o número de acta.'
           : 'Captura al menos nombre, apellido o fecha de nacimiento del registrado, o datos del padre o la madre.'
       );
       this.busquedaHecha.set(true);
@@ -450,12 +617,22 @@ export class NacimientoComponent implements OnInit, OnDestroy {
     );
     this.filtroDistrito.set(datos.distrito);
     this.filtroDistritoNac.set(datos.distritoNacimiento);
+    this.originalMunicipio = { id: datos.municipioId, texto: datos.municipio };
+    this.originalMunicipioNac = { id: datos.municipioNacimientoId, texto: datos.municipioNacimiento };
+    const reg = municipioVisible(registro.origen, registro.municipio_registro_historico_id, registro.municipio_registro_historico_texto, id => this.catMun.nombre(id));
+    const nac = municipioVisible(registro.origen, registro.municipio_nacimiento_historico_id, registro.municipio_nacimiento_historico_texto, id => this.catMun.nombre(id));
+    this.nacimientoForm.patchValue(
+      { municipio: normalizar(reg.nombre), municipioNacimiento: normalizar(nac.nombre) },
+      { emitEvent: false }
+    );
     this.registroId.set(registro.id);
     this.abrirCaptura();
   }
 
   nuevoRegistro(): void {
     if (!this.permisoEdicion()) { this.denegarEdicion(); return; }
+    this.originalMunicipio = { id: '', texto: '' };
+    this.originalMunicipioNac = { id: '', texto: '' };
     this.nacimientoForm.reset();
     this.registroId.set(null);
     this.abrirCaptura();
@@ -488,7 +665,14 @@ export class NacimientoComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const regMun = this.resolverMunicipio(f.municipioId, this.originalMunicipio, 'de registro');
+    if (!regMun) return;
+    const nacMun = this.resolverMunicipio(f.municipioNacimientoId, this.originalMunicipioNac, 'de nacimiento');
+    if (!nacMun) return;
+
     const payload = formularioARegistro(f);
+    payload.municipio_registro_historico_texto = regMun.texto;
+    payload.municipio_nacimiento_historico_texto = nacMun.texto;
     const id = this.registroId();
     const peticion = id
       ? this.api.actualizarRegistroNacimiento(id, payload)
@@ -513,6 +697,24 @@ export class NacimientoComponent implements OnInit, OnDestroy {
         alert(err?.error?.error?.message ?? 'No se pudo guardar el registro.');
       },
     });
+  }
+
+  private resolverMunicipio(
+    numero: any,
+    original: { id: string; texto: string },
+    etiqueta: string,
+  ): { texto: string | null } | null {
+    const num = `${numero ?? ''}`.trim();
+    if (!num) return { texto: null };
+    if (num === original.id) {
+      return { texto: original.texto ? original.texto.trim().toUpperCase() : null };
+    }
+    const m = this.catMun.buscar(num);
+    if (!m) {
+      alert(`El municipio ${etiqueta} número ${num} no existe en el catálogo de municipios.`);
+      return null;
+    }
+    return { texto: normalizar(m.nombre) };
   }
 
   nombreDe(r: RegistroNacimiento): string {

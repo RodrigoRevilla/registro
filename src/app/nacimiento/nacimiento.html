@@ -37,7 +37,7 @@
         <mat-icon>article</mat-icon>
         <span class="modo-txt">
           <strong>Datos registrales</strong>
-          <small>Entidad, municipio, oficialía, fecha y número de acta</small>
+          <small>Municipio, localidad, oficialía, año y número de acta</small>
         </span>
         @if (modoBusqueda() === 'registrales') { <mat-icon class="modo-check">check_circle</mat-icon> }
       </button>
@@ -104,9 +104,63 @@
               </div>
             </ng-template>
           </div>
+          <div class="f f-mun">
+            <span>Localidad</span>
+            <div class="campo-ayuda" cdkOverlayOrigin #origenLoc="cdkOverlayOrigin">
+              <input formControlName="localidad" [matAutocomplete]="acLocBus"
+                     [placeholder]="municipioElegido() ? (cargandoLocalidades() ? 'Cargando…' : 'Número o nombre') : 'Elige municipio'">
+              <button type="button" class="btn-ayuda" [class.on]="ayudaLocalidades()"
+                      [disabled]="!municipioElegido() || !localidades().length"
+                      (click)="abrirAyudaLocalidades()" matTooltip="Ver lista de localidades">
+                <mat-icon>format_list_bulleted</mat-icon>
+              </button>
+            </div>
+            <mat-autocomplete #acLocBus="matAutocomplete" [panelWidth]="340">
+              @for (l of localidadesBusqueda(); track l.clave_local) {
+                <mat-option [value]="l.descripcion">
+                  <span class="opt-num">{{ numeroLocalidad(l) }}</span> {{ l.descripcion }}
+                </mat-option>
+              }
+            </mat-autocomplete>
+
+            <ng-template cdkConnectedOverlay
+                         [cdkConnectedOverlayOrigin]="origenLoc"
+                         [cdkConnectedOverlayOpen]="ayudaLocalidades()"
+                         [cdkConnectedOverlayHasBackdrop]="true"
+                         cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
+                         [cdkConnectedOverlayMinWidth]="340"
+                         [cdkConnectedOverlayOffsetY]="4"
+                         (backdropClick)="cerrarAyudaLocalidades()"
+                         (detach)="cerrarAyudaLocalidades()">
+              <div class="ayuda-panel" role="dialog" aria-label="Lista de localidades">
+                <div class="ayuda-buscar">
+                  <mat-icon>search</mat-icon>
+                  <input #ayudaLocInput placeholder="Buscar por número o nombre"
+                         [value]="filtroAyudaLoc()"
+                         (input)="filtroAyudaLoc.set($any($event.target).value)"
+                         (keydown.enter)="$event.preventDefault(); elegirPrimeraLocalidad()">
+                </div>
+                <div class="ayuda-lista">
+                  @for (l of localidadesAyuda(); track l.clave_local) {
+                    <button type="button" class="ayuda-item" (click)="elegirLocalidad(l)">
+                      <span class="num num-loc">{{ numeroLocalidad(l) }}</span>
+                      <span class="nom">{{ l.descripcion }}</span>
+                    </button>
+                  } @empty {
+                    <div class="ayuda-vacio">Sin coincidencias</div>
+                  }
+                </div>
+                <div class="ayuda-pie">{{ localidadesAyuda().length }} de {{ localidades().length }} localidades · {{ municipioElegido()?.nombre }}</div>
+              </div>
+            </ng-template>
+          </div>
           <label class="f">
             <span>Oficialía</span>
             <input formControlName="oficialia" inputmode="numeric">
+          </label>
+          <label class="f">
+            <span>Año</span>
+            <input formControlName="anioRegistro" inputmode="numeric" maxlength="4" class="mono">
           </label>
           <label class="f">
             <span>Fecha de registro</span>
@@ -255,7 +309,7 @@
                   <td class="num mono">{{ r.numero_acta ?? '—' }}</td>
                   <td class="num">{{ r.anio_registro ?? '—' }}</td>
                   <td class="num">{{ r.oficialia ?? '—' }}</td>
-                  <td>{{ r.municipio_registro_historico_texto || '—' }}</td>
+                  <td>{{ municipioDe(r) }}</td>
                   <td>{{ fechaNacDe(r) }}</td>
                   <td class="acciones">
                     <button type="button" class="btn btn-icon" matTooltip="Ver detalle"
@@ -317,20 +371,27 @@
                 }
               </mat-autocomplete>
             </label>
-            <label class="f c2">
+            <div class="f c3">
               <span>Municipio <i>*</i></span>
-              <input formControlName="municipio" [matAutocomplete]="acMun">
+              <div class="par">
+                <input formControlName="municipioId" class="cod mono" inputmode="numeric" placeholder="Núm."
+                       [matAutocomplete]="acMun" matTooltip="Escribe el número o el nombre y elige de la lista">
+                <input formControlName="municipio" readonly class="ro" placeholder="Del catálogo"
+                       matTooltip="Se llena del catálogo al cambiar el número">
+              </div>
               <mat-autocomplete #acMun="matAutocomplete">
                 @for (m of municipiosFiltrados(); track m.id_municipio) {
-                  <mat-option [value]="m.nombre">{{ m.nombre }}</mat-option>
+                  <mat-option [value]="'' + m.id_municipio">
+                    <span class="opt-num">{{ numeroMunicipio(m) }}</span> {{ m.nombre }}
+                  </mat-option>
                 }
               </mat-autocomplete>
-            </label>
+            </div>
             <label class="f c1">
               <span>Oficialía <i>*</i></span>
               <input formControlName="oficialia" inputmode="numeric">
             </label>
-            <label class="f c1">
+            <label class="f c2">
               <span>Acta <i>*</i></span>
               <input formControlName="numeroActa" class="mono">
             </label>
@@ -342,22 +403,13 @@
               <span>Libro</span>
               <input formControlName="libro">
             </label>
-            <label class="f c2">
-              <span>Estatus</span>
-              <select formControlName="status">
-                <option value="">—</option>
-                <option value="Vigente">Vigente</option>
-                <option value="Cancelada">Cancelada</option>
-                <option value="Rectificada">Rectificada</option>
-              </select>
-            </label>
 
-            <label class="f c3">
+            <label class="f c2">
               <span>Localidad</span>
               <input formControlName="localidad">
             </label>
             <label class="f c2">
-              <span>Fecha de registro <i>*</i></span>
+              <span>Fecha de registro</span>
               <input type="date" formControlName="fechaRegistro">
             </label>
             <label class="f c1">
@@ -368,9 +420,18 @@
               <span>CURP <i>*</i></span>
               <input formControlName="curp" class="mono" maxlength="20">
             </label>
-            <label class="f c3">
+            <label class="f c2">
               <span>CURP Registro Civil</span>
               <input formControlName="curp_regciv" class="mono" maxlength="20">
+            </label>
+            <label class="f c2">
+              <span>Estatus</span>
+              <select formControlName="status">
+                <option value="">—</option>
+                <option value="Vigente">Vigente</option>
+                <option value="Cancelada">Cancelada</option>
+                <option value="Rectificada">Rectificada</option>
+              </select>
             </label>
           </div>
         </fieldset>
@@ -424,15 +485,22 @@
                 }
               </mat-autocomplete>
             </label>
-            <label class="f c3">
+            <div class="f c3">
               <span>Municipio nac.</span>
-              <input formControlName="municipioNacimiento" [matAutocomplete]="acMunNac">
+              <div class="par">
+                <input formControlName="municipioNacimientoId" class="cod mono" inputmode="numeric" placeholder="Núm."
+                       [matAutocomplete]="acMunNac" matTooltip="Escribe el número o el nombre y elige de la lista">
+                <input formControlName="municipioNacimiento" readonly class="ro" placeholder="Del catálogo"
+                       matTooltip="Se llena del catálogo al cambiar el número">
+              </div>
               <mat-autocomplete #acMunNac="matAutocomplete">
                 @for (m of municipiosNacFiltrados(); track m.id_municipio) {
-                  <mat-option [value]="m.nombre">{{ m.nombre }}</mat-option>
+                  <mat-option [value]="'' + m.id_municipio">
+                    <span class="opt-num">{{ numeroMunicipio(m) }}</span> {{ m.nombre }}
+                  </mat-option>
                 }
               </mat-autocomplete>
-            </label>
+            </div>
             <label class="f c2">
               <span>Localidad nac.</span>
               <input formControlName="localidadNacimiento">

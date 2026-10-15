@@ -46,7 +46,7 @@
             <dt>Fecha registro</dt><dd>{{ formatearFecha(a.fechaRegistro) }}</dd>
             <dt>Entidad</dt><dd>{{ valor(a.entidad) }}</dd>
             <dt>Distrito</dt><dd>{{ valor(a.distrito) }}</dd>
-            <dt>Municipio</dt><dd>{{ valor(a.municipio) }}</dd>
+            <dt>Municipio</dt><dd>{{ municipioRegistro() }}</dd>
           </dl>
         </section>
 
@@ -56,7 +56,7 @@
             <dt>Fecha</dt><dd class="strong">{{ formatearFecha(a.fechaNacimiento) }}</dd>
             <dt>Hora</dt><dd>{{ a.horaNacimiento ? a.horaNacimiento + ' hrs' : '—' }}</dd>
             <dt>Entidad</dt><dd>{{ valor(a.entidadNacimiento) }}</dd>
-            <dt>Municipio</dt><dd>{{ valor(a.municipioNacimiento) }}</dd>
+            <dt>Municipio</dt><dd>{{ municipioNacimiento() }}</dd>
             <dt>Localidad</dt><dd>{{ valor(a.localidad) }}</dd>
             <dt>Sexo</dt><dd>{{ valor(getSexoLabel(a.sexo)) }}</dd>
             <dt>Estado vital</dt><dd>{{ valor(a.estadoVital) }}</dd>
