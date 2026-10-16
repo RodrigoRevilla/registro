@@ -306,6 +306,56 @@ export class ApiService {
       headers: this.getHeaders(),
     });
   }
+
+  buscarRegistrosDefuncion(filtros: BusquedaDefuncion): Observable<ApiResp<RegistroDefuncion[]>> {
+    return this.http.get<ApiResp<RegistroDefuncion[]>>(`${this.baseUrl}/registros-defuncion`, {
+      headers: this.getHeaders(),
+      params: this.toParams(filtros as Record<string, any>),
+    });
+  }
+
+  getRegistroDefuncion(id: number): Observable<ApiResp<RegistroDefuncion>> {
+    return this.http.get<ApiResp<RegistroDefuncion>>(`${this.baseUrl}/registros-defuncion/${id}`, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  crearRegistroDefuncion(registro: Partial<RegistroDefuncion>): Observable<ApiResp<RegistroDefuncion>> {
+    return this.http.post<ApiResp<RegistroDefuncion>>(`${this.baseUrl}/registros-defuncion`, registro, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  actualizarRegistroDefuncion(id: number, registro: Partial<RegistroDefuncion>): Observable<ApiResp<RegistroDefuncion>> {
+    return this.http.put<ApiResp<RegistroDefuncion>>(`${this.baseUrl}/registros-defuncion/${id}`, registro, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  buscarRegistrosReconocimiento(filtros: BusquedaReconocimiento): Observable<ApiResp<RegistroReconocimiento[]>> {
+    return this.http.get<ApiResp<RegistroReconocimiento[]>>(`${this.baseUrl}/registros-reconocimiento`, {
+      headers: this.getHeaders(),
+      params: this.toParams(filtros as Record<string, any>),
+    });
+  }
+
+  getRegistroReconocimiento(id: number): Observable<ApiResp<RegistroReconocimiento>> {
+    return this.http.get<ApiResp<RegistroReconocimiento>>(`${this.baseUrl}/registros-reconocimiento/${id}`, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  crearRegistroReconocimiento(registro: Partial<RegistroReconocimiento>): Observable<ApiResp<RegistroReconocimiento>> {
+    return this.http.post<ApiResp<RegistroReconocimiento>>(`${this.baseUrl}/registros-reconocimiento`, registro, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  actualizarRegistroReconocimiento(id: number, registro: Partial<RegistroReconocimiento>): Observable<ApiResp<RegistroReconocimiento>> {
+    return this.http.put<ApiResp<RegistroReconocimiento>>(`${this.baseUrl}/registros-reconocimiento/${id}`, registro, {
+      headers: this.getHeaders(),
+    });
+  }
 }
 
 export interface ApiResp<T> {
@@ -399,7 +449,6 @@ export interface RegistroNacimiento {
   estatus_acervo: string | null;
   fecha_migracion: string | null;
 }
-
 export interface BusquedaMatrimonio {
   curp_matrimonial?: string;
   id_satys?: number;
@@ -463,6 +512,122 @@ export interface RegistroMatrimonio {
   edad_contrayente2: number | null;
   fecha_nacimiento_contrayente2: string | null;
   nacionalidad_contrayente2_texto: string | null;
+  estatus_acervo: string | null;
+  fecha_migracion: string | null;
+}
+
+export interface BusquedaDefuncion {
+  llave?: string;
+  id_satys?: number;
+  nombre?: string;
+  apellido_paterno?: string;
+  apellido_materno?: string;
+  numero_acta?: number;
+  numero_acta_original?: string;
+  anio_registro?: number;
+  oficialia?: number;
+  estado_registro_historico_id?: number;
+  municipio_registro_historico_id?: number;
+  municipio?: string;
+  distrito_registro_historico_id?: number;
+  distrito?: string;
+  limit?: number;
+  offset?: number;
+}
+
+export interface RegistroDefuncion {
+  id: number;
+  origen: string | null;
+  id_satys: number | null;
+  llave: string | null;
+  estado_registro_historico_id: number | null;
+  estado_registro_historico_texto: string | null;
+  municipio_registro_historico_id: number | null;
+  municipio_registro_historico_texto: string | null;
+  distrito_registro_historico_id: number | null;
+  distrito_registro_historico_texto: string | null;
+  oficialia: number | null;
+  localidad_registro_historica_id: number | null;
+  localidad_registro_historica_texto: string | null;
+  tipo_defuncion: string | null;
+  dia_registro: number | null;
+  mes_registro: number | null;
+  anio_registro: number | null;
+  fecha_registro: string | null;
+  numero_acta: number | null;
+  numero_acta_original: string | null;
+  foja: string | number | null;
+  libro: string | null;
+  estado_defuncion_historico_id: number | null;
+  estado_defuncion_historico_texto: string | null;
+  municipio_defuncion_historico_id: number | null;
+  municipio_defuncion_historico_texto: string | null;
+  distrito_defuncion_historico_id: number | null;
+  distrito_defuncion_historico_texto: string | null;
+  localidad_defuncion_historica_id: number | null;
+  localidad_defuncion_historica_texto: string | null;
+  fecha_defuncion: string | null;
+  nombre: string | null;
+  apellido_paterno: string | null;
+  apellido_materno: string | null;
+  sexo: string | null;
+  edad: number | null;
+  estatus_acervo: string | null;
+  fecha_migracion: string | null;
+}
+
+export interface BusquedaReconocimiento {
+  id_satys?: number;
+  nombre_reconocido?: string;
+  apellido_paterno_reconocido?: string;
+  apellido_materno_reconocido?: string;
+  nombre_reconocedor?: string;
+  apellido_paterno_reconocedor?: string;
+  apellido_materno_reconocedor?: string;
+  numero_acta?: number;
+  numero_acta_original?: string;
+  anio_registro?: number;
+  oficialia?: number;
+  estado_registro_historico_id?: number;
+  municipio_registro_historico_id?: number;
+  municipio?: string;
+  distrito_registro_historico_id?: number;
+  distrito?: string;
+  localidad?: string;
+  fecha_registro?: string;
+  limit?: number;
+  offset?: number;
+}
+
+export interface RegistroReconocimiento {
+  id: number;
+  origen: string | null;
+  id_satys: number | null;
+  estado_registro_historico_id: number | null;
+  estado_registro_historico_texto: string | null;
+  municipio_registro_historico_id: number | null;
+  municipio_registro_historico_texto: string | null;
+  distrito_registro_historico_id: number | null;
+  distrito_registro_historico_texto: string | null;
+  oficialia: number | null;
+  localidad_registro_historica_id: number | null;
+  localidad_registro_historica_texto: string | null;
+  dia_registro: number | null;
+  mes_registro: number | null;
+  anio_registro: number | null;
+  fecha_registro: string | null;
+  numero_acta: number | null;
+  numero_acta_original: string | null;
+  foja: string | number | null;
+  libro: string | null;
+  nombre_reconocido: string | null;
+  apellido_paterno_reconocido: string | null;
+  apellido_materno_reconocido: string | null;
+  sexo_reconocido: string | null;
+  nombre_reconocedor: string | null;
+  apellido_paterno_reconocedor: string | null;
+  apellido_materno_reconocedor: string | null;
+  parentesco_reconocedor: string | null;
   estatus_acervo: string | null;
   fecha_migracion: string | null;
 }

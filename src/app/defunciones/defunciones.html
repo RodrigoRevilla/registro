@@ -1,0 +1,451 @@
+<header class="topbar">
+  <div class="topbar-inner">
+    <img class="topbar-escudo" src="/oaxaca.png" alt="Registro Civil" />
+    <div class="topbar-text">
+      <span class="topbar-sup">Registro Civil del Estado de Oaxaca</span>
+      <h1>Actas de Defunción</h1>
+    </div>
+    <div class="topbar-actions">
+      @if (puedeEditar()) {
+        <button type="button" class="btn btn-ghost-light" (click)="nuevoRegistro()">
+          <mat-icon>add</mat-icon> Nuevo registro
+        </button>
+      }
+      <button type="button" class="btn btn-ghost-light" (click)="solicitudManual()"
+              matTooltip="Generar la solicitud capturando los datos a mano">
+        <mat-icon>edit_note</mat-icon> Solicitud manual
+      </button>
+      <button type="button" class="btn btn-ghost-light" (click)="goHome()">
+        <mat-icon>arrow_back</mat-icon> Inicio
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+
+  @if (hojaGenerada(); as h) {
+    <section class="card aviso-hoja" role="status">
+      <mat-icon class="ah-icon">check_circle</mat-icon>
+      <div class="ah-txt">
+        <strong>Hoja de pago generada</strong>
+        <span>{{ h.nombre || 'Solicitud registrada' }} · lista para la siguiente búsqueda</span>
+      </div>
+      <div class="ah-dato">
+        <em>Folio</em>
+        <b class="mono">{{ h.folio }}</b>
+        <button type="button" class="btn btn-icon" (click)="folios.copiar(h.folio)" matTooltip="Copiar folio">
+          <mat-icon>{{ folios.copiado() === h.folio ? 'check' : 'content_copy' }}</mat-icon>
+        </button>
+      </div>
+      @if (h.lineaCaptura) {
+        <div class="ah-dato">
+          <em>Línea de captura</em>
+          <b class="mono">{{ h.lineaCaptura }}</b>
+          <button type="button" class="btn btn-icon" (click)="folios.copiar(h.lineaCaptura)" matTooltip="Copiar línea de captura">
+            <mat-icon>{{ folios.copiado() === h.lineaCaptura ? 'check' : 'content_copy' }}</mat-icon>
+          </button>
+        </div>
+      }
+      <div class="ah-acciones">
+        @if (h.urlPdf) {
+          <button type="button" class="btn btn-outline" (click)="reimprimirHoja(h.urlPdf)">
+            <mat-icon>print</mat-icon> Imprimir de nuevo
+          </button>
+        }
+        <button type="button" class="btn btn-icon" (click)="hojaGenerada.set(null)" matTooltip="Cerrar aviso">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </section>
+  }
+
+  <section class="card search-card">
+    <div class="search-tabs" role="tablist" aria-label="Tipo de búsqueda">
+      <span class="tabs-label">Buscar por</span>
+      <button type="button" role="tab" class="modo" [class.on]="modoBusqueda() === 'personales'"
+              [attr.aria-selected]="modoBusqueda() === 'personales'" (click)="cambiarModo('personales')">
+        <mat-icon>person_search</mat-icon>
+        <span class="modo-txt">
+          <strong>Datos personales</strong>
+          <small>Nombre y apellidos del finado</small>
+        </span>
+        @if (modoBusqueda() === 'personales') { <mat-icon class="modo-check">check_circle</mat-icon> }
+      </button>
+      <button type="button" role="tab" class="modo" [class.on]="modoBusqueda() === 'registrales'"
+              [attr.aria-selected]="modoBusqueda() === 'registrales'" (click)="cambiarModo('registrales')">
+        <mat-icon>article</mat-icon>
+        <span class="modo-txt">
+          <strong>Datos registrales</strong>
+          <small>Distrito, municipio, oficialía, acta, año y llave</small>
+        </span>
+        @if (modoBusqueda() === 'registrales') { <mat-icon class="modo-check">check_circle</mat-icon> }
+      </button>
+    </div>
+
+    <form [formGroup]="busquedaForm" (ngSubmit)="buscarActa()" autocomplete="off">
+
+      @if (modoBusqueda() === 'registrales') {
+        <div class="search-grid search-grid--def">
+          <label class="f">
+            <span>Entidad</span>
+            <select formControlName="entidad">
+              @for (e of entidadesInegi; track e.clave) {
+                <option [ngValue]="e.clave">{{ e.clave.toString().padStart(2, '0') }} · {{ e.nombre }}</option>
+              }
+            </select>
+          </label>
+          <label class="f">
+            <span>Distrito</span>
+            <input formControlName="distrito" placeholder="Nombre del distrito" [matAutocomplete]="acDisBus">
+            <mat-autocomplete #acDisBus="matAutocomplete">
+              @for (d of distritosBusqueda(); track d.id_distrito) {
+                <mat-option [value]="d.nombre">{{ d.nombre }}</mat-option>
+              }
+            </mat-autocomplete>
+          </label>
+          <div class="f f-mun">
+            <span>Municipio</span>
+            <div class="campo-ayuda" cdkOverlayOrigin #origenMun="cdkOverlayOrigin">
+              <input formControlName="municipio" placeholder="Número o nombre" [matAutocomplete]="acMunBus">
+              <button type="button" class="btn-ayuda" [class.on]="ayudaMunicipios()"
+                      [disabled]="entidadBusqueda() !== entidadDefault"
+                      (click)="abrirAyudaMunicipios()" matTooltip="Ver lista de municipios">
+                <mat-icon>format_list_bulleted</mat-icon>
+              </button>
+            </div>
+            <mat-autocomplete #acMunBus="matAutocomplete">
+              @for (m of municipiosBusqueda(); track m.id_municipio) {
+                <mat-option [value]="m.nombre">
+                  <span class="opt-num">{{ numeroMunicipio(m) }}</span> {{ m.nombre }}
+                </mat-option>
+              }
+            </mat-autocomplete>
+
+            <ng-template cdkConnectedOverlay
+                         [cdkConnectedOverlayOrigin]="origenMun"
+                         [cdkConnectedOverlayOpen]="ayudaMunicipios()"
+                         [cdkConnectedOverlayHasBackdrop]="true"
+                         cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
+                         [cdkConnectedOverlayMinWidth]="340"
+                         [cdkConnectedOverlayOffsetY]="4"
+                         (backdropClick)="cerrarAyudaMunicipios()"
+                         (detach)="cerrarAyudaMunicipios()">
+              <div class="ayuda-panel" role="dialog" aria-label="Lista de municipios">
+                <div class="ayuda-buscar">
+                  <mat-icon>search</mat-icon>
+                  <input #ayudaInput placeholder="Buscar por número o nombre"
+                         [value]="filtroAyuda()"
+                         (input)="filtroAyuda.set($any($event.target).value)"
+                         (keydown.enter)="$event.preventDefault(); elegirPrimerMunicipio()">
+                </div>
+                <div class="ayuda-lista">
+                  @for (m of municipiosAyuda(); track m.id_municipio) {
+                    <button type="button" class="ayuda-item" (click)="elegirMunicipio(m)">
+                      <span class="num">{{ numeroMunicipio(m) }}</span>
+                      <span class="nom">{{ m.nombre }}</span>
+                    </button>
+                  } @empty {
+                    <div class="ayuda-vacio">Sin coincidencias</div>
+                  }
+                </div>
+                <div class="ayuda-pie">{{ municipiosAyuda().length }} de {{ municipios().length }} municipios</div>
+              </div>
+            </ng-template>
+          </div>
+          <label class="f">
+            <span>Oficialía</span>
+            <input formControlName="oficialia" inputmode="numeric">
+          </label>
+          <label class="f">
+            <span>Núm. acta</span>
+            <input formControlName="numeroActa" inputmode="numeric" class="mono">
+          </label>
+          <label class="f">
+            <span>Año</span>
+            <input formControlName="anioRegistro" inputmode="numeric" maxlength="4" class="mono">
+          </label>
+          <label class="f">
+            <span>Llave</span>
+            <input formControlName="llave" class="mono">
+          </label>
+          <div class="search-actions">
+            <button type="submit" class="btn btn-primary" [disabled]="buscando()">
+              @if (buscando()) { <mat-spinner diameter="14"></mat-spinner> } @else { <mat-icon>search</mat-icon> }
+              Buscar
+            </button>
+            <button type="button" class="btn btn-icon" (click)="limpiarBusqueda()" matTooltip="Limpiar búsqueda">
+              <mat-icon>backspace</mat-icon>
+            </button>
+          </div>
+        </div>
+      } @else {
+        <div class="search-grid search-grid--per">
+          <span class="tag-row">Finado</span>
+          <label class="f">
+            <span>Nombre(s)</span>
+            <input formControlName="nombre">
+          </label>
+          <label class="f">
+            <span>Apellido paterno</span>
+            <input formControlName="apellidoPaterno">
+          </label>
+          <label class="f">
+            <span>Apellido materno</span>
+            <input formControlName="apellidoMaterno">
+          </label>
+          <div class="search-actions">
+            <button type="submit" class="btn btn-primary" [disabled]="buscando()">
+              @if (buscando()) { <mat-spinner diameter="14"></mat-spinner> } @else { <mat-icon>search</mat-icon> }
+              Buscar
+            </button>
+            <button type="button" class="btn btn-icon" (click)="limpiarBusqueda()" matTooltip="Limpiar búsqueda">
+              <mat-icon>backspace</mat-icon>
+            </button>
+          </div>
+        </div>
+      }
+
+    </form>
+  </section>
+
+  @if (busquedaHecha() || buscando()) {
+    <section class="card results-card">
+      <div class="card-bar">
+        <span class="card-title">
+          Resultados
+          <span class="count">{{ total() }}</span>
+        </span>
+        @if (totalPaginas() > 1) {
+          <div class="pager">
+            <button type="button" class="btn btn-icon" (click)="irAPagina(-1)" [disabled]="paginaActual() === 1 || buscando()">
+              <mat-icon>chevron_left</mat-icon>
+            </button>
+            <span>{{ paginaActual() }} / {{ totalPaginas() }}</span>
+            <button type="button" class="btn btn-icon" (click)="irAPagina(1)" [disabled]="paginaActual() === totalPaginas() || buscando()">
+              <mat-icon>chevron_right</mat-icon>
+            </button>
+          </div>
+        }
+      </div>
+
+      @if (buscando()) {
+        <div class="estado"><mat-spinner diameter="22"></mat-spinner> Consultando acervo…</div>
+      } @else if (mensajeError()) {
+        <div class="estado estado-error"><mat-icon>error_outline</mat-icon> {{ mensajeError() }}</div>
+      } @else if (resultados().length === 0) {
+        <div class="estado"><mat-icon>search_off</mat-icon> Sin coincidencias. Prueba con menos criterios.</div>
+      } @else {
+        <div class="tabla-wrap">
+          <table class="tabla">
+            <thead>
+              <tr>
+                <th>Finado</th>
+                <th class="num">Acta</th>
+                <th class="num">Año</th>
+                <th class="num">Of.</th>
+                <th>Municipio</th>
+                <th>Llave</th>
+                <th>Defunción</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (r of resultados(); track r.id) {
+                <tr (click)="verDetalle(r)" [class.activo]="r.id === registroId()">
+                  <td class="nombre">{{ nombreDe(r) }}</td>
+                  <td class="num mono">{{ actaDe(r) }}</td>
+                  <td class="num">{{ r.anio_registro ?? '—' }}</td>
+                  <td class="num">{{ r.oficialia ?? '—' }}</td>
+                  <td>{{ municipioDe(r) }}</td>
+                  <td class="mono">{{ r.llave || '—' }}</td>
+                  <td>{{ fechaDefDe(r) }}</td>
+                  <td class="acciones">
+                    <button type="button" class="btn btn-icon" matTooltip="Ver detalle"
+                            (click)="$event.stopPropagation(); verDetalle(r)">
+                      <mat-icon>visibility</mat-icon>
+                    </button>
+                    @if (puedeEditar()) {
+                      <button type="button" class="btn btn-icon" matTooltip="Editar"
+                              (click)="$event.stopPropagation(); editarRegistro(r)">
+                        <mat-icon>edit</mat-icon>
+                      </button>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+  }
+
+  @if (mostrarCaptura() && puedeEditar()) {
+    <section class="card captura-card" #capturaRef>
+      <div class="card-bar card-bar--dark">
+        <span class="card-title">
+          {{ registroId() ? 'Editar registro' : 'Nuevo registro' }}
+          @if (registroId()) { <span class="count">#{{ registroId() }}</span> }
+        </span>
+        <div class="bar-actions">
+          <button type="button" class="btn btn-light" (click)="guardarRegistro()" [disabled]="guardando()">
+            <mat-icon>save</mat-icon>
+            {{ guardando() ? 'Guardando…' : (registroId() ? 'Actualizar' : 'Guardar') }}
+          </button>
+          <button type="button" class="btn btn-icon btn-icon-light" (click)="cerrarCaptura()" matTooltip="Cerrar">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <form [formGroup]="defuncionForm" autocomplete="off" class="captura">
+
+        <fieldset class="grupo">
+          <legend>Datos del acta</legend>
+          <div class="g12">
+            <label class="f c2">
+              <span>Entidad <i>*</i></span>
+              <select formControlName="entidad">
+                <option value="">—</option>
+                @for (e of entidades; track e) { <option [value]="e">{{ e }}</option> }
+              </select>
+            </label>
+            <label class="f c2">
+              <span>Distrito</span>
+              <input formControlName="distrito" [matAutocomplete]="acDist">
+              <mat-autocomplete #acDist="matAutocomplete">
+                @for (d of distritosFiltrados(); track d.id_distrito) {
+                  <mat-option [value]="d.nombre">{{ d.nombre }}</mat-option>
+                }
+              </mat-autocomplete>
+            </label>
+            <div class="f c3">
+              <span>Municipio <i>*</i></span>
+              <div class="par">
+                <input formControlName="municipioId" class="cod mono" inputmode="numeric" placeholder="Núm."
+                       [matAutocomplete]="acMun" matTooltip="Escribe el número o el nombre y elige de la lista">
+                <input formControlName="municipio" readonly class="ro" placeholder="Del catálogo"
+                       matTooltip="Se llena del catálogo al cambiar el número">
+              </div>
+              <mat-autocomplete #acMun="matAutocomplete">
+                @for (m of municipiosFiltrados(); track m.id_municipio) {
+                  <mat-option [value]="'' + m.id_municipio">
+                    <span class="opt-num">{{ numeroMunicipio(m) }}</span> {{ m.nombre }}
+                  </mat-option>
+                }
+              </mat-autocomplete>
+            </div>
+            <label class="f c1">
+              <span>Oficialía <i>*</i></span>
+              <input formControlName="oficialia" inputmode="numeric">
+            </label>
+            <label class="f c2">
+              <span>Acta <i>*</i></span>
+              <input formControlName="numeroActa" class="mono">
+            </label>
+            <label class="f c1">
+              <span>Foja</span>
+              <input formControlName="foja">
+            </label>
+            <label class="f c1">
+              <span>Libro</span>
+              <input formControlName="libro">
+            </label>
+
+            <label class="f c2">
+              <span>Localidad</span>
+              <input formControlName="localidad">
+            </label>
+            <label class="f c2">
+              <span>Tipo def.</span>
+              <input formControlName="tipoDefuncion">
+            </label>
+            <label class="f c2">
+              <span>Fecha de registro</span>
+              <input type="date" formControlName="fechaRegistro">
+            </label>
+            <label class="f c1">
+              <span>Año</span>
+              <input formControlName="anioRegistro" maxlength="4">
+            </label>
+            <label class="f c3">
+              <span>Llave</span>
+              <input formControlName="llave" class="mono">
+            </label>
+            <label class="f c2">
+              <span>Estatus</span>
+              <select formControlName="status">
+                <option value="">—</option>
+                <option value="VIGENTE">Vigente</option>
+                <option value="CANCELADA">Cancelada</option>
+                <option value="RECTIFICADA">Rectificada</option>
+              </select>
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset class="grupo">
+          <legend>Lugar de defunción</legend>
+          <div class="g12">
+            <label class="f c2">
+              <span>Entidad</span>
+              <select formControlName="entidadDefuncion">
+                <option value="">—</option>
+                @for (e of entidades; track e) { <option [value]="e">{{ e }}</option> }
+                <option value="Extranjero">Extranjero</option>
+              </select>
+            </label>
+            <label class="f c2">
+              <span>Distrito</span>
+              <input formControlName="distritoDefuncion">
+            </label>
+            <label class="f c3">
+              <span>Municipio</span>
+              <input formControlName="municipioDefuncion">
+            </label>
+            <label class="f c3">
+              <span>Localidad</span>
+              <input formControlName="localidadDefuncion">
+            </label>
+            <label class="f c2">
+              <span>Fecha de defunción</span>
+              <input type="date" formControlName="fechaDefuncion">
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset class="grupo">
+          <legend>Nombre del finado</legend>
+          <div class="g12">
+            <label class="f c3">
+              <span>Nombre(s) <i>*</i></span>
+              <input formControlName="nombre">
+            </label>
+            <label class="f c3">
+              <span>Apellido paterno <i>*</i></span>
+              <input formControlName="apellidoPaterno">
+            </label>
+            <label class="f c3">
+              <span>Apellido materno</span>
+              <input formControlName="apellidoMaterno">
+            </label>
+            <div class="f c2">
+              <span>Sexo</span>
+              <div class="seg">
+                <button type="button" [class.on]="defuncionForm.value.sexo === 'M'" (click)="setSexo('M')">Masculino</button>
+                <button type="button" [class.on]="defuncionForm.value.sexo === 'F'" (click)="setSexo('F')">Femenino</button>
+              </div>
+            </div>
+            <label class="f c1">
+              <span>Edad</span>
+              <input type="number" formControlName="edad" min="0" max="130">
+            </label>
+          </div>
+        </fieldset>
+
+      </form>
+    </section>
+  }
+
+</main>

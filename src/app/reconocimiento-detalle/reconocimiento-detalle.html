@@ -1,0 +1,83 @@
+<div class="ficha">
+
+  <header class="ficha-head">
+    @if (registro(); as r) {
+      <div class="avatar">{{ iniciales(r) }}</div>
+      <div class="who">
+        <span class="sup">Acta de reconocimiento · Acta {{ valor(acta(r)) }} · {{ valor(r.anio_registro) }}</span>
+        <h2>{{ titulo(r) }}</h2>
+        <div class="chips">
+          @if (r.oficialia) { <span class="chip">Oficialía {{ r.oficialia }}</span> }
+          @if (r.estatus_acervo) { <span class="chip">{{ r.estatus_acervo }}</span> }
+          @if (r.origen) { <span class="chip chip-soft">{{ r.origen }}</span> }
+        </div>
+      </div>
+    } @else {
+      <div class="who">
+        <span class="sup">Registro Civil del Estado</span>
+        <h2>Acta de reconocimiento</h2>
+      </div>
+    }
+    <button type="button" class="btn-x" (click)="cerrar()" aria-label="Cerrar">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+
+  <div class="ficha-body">
+    @if (cargando()) {
+      <div class="estado"><mat-spinner diameter="24"></mat-spinner> Cargando registro…</div>
+    } @else if (error()) {
+      <div class="estado estado-error"><mat-icon>error_outline</mat-icon> {{ error() }}</div>
+    } @else if (registro(); as r) {
+      <div class="cols">
+
+        <section class="bloque">
+          <h3><mat-icon>article</mat-icon> Datos del acta</h3>
+          <dl class="kv">
+            <dt>Núm. acta</dt><dd class="mono strong">{{ valor(acta(r)) }}</dd>
+            <dt>Año</dt><dd>{{ valor(r.anio_registro) }}</dd>
+            <dt>Oficialía</dt><dd>{{ valor(r.oficialia) }}</dd>
+            <dt>Foja</dt><dd>{{ valor(r.foja) }}</dd>
+            <dt>Libro</dt><dd>{{ valor(r.libro) }}</dd>
+            <dt>Fecha registro</dt><dd>{{ formatearFecha(fechaRegistro(r)) }}</dd>
+            <dt>Entidad</dt><dd>{{ valor(r.estado_registro_historico_texto) }}</dd>
+            <dt>Distrito</dt><dd>{{ valor(r.distrito_registro_historico_texto) }}</dd>
+            <dt>Municipio</dt><dd>{{ municipio() }}</dd>
+            <dt>Localidad</dt><dd>{{ valor(r.localidad_registro_historica_texto) }}</dd>
+          </dl>
+        </section>
+
+        <section class="bloque">
+          <h3><mat-icon>person</mat-icon> Reconocido</h3>
+          <dl class="kv">
+            <dt>Nombre</dt><dd class="strong">{{ valor(reconocido(r)) }}</dd>
+            <dt>Sexo</dt><dd>{{ valor(sexo(r)) }}</dd>
+            <dt>Estatus</dt><dd>{{ valor(r.estatus_acervo) }}</dd>
+          </dl>
+        </section>
+
+        <section class="bloque">
+          <h3><mat-icon>how_to_reg</mat-icon> Reconocedor</h3>
+          <dl class="kv">
+            <dt>Nombre</dt><dd class="strong">{{ valor(reconocedor(r)) }}</dd>
+            <dt>Parentesco</dt><dd>{{ valor(r.parentesco_reconocedor) }}</dd>
+          </dl>
+        </section>
+
+      </div>
+    }
+  </div>
+
+  <footer class="ficha-foot">
+    <button type="button" class="btn btn-ghost" (click)="cerrar()">Cerrar</button>
+    @if (puedeEditar()) {
+      <button type="button" class="btn btn-outline" (click)="editar()" [disabled]="!registro()">
+        <mat-icon>edit</mat-icon> Editar
+      </button>
+    }
+    <button type="button" class="btn btn-primary" (click)="generar()" [disabled]="!registro()">
+      <mat-icon>description</mat-icon> Generar certificación
+    </button>
+  </footer>
+
+</div>

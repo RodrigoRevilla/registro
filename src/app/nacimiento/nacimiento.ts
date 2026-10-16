@@ -271,7 +271,7 @@ export class NacimientoComponent implements OnInit, OnDestroy {
 
   private cargarCatalogos(): void {
     this.api.getDistritos().pipe(takeUntil(this.destroy$)).subscribe({
-      next: resp => this.distritos.set(resp?.data ?? []),
+      next: resp => this.distritos.set((resp?.data ?? []).filter((d: Distrito) => `${d.nombre ?? ''}`.trim())),
       error: err => console.error('Error catálogo distritos:', err?.status),
     });
     this.catMun.cargar();

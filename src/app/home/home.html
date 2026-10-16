@@ -78,8 +78,12 @@
                   <button mat-menu-item (click)="irAMatrimonios($event)">
                     <mat-icon>favorite</mat-icon> Matrimonio
                   </button>
-                  <button mat-menu-item disabled><mat-icon>sentiment_very_dissatisfied</mat-icon> Defunciones</button>
-                  <button mat-menu-item disabled><mat-icon>how_to_reg</mat-icon> Reconocimientos</button>
+                  <button mat-menu-item (click)="irADefunciones($event)">
+                    <mat-icon>sentiment_very_dissatisfied</mat-icon> Defunciones
+                  </button>
+                  <button mat-menu-item (click)="irAReconocimientos($event)">
+                    <mat-icon>how_to_reg</mat-icon> Reconocimientos
+                  </button>
                   <button mat-menu-item disabled><mat-icon>gavel</mat-icon> Divorcios</button>
                   <button mat-menu-item disabled><mat-icon>child_friendly</mat-icon> Adopciones</button>
                   <button mat-menu-item disabled><mat-icon>assignment</mat-icon> Inscripción de Sentencias</button>

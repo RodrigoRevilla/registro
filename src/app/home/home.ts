@@ -184,6 +184,16 @@ export class HomeComponent implements OnInit {
     this.router.navigate(['/matrimonios']);
   }
 
+  irADefunciones(event: MouseEvent) {
+    event?.stopImmediatePropagation();
+    this.router.navigate(['/defunciones']);
+  }
+
+  irAReconocimientos(event: MouseEvent) {
+    event?.stopImmediatePropagation();
+    this.router.navigate(['/reconocimientos']);
+  }
+
   irAReimpresionSolicitudes(event: Event): void {
     event.stopPropagation();
     this.router.navigate(['/reimpresion-solicitudes']);
